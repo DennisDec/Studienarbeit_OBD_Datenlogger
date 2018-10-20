@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -21,6 +22,26 @@ app.set('view engine', 'hbs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Use Express Validator
+app.use(expressValidator({ 
+  customValidators: {                           // create custom validators
+    usernameExists: function(username) {        // create a validator with the name of 'usernameExists' and make it a function
+      return new Promise(function(resolve, reject) {
+        const db = require('./db.js');
+        db.query('SELECT id FROM users WHERE username = ?', [username], function(err, results, fields) {
+          if (err) reject(err);
+          if(results.length === 0) {            
+            resolve();
+          } else {
+            reject();
+          }
+        })
+      })
+    }
+  }
+}));
+
 app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'public')));
 
