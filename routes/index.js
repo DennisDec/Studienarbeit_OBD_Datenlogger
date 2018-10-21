@@ -1,16 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var expressValidator = require('express-validator');
+var passport = require('passport');
 const bcrypt = require('bcrypt');
 
+const saltRounds = 10;
 
 // GET home page
 router.get('/', function(req, res) {
   res.render('home', { title: 'Home' });
 });
 
-// GET profile page
-router.get('/profile', function(req, res, next) {
+// GET profile page; only accessable for authenticated users
+router.get('/profile', authenticationMiddleware(), function(req, res, next) {
   res.render('profile', { title: 'Profile' });
 });
 
@@ -18,6 +20,11 @@ router.get('/profile', function(req, res, next) {
 router.get('/login', function(req, res, next) {
   res.render('login', { title: 'Login' });
 });
+// handle POST of login page; use passport to authenticate the user
+router.post('/login', passport.authenticate('local', {
+  successRedirect: '/profile',
+  failureRedirect: '/login'
+}));
 
 // GET register page
 router.get('/register', function(req, res, next) {
@@ -36,7 +43,7 @@ router.post('/register', function(req, res, next) {
   req.checkBody('passwordMatch', 'Password must be between 8-100 characters long.').len(8, 100);
   req.checkBody('passwordMatch', 'Passwords do not match, please try again.').equals(req.body.password);
   req.checkBody('username', 'Username already exists.').usernameExists(req.body.username);
-  
+       
   //const errors = req.validationErrors();
   // due to the custom check async errors can occur
   req.asyncValidationErrors().then(function() {
@@ -59,11 +66,37 @@ router.post('/register', function(req, res, next) {
       bcrypt.hash(password, saltRounds, function(err, hash) {
         db.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hash], function(error, results, fields) {    // use ? so that you can't hack the server with unwanted inputs
           if(error) throw error;
-          res.render('register', { title: 'Registration complete' });
+          // login in the user with the user_id that was automatically created by MySQL
+          db.query('SELECT LAST_INSERT_ID() as user_id', function(error, results, fields) {
+            if(error) throw error;
+            const user_id = results[0];
+            console.log(user_id);
+            // login (passport) uses serialization-function
+            req.login(user_id, function(err) {
+              res.redirect('/');
+            });
+          });
         });
       });
     } 
   });
 });
+
+// save the user_id as a session information
+passport.serializeUser(function(user_id, done) {
+  done(null, user_id);
+});
+// read all session information
+passport.deserializeUser(function(user_id, done) {
+  done(null, user_id);
+});
+// check whether the user is authenticated, if not redirect him to the login page
+function authenticationMiddleware() {
+  return (req, res, next) => {
+    console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
+    if (req.isAuthenticated()) return next();
+    res.redirect('/login');
+  }
+}
 
 module.exports = router;

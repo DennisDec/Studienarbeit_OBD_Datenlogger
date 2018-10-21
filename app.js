@@ -6,6 +6,12 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
 
+var session = require('express-session');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var MySQLStore = require('express-mysql-session')(session);
+var bcrypt = require('bcrypt');
+
 var index = require('./routes/index');
 var users = require('./routes/users');
 
@@ -45,8 +51,59 @@ app.use(expressValidator({
 app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'public')));
 
+// set up a session and save it in MySQL when the user is authenticated
+var options = {
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database : process.env.DB_NAME
+};
+// saves the session information in MySQL
+var sessionStore = new MySQLStore(options);
+
+app.use(session({
+  secret: 'aiuwhdhwoawd',   
+  store: sessionStore,
+  resave: 'false',          // doesn't resave the session information after every refresh
+  saveUninitialized: false  // saves session information only if user is initialized
+}));
+
+// use passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// every route is now able to see whether the user is authenticated 
+app.use(function(req, res, next) {
+  res.locals.isAuthenticated = req.isAuthenticated();   
+  next();
+});
+
 app.use('/', index);
 app.use('/users', users);
+
+// set up the strategy for passport
+// therefor the input password has to be compared to the saved password
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    console.log(username);
+    const db = require('./db.js');
+    db.query('SELECT id, password FROM users WHERE username = ?', [username], function(err, results, fields) {
+      if (err) done(err);
+      if(results.length === 0) {    
+        done(null, false);
+      } else {
+        const hash = results[0].password.toString();
+        bcrypt.compare(password, hash, function(err, response) {
+          if (response === true) {
+            return done(null, {user_id: results[0].id});
+          } else {
+            return done(null, false);
+          }
+        });
+      }
+    });  
+  }
+));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
