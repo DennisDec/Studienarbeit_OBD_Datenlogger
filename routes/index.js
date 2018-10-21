@@ -42,30 +42,36 @@ router.post('/register', function(req, res, next) {
   req.checkBody("password", "Password must include one lowercase character, one uppercase character, a number, and a special character.").matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.* )(?=.*[^a-zA-Z0-9]).{8,}$/, "i");
   req.checkBody('passwordMatch', 'Password must be between 8-100 characters long.').len(8, 100);
   req.checkBody('passwordMatch', 'Passwords do not match, please try again.').equals(req.body.password);
-  req.checkBody('username', 'Username already exists.').usernameExists(req.body.username);
        
-  //const errors = req.validationErrors();
-  // due to the custom check async errors can occur
-  req.asyncValidationErrors().then(function() {
-    next();
-  }).catch(function(errors) {
-    if(errors) {
-      // if errors occur they should be outputted on the register page
-      console.log(`errors: ${JSON.stringify(errors)}`);
-      res.render('register', { 
-        title: 'Registration failed',
-        errors: errors
-      });
-    } else {
-      const username = req.body.username;
-      const email = req.body.email;
-      const password = req.body.password;
-      // connect to a MySQL server
-      const db = require('../db.js');
-      // hash the password and save the hash into the MySQL server
-      bcrypt.hash(password, saltRounds, function(err, hash) {
-        db.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hash], function(error, results, fields) {    // use ? so that you can't hack the server with unwanted inputs
-          if(error) throw error;
+  const errors = req.validationErrors();
+  
+  if(errors) {
+    // if errors occur they should be outputted on the register page
+    console.log(`errors: ${JSON.stringify(errors)}`);
+    res.render('register', { 
+      title: 'Registration failed',
+      errors: errors
+    });
+  } else {
+    const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.password;
+    // connect to a MySQL server
+    const db = require('../db.js');
+    // hash the password and save the hash into the MySQL server
+    bcrypt.hash(password, saltRounds, function(err, hash) {
+      db.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hash], function(error, results, fields) {    // use ? so that you can't hack the server with unwanted inputs
+        if(error) {
+          console.log(`errors: ${JSON.stringify(error)}`);
+          var error = [{
+            msg: 'Duplicate Error'
+          }]
+          console.log(`errors: ${JSON.stringify(error)}`);
+          res.render('register', { 
+            title: 'Registration failed',
+            errors: error
+          });
+        } else {
           // login in the user with the user_id that was automatically created by MySQL
           db.query('SELECT LAST_INSERT_ID() as user_id', function(error, results, fields) {
             if(error) throw error;
@@ -76,10 +82,10 @@ router.post('/register', function(req, res, next) {
               res.redirect('/');
             });
           });
-        });
+        }
       });
-    } 
-  });
+    });
+  } 
 });
 
 // save the user_id as a session information

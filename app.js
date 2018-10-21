@@ -30,23 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Use Express Validator
-app.use(expressValidator({ 
-  customValidators: {                           // create custom validators
-    usernameExists: function(username) {        // create a validator with the name of 'usernameExists' and make it a function
-      return new Promise(function(resolve, reject) {
-        const db = require('./db.js');
-        db.query('SELECT id FROM users WHERE username = ?', [username], function(err, results, fields) {
-          if (err) reject(err);
-          if(results.length === 0) {            
-            resolve();
-          } else {
-            reject();
-          }
-        })
-      })
-    }
-  }
-}));
+app.use(expressValidator());
 
 app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'public')));
