@@ -34,3 +34,5 @@ npm-debug.log
 
 # Local env file with credentials
 .env
+
+src/maps/markes.json

@@ -14,8 +14,9 @@ var printMarkers = async function() {
     for ( var i=0; i < markers.length; ++i ) 
     {
     L.marker( [markers[i].lat, markers[i].lng] )
-        .bindPopup( '<a href="' + markers[i].url + '" target="_blank">' + markers[i].name + '</a>' )
+        .bindPopup( '<p>' + markers[i].route_name + '</p>' )
         .addTo( map );
     }
 }
+
 printMarkers();

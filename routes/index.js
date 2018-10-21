@@ -13,6 +13,16 @@ router.get('/', function(req, res) {
 
 // GET profile page; only accessable for authenticated users
 router.get('/profile', authenticationMiddleware(), function(req, res, next) {
+  // get GPS-data from the MySQL-server and save it into a json-file  
+  var db = require('../db.js');
+  var fs = require('fs');
+  db.query('SELECT * FROM gpsdata', function(err, results, fields) {
+    if(err) throw err;
+    fs.writeFile('src/maps/markers.json', JSON.stringify(results), function (err) {
+      if (err) throw err;
+      console.log('GPS-data saved');
+    });
+  });
   res.render('profile', { title: 'Profile' });
 });
 
