@@ -13,10 +13,23 @@ var printMarkers = async function() {
 
     for ( var i=0; i < markers.length; ++i ) 
     {
-    L.marker( [markers[i].lat, markers[i].lng] )
-        .bindPopup( '<p>' + markers[i].route_name + '</p>' )
-        .addTo( map );
+        L.marker( [markers[i].lat, markers[i].lng] )
+            .bindPopup( '<p>' + markers[i].route_name + '</p>' )
+            .addTo( map );
+        if ((i + 1)  < markers.length) {
+            var latlngs = Array();
+            latlngs.push({ 
+                "lat": markers[i].lat,
+                "lng":markers[i].lng
+            });
+            latlngs.push({ 
+                "lat": markers[i+1].lat,
+                "lng":markers[i+1].lng
+            });
+            var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+        }
     }
+    map.fitBounds(polyline.getBounds());
 }
 
 printMarkers();
