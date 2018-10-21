@@ -4,6 +4,14 @@
     
     <h1>{{title}}</h1>
 
+    {{#if errors}}
+        {{#each errors}}
+            <div class="alert alert-danger" role="alert">
+                {{this.msg}}
+            </div>
+        {{/each}}
+    {{/if}}
+
     <form method="POST" action="/login">
         <div class="form-group">
             <label for="username">Username</label>

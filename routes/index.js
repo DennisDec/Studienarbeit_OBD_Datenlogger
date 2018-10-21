@@ -23,8 +23,19 @@ router.get('/login', function(req, res, next) {
 // handle POST of login page; use passport to authenticate the user
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/profile',
-  failureRedirect: '/login'
+  failureRedirect: '/loginFail'
 }));
+// after unsuccessful login head to route /loginFail and show error message
+router.get('/loginFail', function(req, res, next) {
+  var error = [{
+    msg: 'Duplicate Error'
+  }]
+  console.log(`errors: ${JSON.stringify(error)}`);
+  res.render('login', { 
+    title: 'Login failed',
+    errors: error
+  });
+});
 
 // Destroy session via logout button
 router.get('/logout', function(req, res, next) {
