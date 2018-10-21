@@ -33,7 +33,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(expressValidator());
 
 app.use(cookieParser());
-//app.use(express.static(path.join(__dirname, 'public')));
+
+// so that maps are available for every middleware
+app.use(express.static(path.join(__dirname, 'src')));
 
 // set up a session and save it in MySQL when the user is authenticated
 var options = {

@@ -28,7 +28,7 @@ router.post('/login', passport.authenticate('local', {
 // after unsuccessful login head to route /loginFail and show error message
 router.get('/loginFail', function(req, res, next) {
   var error = [{
-    msg: 'Duplicate Error'
+    msg: 'Incorrect username or password.'
   }]
   console.log(`errors: ${JSON.stringify(error)}`);
   res.render('login', { 
@@ -84,7 +84,7 @@ router.post('/register', function(req, res, next) {
         if(error) {
           console.log(`errors: ${JSON.stringify(error)}`);
           var error = [{
-            msg: 'Duplicate Error'
+            msg: 'Username already exists.'
           }]
           console.log(`errors: ${JSON.stringify(error)}`);
           res.render('register', { 
