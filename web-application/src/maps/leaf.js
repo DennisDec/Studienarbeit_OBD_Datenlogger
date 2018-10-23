@@ -20,16 +20,17 @@ var printMarkers = async function() {
             var latlngs = Array();
             latlngs.push({ 
                 "lat": markers[i].lat,
-                "lng":markers[i].lng
+                "lng": markers[i].lng
             });
             latlngs.push({ 
                 "lat": markers[i+1].lat,
-                "lng":markers[i+1].lng
+                "lng": markers[i+1].lng
             });
             var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
         }
     }
-    map.fitBounds(polyline.getBounds());
+    var bounds = L.latLngBounds(markers);
+    map.fitBounds(bounds);
 }
 
 printMarkers();
