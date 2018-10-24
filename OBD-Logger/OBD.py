@@ -10,7 +10,7 @@ NotConnected = True
 
 filename = datetime.datetime.now().strftime("%y_%m_%d_%H:%M:%S_") + "test.csv"
 
-
+#PID's which we want to get
 PidsMode1 = [4, 12, 13, 17, 31, 47, 70, 81, 90, 94, 127, 154]
 
 while NotConnected:
@@ -30,8 +30,12 @@ HeaderCSV = ["Time", "Speed", "RPM"]
 log = LogFile()
 log.createLogfile(filename, HeaderCSV)
 
-while (connection.query(obd.commands.RPM).is_null() == True):
-    time.sleep(4)
+IgnitionStep2 = False
+while (IgnitionStep2 == False):
+    
+    if(connection.query(obd.commands.RPM).is_null() == False):
+        IgnitionStep2 = True
+    time.sleep(3)
     
 while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and (connection.query(obd.commands.RPM).is_null() == False)):
     
