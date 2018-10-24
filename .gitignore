@@ -1,1 +1,6 @@
 OBD-Logger/__pycache__/LogFile.cpython-35.pyc
+.vscode/settings.json
+OBD-Logger/__pycache__/LogFile_test.cpython-35.pyc
+OBD-Logger/Files/Unittest.csv
+OBD-Logger/Files/TestFile.csv
+OBD-Logger/LogFile_test.py
