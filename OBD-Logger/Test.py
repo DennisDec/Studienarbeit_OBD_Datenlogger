@@ -6,8 +6,6 @@ import datetime
 import time
 
 
-print(os.getcwd())
-
 filename = 'TestFile.csv'
 log = LogFile()
 log.createLogfile(filename, ["Time", "Speed", "RPM"])
