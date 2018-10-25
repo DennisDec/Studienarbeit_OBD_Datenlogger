@@ -5,3 +5,5 @@ OBD-Logger/Files/Unittest.csv
 OBD-Logger/Files/TestFile.csv
 OBD-Logger/LogFile_test.py
 .vscode/launch.json
+OBD-Logger/Files/TestFile.csv
+OBD-Logger/OBDHandler_async.py
