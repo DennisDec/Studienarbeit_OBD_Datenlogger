@@ -6,26 +6,26 @@ import datetime
 import time
 
 
-filename = 'TestFile.csv'
-log = LogFile()
-log.createLogfile(filename, ["Time", "Speed", "RPM"])
+# filename = 'TestFile.csv'
+# log = LogFile()
+# log.createLogfile(filename, ["Time", "Speed", "RPM"])
 
-t1 = str(datetime.datetime.now())
+# t1 = str(datetime.datetime.now())
 
-t2 = str(datetime.datetime.now())
+# t2 = str(datetime.datetime.now())
 
-log.addData(t1, 30, 2400)
-log.addData(t2, 40, 2600)
-log.addData(t2, 50, 2700)
+# log.addData(t1, 30, 2400)
+# log.addData(t2, 40, 2600)
+# log.addData(t2, 50, 2700)
 
-log.appendFile()
+# log.appendFile()
 
-log2 = LogFile()
-log2.loadFromFile(filename)
+# log2 = LogFile()
+# log2.loadFromFile(filename)
 
-speed = log2.getLabelData(SupportedLabels.RPM)
+# speed = log2.getLabelData(SupportedLabels.RPM)
 
-print(speed)
+# print(speed)
 
 
 files = LogFile.getFilenames() #static Method

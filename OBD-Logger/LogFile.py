@@ -3,6 +3,7 @@ import os
 import datetime
 
 # Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
+# "/Files/" #"\\OBD-Logger\\Files\\"
 path = os.getcwd() + "\\OBD-Logger\\Files\\"
 
 
@@ -10,12 +11,16 @@ class SupportedLabels:
     """All Labels which can be read"""
     SPEED = "SPEED"
     RPM = "RPM"
-    #ENGINE_LOAD = "ENGINE_LOAD"
+    ENGINE_LOAD = "ENGINE_LOAD"
+    MAF = "MAF"
+    AMBIANT_AIR_TEMP = "AMBIANT_AIR_TEMP"
+    RELATIVE_ACCEL_POS = "RELATIVE_ACCEL_POS"
+    COMMANDED_EQUIV_RATIO = "COMMANDED_EQUIV_RATIO"
+    FUEL_LEVEL = "FUEL_LEVEL"
 
 
 class LogStatus:
     """ Values for the Log status flags """
-
     NO_LOGFILE = "No LogFile"
     LOG_CREATED = "LogFile created"
     LOG_FILE_LOADED = "LogFile loaded from File"
@@ -35,6 +40,13 @@ class LogFile:
         self._data = {
             SupportedLabels.SPEED: [],
             SupportedLabels.RPM: [],
+            SupportedLabels.ENGINE_LOAD: [],
+            SupportedLabels.MAF: [],
+            SupportedLabels.AMBIANT_AIR_TEMP: [],
+            SupportedLabels.RELATIVE_ACCEL_POS: [],
+            SupportedLabels.COMMANDED_EQUIV_RATIO: [],
+            SupportedLabels.FUEL_LEVEL: [],
+
         }
         self._status = LogStatus.NO_LOGFILE
 
@@ -52,12 +64,18 @@ class LogFile:
         self._filename = filename
         self._status = LogStatus.LOG_CREATED
 
-    def addData(self, time, speed, rpm):
+    def addData(self, time, speed, rpm, load, maf, temp, pedal, afr, fuel_lvl):
         # TODO Bei Speed RPM und co dürfen nur Zahlen übergeben werden!
         #       Strings führen beim laden aus Datei zu einem Fehler
         self._time.append(time)
         self._data[SupportedLabels.SPEED].append(speed)
         self._data[SupportedLabels.RPM].append(rpm)
+        self._data[SupportedLabels.ENGINE_LOAD].append(load)
+        self._data[SupportedLabels.MAF].append(maf)
+        self._data[SupportedLabels.AMBIANT_AIR_TEMP].append(temp)
+        self._data[SupportedLabels.RELATIVE_ACCEL_POS].append(pedal)
+        self._data[SupportedLabels.COMMANDED_EQUIV_RATIO].append(afr)
+        self._data[SupportedLabels.FUEL_LEVEL].append(fuel_lvl)
 
     def getLabelData(self, SupportedLabels):
         if (not self._status == LogStatus.LOG_FILE_LOADED):
@@ -97,6 +115,15 @@ class LogFile:
                     buffer.append(self._time[i])
                     buffer.append(self._data[SupportedLabels.SPEED][i])
                     buffer.append(self._data[SupportedLabels.RPM][i])
+                    buffer.append(self._data[SupportedLabels.ENGINE_LOAD][i])
+                    buffer.append(self._data[SupportedLabels.MAF][i])
+                    buffer.append(
+                        self._data[SupportedLabels.AMBIANT_AIR_TEMP][i])
+                    buffer.append(
+                        self._data[SupportedLabels.RELATIVE_ACCEL_POS][i])
+                    buffer.append(
+                        self._data[SupportedLabels.COMMANDED_EQUIV_RATIO][i])
+                    buffer.append(self._data[SupportedLabels.FUEL_LEVEL][i])
                     wr.writerow(buffer)
         except:
             raise FileNotFoundError("Fehler beim erweitern der Datei")
@@ -104,6 +131,12 @@ class LogFile:
         del self._time[:]  # delete time Array
         del self._data[SupportedLabels.SPEED][:]
         del self._data[SupportedLabels.RPM][:]
+        del self._data[SupportedLabels.ENGINE_LOAD][:]
+        del self._data[SupportedLabels.MAF][:]
+        del self._data[SupportedLabels.AMBIANT_AIR_TEMP][:]
+        del self._data[SupportedLabels.RELATIVE_ACCEL_POS][:]
+        del self._data[SupportedLabels.COMMANDED_EQUIV_RATIO][:]
+        del self._data[SupportedLabels.FUEL_LEVEL][:]
 
     def loadFromFile(self, filename):
         try:
