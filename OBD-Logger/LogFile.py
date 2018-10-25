@@ -3,8 +3,8 @@ import os
 import datetime
 
 # Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
-path = os.getcwd() + "/Files/" #"\\OBD-Logger\\Files\\"
-
+# "/Files/" #"\\OBD-Logger\\Files\\"
+path = os.getcwd() + "\\OBD-Logger\\Files\\"
 
 
 class SupportedLabels:
@@ -17,12 +17,10 @@ class SupportedLabels:
     RELATIVE_ACCEL_POS = "RELATIVE_ACCEL_POS"
     COMMANDED_EQUIV_RATIO = "COMMANDED_EQUIV_RATIO"
     FUEL_LEVEL = "FUEL_LEVEL"
-    
 
 
 class LogStatus:
     """ Values for the Log status flags """
-
     NO_LOGFILE = "No LogFile"
     LOG_CREATED = "LogFile created"
     LOG_FILE_LOADED = "LogFile loaded from File"
@@ -47,10 +45,9 @@ class LogFile:
             SupportedLabels.AMBIANT_AIR_TEMP: [],
             SupportedLabels.RELATIVE_ACCEL_POS: [],
             SupportedLabels.COMMANDED_EQUIV_RATIO: [],
-            SupportedLabels.FUEL_LEVEL: [],         
-            
-            
-            }
+            SupportedLabels.FUEL_LEVEL: [],
+
+        }
         self._status = LogStatus.NO_LOGFILE
 
     def status(self):
@@ -79,8 +76,6 @@ class LogFile:
         self._data[SupportedLabels.RELATIVE_ACCEL_POS].append(pedal)
         self._data[SupportedLabels.COMMANDED_EQUIV_RATIO].append(afr)
         self._data[SupportedLabels.FUEL_LEVEL].append(fuel_lvl)
-        
-        
 
     def getLabelData(self, SupportedLabels):
         if (not self._status == LogStatus.LOG_FILE_LOADED):
@@ -99,8 +94,8 @@ class LogFile:
         timebuffer = self._time
 
         for i in timebuffer:
-            tList.append(round((datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") - \
-            datetime.datetime.strptime(self._time[1], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
+            tList.append(round((datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") -
+                                datetime.datetime.strptime(self._time[1], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
         return tList
 
     def getfilename(self):
@@ -122,9 +117,12 @@ class LogFile:
                     buffer.append(self._data[SupportedLabels.RPM][i])
                     buffer.append(self._data[SupportedLabels.ENGINE_LOAD][i])
                     buffer.append(self._data[SupportedLabels.MAF][i])
-                    buffer.append(self._data[SupportedLabels.AMBIANT_AIR_TEMP][i])
-                    buffer.append(self._data[SupportedLabels.RELATIVE_ACCEL_POS][i])
-                    buffer.append(self._data[SupportedLabels.COMMANDED_EQUIV_RATIO][i])                    
+                    buffer.append(
+                        self._data[SupportedLabels.AMBIANT_AIR_TEMP][i])
+                    buffer.append(
+                        self._data[SupportedLabels.RELATIVE_ACCEL_POS][i])
+                    buffer.append(
+                        self._data[SupportedLabels.COMMANDED_EQUIV_RATIO][i])
                     buffer.append(self._data[SupportedLabels.FUEL_LEVEL][i])
                     wr.writerow(buffer)
         except:
