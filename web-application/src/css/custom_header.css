@@ -98,11 +98,26 @@ body {
     border-color: transparent;
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
   }
-/*
+
+  .register {
+    width: 400px;
+    border-radius: 15px;
+    text-align: left;
+    margin: 0 auto;
+  }
+
+  .login {
+    width: 400px;
+    border-radius: 15px;
+    text-align: left;
+    margin: 0 auto;
+  }
+
+/* 
   :root {
     --breakpoint-xs: 0;
     --breakpoint-sm: 576px;
     --breakpoint-md: 800px;
     --breakpoint-lg: 800px;
     --breakpoint-xl: 1200px;
-  }*/
+  } */

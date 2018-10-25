@@ -37,23 +37,47 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
+                {{#if home}}
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link active" href="/">Home</a>
                 </li>
+                {{else}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                {{/if}}
                 {{#if isAuthenticated}}
+                {{#if dashboard}}
+                <li class="nav-item">
+                    <a class="nav-link active" href="/dashboard">Dashboard</a>
+                </li>
+                {{else}}
                 <li class="nav-item">
                     <a class="nav-link" href="/dashboard">Dashboard</a>
                 </li>
+                {{/if}}
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Logout</a>
+                </li>
+                {{else}}
+                {{#if register}}
+                <li class="nav-item">
+                    <a class="nav-link active" href="/register">Register</a>
                 </li>
                 {{else}}
                 <li class="nav-item">
                     <a class="nav-link" href="/register">Register</a>
                 </li>
+                {{/if}}
+                {{#if login}}
+                <li class="nav-item">
+                    <a class="nav-link active" href="/login">Login</a>
+                </li>
+                {{else}}
                 <li class="nav-item">
                     <a class="nav-link" href="/login">Login</a>
                 </li>
+                {{/if}}
                 {{/if}}
                 </ul>
             </div>
