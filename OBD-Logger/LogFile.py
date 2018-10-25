@@ -76,8 +76,8 @@ class LogFile:
         timebuffer = self._time
 
         for i in timebuffer:
-            tList.append(round((datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") -
-                                datetime.datetime.strptime(self._time[1], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
+            tList.append(round((datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") - \
+            datetime.datetime.strptime(self._time[1], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
         return tList
 
     def getfilename(self):

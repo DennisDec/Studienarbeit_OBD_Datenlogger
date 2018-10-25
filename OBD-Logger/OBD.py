@@ -43,8 +43,19 @@ while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and (connection.
     timestr = str(datetime.datetime.now()) #Parse String to datetime :  t = datetime.datetime.strptime(t,"%Y-%m-%d %H:%M:%S.%f") --> Calculate Difference: t = t2-t1 --> t = round(t.total_seconds()/60, 2) [Time in Minute]
     speed = connection.query(obd.commands.SPEED)
     rpm = connection.query(obd.commands.RPM)
+
+    if speed.is_null():
+        speed = 0
+    else:
+        speed = speed.value.magnitude
+    
+    if rpm.is_null():
+        rpm = 0
+    else:
+        rpm = rpm.value.magnitude
+
     log.addData(timestr, speed, rpm)
-    time.sleep(2)
+    time.sleep(1)
 
     if(i%10 == 0):
         log.appendFile()
