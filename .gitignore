@@ -1,7 +1,16 @@
+#OBD-logging
 OBD-Logger/__pycache__/LogFile.cpython-35.pyc
-.vscode/settings.json
+.vscode
 OBD-Logger/__pycache__/LogFile_test.cpython-35.pyc
 OBD-Logger/Files/Unittest.csv
 OBD-Logger/Files/TestFile.csv
 OBD-Logger/LogFile_test.py
 .vscode/launch.json
+
+# web-application
+node_modules
+# Debug log from npm
+npm-debug.log
+# Local env file with credentials
+.env
+markers.json

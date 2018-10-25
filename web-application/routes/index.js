@@ -12,7 +12,7 @@ router.get('/', function(req, res) {
 });
 
 // GET profile page; only accessable for authenticated users
-router.get('/profile', authenticationMiddleware(), function(req, res, next) {
+router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
   // get GPS-data from the MySQL-server and save it into a json-file  
   var db = require('../db.js');
   var fs = require('fs');
@@ -23,7 +23,7 @@ router.get('/profile', authenticationMiddleware(), function(req, res, next) {
       console.log('GPS-data saved');
     });
   });
-  res.render('profile', { title: 'Profile' });
+  res.render('dashboard', { title: 'Dashboard' });
 });
 
 // GET login page
