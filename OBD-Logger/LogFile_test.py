@@ -10,17 +10,17 @@ class TestLogFile(unittest.TestCase):
 
     def test_StatusNoLogFile(self):
         log = LogFile()
-        self.assertEquals(log.status(), LogStatus.NO_LOGFILE)
+        self.assertEqual(log.status(), LogStatus.NO_LOGFILE)
 
     def test_StatusLogCreated(self):
         log = LogFile()
         log.createLogfile(filename, ["Time", "Speed", "RPM"])
-        self.assertEquals(log.status(), LogStatus.LOG_CREATED)
+        self.assertEqual(log.status(), LogStatus.LOG_CREATED)
 
     def test_StatusLogFileLoaded(self):
         log = LogFile()
         log.loadFromFile(filename)
-        self.assertEquals(log.status(), LogStatus.LOG_FILE_LOADED)
+        self.assertEqual(log.status(), LogStatus.LOG_FILE_LOADED)
 
     def test_getFilenames(self):
         LogFile.getFilenames()
