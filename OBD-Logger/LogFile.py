@@ -147,6 +147,12 @@ class LogFile:
                     self._time.append(row[0])
                     self._data[SupportedLabels.SPEED].append(float(row[1]))
                     self._data[SupportedLabels.RPM].append(float(row[2]))
+                    self._data[SupportedLabels.ENGINE_LOAD].append(float(row[3]))
+                    self._data[SupportedLabels.MAF].append(float(row[4]))
+                    self._data[SupportedLabels.AMBIANT_AIR_TEMP].append(float(row[5]))
+                    self._data[SupportedLabels.RELATIVE_ACCEL_POS].append(float(row[6]))
+                    self._data[SupportedLabels.COMMANDED_EQUIV_RATIO].append(float(row[7]))
+                    self._data[SupportedLabels.FUEL_LEVEL].append(float(row[8]))
         except:
             raise FileNotFoundError("Fehler beim Laden der Datei")
 
