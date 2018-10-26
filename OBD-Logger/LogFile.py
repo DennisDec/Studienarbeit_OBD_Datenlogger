@@ -8,7 +8,7 @@ path = os.getcwd() + "\\OBD-Logger\\Files\\"
 
 
 class SupportedLabels:
-    """All Labels which can be read"""
+    """All Labels which support logging funktion"""
     SPEED = "SPEED"
     RPM = "RPM"
     ENGINE_LOAD = "ENGINE_LOAD"
@@ -27,7 +27,7 @@ class LogStatus:
 
 
 class LogFile:
-    """Class to log Data from OBDII adapter"""
+    """Class to log data from OBDII adapter"""
 
     @staticmethod
     def getFilenames():
@@ -53,7 +53,9 @@ class LogFile:
     def status(self):
         return self._status
 
+    # TODO: header can be set inside this Class
     def createLogfile(self, filename, headerCSV):
+        """Create logfile to track OBDII data"""
         try:
             with open(path+filename, 'w', newline='') as file:
                 wr = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)
@@ -64,10 +66,12 @@ class LogFile:
         self._filename = filename
         self._status = LogStatus.LOG_CREATED
 
+    # TODO User List instead of single parameter
     def addData(self, time, speed, rpm, load, maf, temp, pedal, afr, fuel_lvl):
-        # TODO Bei Speed RPM und co dürfen nur Zahlen übergeben werden!
-        #       Strings führen beim laden aus Datei zu einem Fehler
+        """add data to buffer"""
         self._time.append(time)
+
+        # TODO Use for-Loop
         self._data[SupportedLabels.SPEED].append(speed)
         self._data[SupportedLabels.RPM].append(rpm)
         self._data[SupportedLabels.ENGINE_LOAD].append(load)
@@ -102,8 +106,9 @@ class LogFile:
         return self._filename
 
     def appendFile(self):
+        """save buffered date in csv file"""
         if(not self._status == LogStatus.LOG_CREATED):
-            raise ValueError("Es wurde noch keine Datei geladen!")
+            raise ValueError("You have to create LogFile first!")
 
         try:
             with open(path+self._filename, 'a', newline='') as file:
@@ -113,6 +118,8 @@ class LogFile:
                 for i in range(0, len(self._time)):
                     buffer = []
                     buffer.append(self._time[i])
+
+                    # TODO: Use for-Loop instead
                     buffer.append(self._data[SupportedLabels.SPEED][i])
                     buffer.append(self._data[SupportedLabels.RPM][i])
                     buffer.append(self._data[SupportedLabels.ENGINE_LOAD][i])
@@ -126,9 +133,10 @@ class LogFile:
                     buffer.append(self._data[SupportedLabels.FUEL_LEVEL][i])
                     wr.writerow(buffer)
         except:
-            raise FileNotFoundError("Fehler beim erweitern der Datei")
+            raise FileNotFoundError("Error!: Appending file failed")
 
-        del self._time[:]  # delete time Array
+        # TODO Define LabelList and use for-Loop
+        del self._time[:]
         del self._data[SupportedLabels.SPEED][:]
         del self._data[SupportedLabels.RPM][:]
         del self._data[SupportedLabels.ENGINE_LOAD][:]
@@ -139,21 +147,34 @@ class LogFile:
         del self._data[SupportedLabels.FUEL_LEVEL][:]
 
     def loadFromFile(self, filename):
+        """load data from csv file"""
         try:
             with open(path+filename, 'r') as csvfile:
-                next(csvfile)  # Header wird ausgelassen
+                next(csvfile)  #ignore header (first row)
                 fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
                 for row in fileReader:
                     self._time.append(row[0])
                     self._data[SupportedLabels.SPEED].append(float(row[1]))
                     self._data[SupportedLabels.RPM].append(float(row[2]))
-                    self._data[SupportedLabels.ENGINE_LOAD].append(float(row[3]))
+                    self._data[SupportedLabels.ENGINE_LOAD].append(
+                        float(row[3]))
                     self._data[SupportedLabels.MAF].append(float(row[4]))
-                    self._data[SupportedLabels.AMBIANT_AIR_TEMP].append(float(row[5]))
-                    self._data[SupportedLabels.RELATIVE_ACCEL_POS].append(float(row[6]))
-                    self._data[SupportedLabels.COMMANDED_EQUIV_RATIO].append(float(row[7]))
-                    self._data[SupportedLabels.FUEL_LEVEL].append(float(row[8]))
+                    self._data[SupportedLabels.AMBIANT_AIR_TEMP].append(
+                        float(row[5]))
+                    self._data[SupportedLabels.RELATIVE_ACCEL_POS].append(
+                        float(row[6]))
+                    self._data[SupportedLabels.COMMANDED_EQUIV_RATIO].append(
+                        float(row[7]))
+                    self._data[SupportedLabels.FUEL_LEVEL].append(
+                        float(row[8]))
         except:
-            raise FileNotFoundError("Fehler beim Laden der Datei")
+            raise FileNotFoundError("Error: Loading File failed!")
 
         self._status = LogStatus.LOG_FILE_LOADED
+
+    def getAverageData(self):
+        if (not self._status == LogStatus.LOG_FILE_LOADED):
+            raise ValueError("Not allowed! You have to loadFromFile first")
+        # TODO return average value of data-Array
+
+    # TODO Add method: getAverageFuelConsumption() and return Value

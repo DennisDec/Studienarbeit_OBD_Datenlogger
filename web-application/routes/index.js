@@ -8,11 +8,11 @@ const saltRounds = 10;
 
 // GET home page
 router.get('/', function(req, res) {
-  res.render('home', { title: 'Home' });
+  res.render('home', { title: 'Home', home: true });
 });
 
-// GET profile page; only accessable for authenticated users
-router.get('/profile', authenticationMiddleware(), function(req, res, next) {
+// GET dashboard page; only accessable for authenticated users
+router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
   // get GPS-data from the MySQL-server and save it into a json-file  
   var db = require('../db.js');
   var fs = require('fs');
@@ -23,16 +23,16 @@ router.get('/profile', authenticationMiddleware(), function(req, res, next) {
       console.log('GPS-data saved');
     });
   });
-  res.render('profile', { title: 'Profile' });
+  res.render('dashboard', { title: 'Dashboard', dashboard: true });
 });
 
 // GET login page
 router.get('/login', function(req, res, next) {
-  res.render('login', { title: 'Login' });
+  res.render('login', { title: 'Login', login: true });
 });
 // handle POST of login page; use passport to authenticate the user
 router.post('/login', passport.authenticate('local', {
-  successRedirect: '/profile',
+  successRedirect: '/dashboard',
   failureRedirect: '/loginFail'
 }));
 // after unsuccessful login head to route /loginFail and show error message
@@ -43,7 +43,8 @@ router.get('/loginFail', function(req, res, next) {
   console.log(`errors: ${JSON.stringify(error)}`);
   res.render('login', { 
     title: 'Login failed',
-    errors: error
+    errors: error,
+    login: true
   });
 });
 
@@ -58,7 +59,7 @@ router.get('/logout', function(req, res, next) {
 
 // GET register page
 router.get('/register', function(req, res, next) {
-  res.render('register', { title: 'Registration' });
+  res.render('register', { title: 'Registration', register: true });
 });
 
 // handle POST of register page

@@ -6,23 +6,21 @@
         <title>{{ title }}</title>
         <meta name="description" content="Aufbau eines Fahrzeug-GPS-Datenloggers mit WLAN-Anbindung zu einem Datenarchivierungssystem">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <!-- <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        
+        <link rel="icon" type="image/png" href="img/favicon2.png" sizes="any">
 
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
-        Bootstrap core CSS -->
+        <!-- Bootstrap core CSS -->
         <link href="https://getbootstrap.com/docs/4.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        <!-- Custom styles for this template -->
-        <link href="https://getbootstrap.com/docs/4.1/examples/navbar-fixed/navbar-top-fixed.css" rel="stylesheet">
-        <!-- Place favicon.ico in the root directory -->   
-        
-        
         <link rel="stylesheet" type="text/css" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+        <link href="css/custom_header.css" rel="stylesheet">
       
-        <script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'></script>
         <script type='text/javascript' src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js'></script>
+        <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+        
+
         
 </head>
     <body>
@@ -30,30 +28,56 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-            <a class="navbar-brand" href="#">OBD-Datenlogger</a>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark shadow">
+            
+            <div style="margin-right: 10px"><img src="img/favicon.svg" width="40px" heigth="40px" alt="Logo" /></div>
+            <div class="navbar-brand">OBD-Datenlogger</div>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
+                {{#if home}}
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link active" href="/">Home</a>
                 </li>
+                {{else}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                {{/if}}
                 {{#if isAuthenticated}}
+                {{#if dashboard}}
                 <li class="nav-item">
-                    <a class="nav-link" href="/profile">Profile</a>
+                    <a class="nav-link active" href="/dashboard">Dashboard</a>
                 </li>
+                {{else}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">Dashboard</a>
+                </li>
+                {{/if}}
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Logout</a>
+                </li>
+                {{else}}
+                {{#if register}}
+                <li class="nav-item">
+                    <a class="nav-link active" href="/register">Register</a>
                 </li>
                 {{else}}
                 <li class="nav-item">
                     <a class="nav-link" href="/register">Register</a>
                 </li>
+                {{/if}}
+                {{#if login}}
+                <li class="nav-item">
+                    <a class="nav-link active" href="/login">Login</a>
+                </li>
+                {{else}}
                 <li class="nav-item">
                     <a class="nav-link" href="/login">Login</a>
                 </li>
+                {{/if}}
                 {{/if}}
                 </ul>
             </div>
