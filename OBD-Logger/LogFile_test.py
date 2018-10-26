@@ -6,7 +6,6 @@ import datetime
 
 filename = 'Unittest.csv'
 
-
 class TestLogFile(unittest.TestCase):
 
     def test_StatusNoLogFile(self):
@@ -34,6 +33,7 @@ class TestLogFile(unittest.TestCase):
 
         t1 = str(datetime.datetime.now())
 
+        #Test values 
         speed = [34, 35, 36, 24, 23, 56]
         rpm = [2000, 2001, 2100, 3100, 50000, 60000]
         load = [60, 40, 50, 30, 70, 80]
