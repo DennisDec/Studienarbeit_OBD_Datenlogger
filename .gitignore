@@ -13,3 +13,7 @@ npm-debug.log
 # Local env file with credentials
 .env
 markers.json
+OBD-Logger/Files/Unittest.csv
+OBD-Logger/Files/TestFile.csv
+OBD-Logger/__pycache__/Signals.cpython-35.pyc
+OBD-Logger/__pycache__/OBDSignal.cpython-35.pyc
