@@ -4,14 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import datetime
 import time
-
-LabelList = [SupportedLabels.SPEED, SupportedLabels.RPM, SupportedLabels.ENGINE_LOAD, SupportedLabels.MAF,
-             SupportedLabels.AMBIANT_AIR_TEMP, SupportedLabels.RELATIVE_ACCEL_POS, SupportedLabels.COMMANDED_EQUIV_RATIO, SupportedLabels.FUEL_LEVEL]
+from Signals import signals
 
 filename = 'TestFile.csv'
 log = LogFile()
-log.createLogfile(filename, ["Time", "Speed", "RPM", "Engine_Load",
-                             "MAF", "Temperature", "Pedal", "AFR", "Fuel Level"])
+log.createLogfile(filename)
 
 
 speed = [34, 35, 36, 24, 23, 56]
@@ -25,16 +22,16 @@ fuel_lvl = [80, 80, 80, 79, 79, 79]
 
 for i in range(0, len(speed)):
     t1 = str(datetime.datetime.now())
-    log.addData(t1, speed[i], rpm[i], load[i], maf[i],
-                temp[i], pedal[i], afr[i], fuel_lvl[i])
+    log.addData(t1, [speed[i], rpm[i], load[i], maf[i],
+                temp[i], pedal[i], afr[i], fuel_lvl[i]])
 
 log.appendFile()
 
 log2 = LogFile()
 log2.loadFromFile(filename)
 
-for label in LabelList:
-    print(label + str(log2.getLabelData(label)))
+for label in signals.getSignalList():
+    print(str(label.name) + str(log2.getLabelData(label.name)))
 
 
 files = LogFile.getFilenames()  # static Method
