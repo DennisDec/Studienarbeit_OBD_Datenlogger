@@ -2,21 +2,11 @@ import csv
 import os
 import datetime
 
+from Signals import signals
+
 # Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
 path = os.getcwd() + "\\OBD-Logger\\Files\\"
-
-
-class SupportedLabels:
-    """All Labels which support logging funktion"""
-    SPEED = "SPEED"
-    RPM = "RPM"
-    ENGINE_LOAD = "ENGINE_LOAD"
-    MAF = "MAF"
-    AMBIANT_AIR_TEMP = "AMBIANT_AIR_TEMP"
-    RELATIVE_ACCEL_POS = "RELATIVE_ACCEL_POS"
-    COMMANDED_EQUIV_RATIO = "COMMANDED_EQUIV_RATIO"
-    FUEL_LEVEL = "FUEL_LEVEL"
 
 
 class LogStatus:
@@ -38,28 +28,24 @@ class LogFile:
         self._filename = ""
         self._time = []
         self._data = {
-            SupportedLabels.SPEED: [],
-            SupportedLabels.RPM: [],
-            SupportedLabels.ENGINE_LOAD: [],
-            SupportedLabels.MAF: [],
-            SupportedLabels.AMBIANT_AIR_TEMP: [],
-            SupportedLabels.RELATIVE_ACCEL_POS: [],
-            SupportedLabels.COMMANDED_EQUIV_RATIO: [],
-            SupportedLabels.FUEL_LEVEL: [],
 
         }
+        
+        for s in signals.getSignalList():
+            self._data[s.name] = []         #Fill Dictionary with Signals from Class Signals
+
         self._status = LogStatus.NO_LOGFILE
 
     def status(self):
         return self._status
 
     # TODO: header can be set inside this Class
-    def createLogfile(self, filename, headerCSV):
+    def createLogfile(self, filename):
         """Create logfile to track OBDII data"""
         try:
             with open(path+filename, 'w', newline='') as file:
                 wr = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)
-                wr.writerow(headerCSV)
+                wr.writerow([s.name for s in signals.getSignalList()]) #Auto generate Header from signals in Signals.py
         except:
             print("Error! Loading File")
 
@@ -67,19 +53,12 @@ class LogFile:
         self._status = LogStatus.LOG_CREATED
 
     # TODO User List instead of single parameter
-    def addData(self, time, speed, rpm, load, maf, temp, pedal, afr, fuel_lvl):
+    def addData(self, time, signalList):
         """add data to buffer"""
         self._time.append(time)
 
-        # TODO Use for-Loop
-        self._data[SupportedLabels.SPEED].append(speed)
-        self._data[SupportedLabels.RPM].append(rpm)
-        self._data[SupportedLabels.ENGINE_LOAD].append(load)
-        self._data[SupportedLabels.MAF].append(maf)
-        self._data[SupportedLabels.AMBIANT_AIR_TEMP].append(temp)
-        self._data[SupportedLabels.RELATIVE_ACCEL_POS].append(pedal)
-        self._data[SupportedLabels.COMMANDED_EQUIV_RATIO].append(afr)
-        self._data[SupportedLabels.FUEL_LEVEL].append(fuel_lvl)
+        for i, s in enumerate(signals.getSignalList()):
+            self._data[s.name].append(signalList[i])
 
     def getLabelData(self, SupportedLabels):
         if (not self._status == LogStatus.LOG_FILE_LOADED):
@@ -120,31 +99,17 @@ class LogFile:
                     buffer.append(self._time[i])
 
                     # TODO: Use for-Loop instead
-                    buffer.append(self._data[SupportedLabels.SPEED][i])
-                    buffer.append(self._data[SupportedLabels.RPM][i])
-                    buffer.append(self._data[SupportedLabels.ENGINE_LOAD][i])
-                    buffer.append(self._data[SupportedLabels.MAF][i])
-                    buffer.append(
-                        self._data[SupportedLabels.AMBIANT_AIR_TEMP][i])
-                    buffer.append(
-                        self._data[SupportedLabels.RELATIVE_ACCEL_POS][i])
-                    buffer.append(
-                        self._data[SupportedLabels.COMMANDED_EQUIV_RATIO][i])
-                    buffer.append(self._data[SupportedLabels.FUEL_LEVEL][i])
+
+                    for s in signals.getSignalList():
+                        buffer.append(self._data[s.name][i])
+                    
                     wr.writerow(buffer)
         except:
             raise FileNotFoundError("Error!: Appending file failed")
 
         # TODO Define LabelList and use for-Loop
         del self._time[:]
-        del self._data[SupportedLabels.SPEED][:]
-        del self._data[SupportedLabels.RPM][:]
-        del self._data[SupportedLabels.ENGINE_LOAD][:]
-        del self._data[SupportedLabels.MAF][:]
-        del self._data[SupportedLabels.AMBIANT_AIR_TEMP][:]
-        del self._data[SupportedLabels.RELATIVE_ACCEL_POS][:]
-        del self._data[SupportedLabels.COMMANDED_EQUIV_RATIO][:]
-        del self._data[SupportedLabels.FUEL_LEVEL][:]
+        self._data.clear()
 
     def loadFromFile(self, filename):
         """load data from csv file"""
@@ -154,19 +119,10 @@ class LogFile:
                 fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
                 for row in fileReader:
                     self._time.append(row[0])
-                    self._data[SupportedLabels.SPEED].append(float(row[1]))
-                    self._data[SupportedLabels.RPM].append(float(row[2]))
-                    self._data[SupportedLabels.ENGINE_LOAD].append(
-                        float(row[3]))
-                    self._data[SupportedLabels.MAF].append(float(row[4]))
-                    self._data[SupportedLabels.AMBIANT_AIR_TEMP].append(
-                        float(row[5]))
-                    self._data[SupportedLabels.RELATIVE_ACCEL_POS].append(
-                        float(row[6]))
-                    self._data[SupportedLabels.COMMANDED_EQUIV_RATIO].append(
-                        float(row[7]))
-                    self._data[SupportedLabels.FUEL_LEVEL].append(
-                        float(row[8]))
+
+                    for i, s in enumerate(signals.getSignalList()):
+                        self._data[s.name].append(float(row[i+1]))                  #+1 because of time in column 0
+                    
         except:
             raise FileNotFoundError("Error: Loading File failed!")
 

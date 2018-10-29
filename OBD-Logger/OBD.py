@@ -1,3 +1,5 @@
+# pylint: disable=no-member
+
 import obd
 import time
 import csv
@@ -27,11 +29,8 @@ print("Erfolg")
 
 PidsMode1 = [i for i in PidsMode1 if obd.commands.has_pid(1, i)]
 
-HeaderCSV = ["Time", "Speed", "RPM", "Engine_Load",
-             "MAF", "Temperature", "Pedal", "AFR", "Fuel Level"]
 log = LogFile()
-log.createLogfile(filename, HeaderCSV)
-
+log.createLogfile(filename)
 IgnitionStep2 = True
 while (IgnitionStep2 == False):
 
@@ -64,8 +63,8 @@ while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and (connection.
         else:
             res.append(r.value.magnitude)
 
-    log.addData(timestr, res[0], res[1], res[2],
-                res[3], res[4], res[5], res[6], res[7])
+    log.addData(timestr, [res[0], res[1], res[2],
+                res[3], res[4], res[5], res[6], res[7]])
     time.sleep(1)
 
     if(i % 10 == 0):
