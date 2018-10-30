@@ -35,7 +35,7 @@ class TestLogFile(unittest.TestCase):
         t1 = str(datetime.datetime.now())
 
         #Test values 
-        speed = [34, 35, 36, 24, 23, 56]
+        speed = [34, None, 36, 24, None, 56]
         rpm = [2000, 2001, 2100, 3100, 50000, 60000]
         load = [60, 40, 35, 30, 70, 80]
         maf = [3, 4, 3, 4, 3, 2]
@@ -49,7 +49,7 @@ class TestLogFile(unittest.TestCase):
             
 
         log.appendFile()
-       
+        
         log2 = LogFile()
         log2.loadFromFile(filename)
 
