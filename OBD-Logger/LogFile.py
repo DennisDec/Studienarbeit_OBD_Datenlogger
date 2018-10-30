@@ -44,7 +44,7 @@ class LogFile:
         """Create logfile to track OBDII data"""
         try:
             with open(path+filename, 'w', newline='') as file:
-                wr = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)
+                wr = csv.writer(file, quoting=csv.QUOTE_MINIMAL)
                 wr.writerow([s.name for s in signals.getSignalList()]) #Auto generate Header from signals in Signals.py
         except:
             print("Error! Loading File")
@@ -92,7 +92,7 @@ class LogFile:
         try:
             with open(path+self._filename, 'a', newline='') as file:
                 wr = csv.writer(
-                    file, quoting=csv.QUOTE_NONNUMERIC, quotechar='"')
+                    file, quoting=csv.QUOTE_MINIMAL, quotechar='"')
 
                 for i in range(0, len(self._time)):
                     buffer = []
@@ -121,7 +121,11 @@ class LogFile:
                     self._time.append(row[0])
 
                     for i, s in enumerate(signals.getSignalList()):
-                        self._data[s.name].append(float(row[i+1]))                  #+1 because of time in column 0
+
+                        if(row[i+1] == ""):
+                            self._data[s.name].append(None)
+                        else:
+                            self._data[s.name].append(float(row[i+1]))                  #+1 because of time in column 0
                     
         except:
             raise FileNotFoundError("Error: Loading File failed!")
