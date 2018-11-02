@@ -3,6 +3,7 @@ import numpy as np
 
 
 __signals__ = [
+  #           SignalName                  description                 sampleRate      Index
     OBDSignal("SPEED"                   , "Car speed"                     , 1         , 1),
     OBDSignal("RPM"                     , "Revolutions per minute"        , 1         , 2),
     OBDSignal("ENGINE_LOAD"             , "Engine load"                   , 1         , 3),
@@ -10,7 +11,7 @@ __signals__ = [
     OBDSignal("AMBIANT_AIR_TEMP"        , "Description"                   , 1         , 5),
     OBDSignal("RELATIVE_ACCEL_POS"      , "Description"                   , 1         , 6),
     OBDSignal("COMMANDED_EQUIV_RATIO"   , "Description"                   , 1         , 7),
-    OBDSignal("FUEL_LEVEL"              , "Description"                   , 1         , 8),
+    OBDSignal("FUEL_LEVEL"              , "Description"                   , 2         , 8),
 ]
 
 
