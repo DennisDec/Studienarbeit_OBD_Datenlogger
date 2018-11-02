@@ -9,7 +9,13 @@ class OBDSignal:
         self.columnInFile = columnInFile
 
     def __str__(self):
-        return "%s" % (self.name)    
+        return "%s" % (self.name)
+
+    def __eq__(self, other):
+        if isinstance(other, OBDSignal):
+            return self.name == other.name and self.sampleRate == other.sampleRate
+
+
 
 
 
