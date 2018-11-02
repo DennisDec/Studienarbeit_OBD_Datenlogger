@@ -36,27 +36,20 @@ class Signals:
             return self.__dict__[key]
 
     def getSignalList(self):
+        #TODO: Sort by column in File
         return self.signals
+
+    def containsSignal(self, signal):
+        if not isinstance(signal, OBDSignal):
+            raise ValueError("Value has to be instance of OBDSignal")
+        for s in self.signals:
+            if(s == signal):
+                return True
+        return False
 
 
 
 signals = Signals()
 
 
-# # signals.getSignalList()
-# for s in signals.getSignalList():
-#     print(s)
-
-
-# print([s.name for s in signals.getSignalList()])
-# # print(signals["RPM"].sampleRate)
-
-
-# data = {}
-
-# data["RPM"] = [1,2,3,4,5,]
-
-# data["Speed"] = [3,3,3,3,3,3,]
-
-# print(data)
 
