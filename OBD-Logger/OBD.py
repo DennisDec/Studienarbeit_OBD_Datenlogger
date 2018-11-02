@@ -4,7 +4,7 @@ import obd
 import time
 import csv
 import datetime
-from LogFile import LogFile, LogStatus, SupportedLabels
+from LogFile import LogFile, LogStatus
 
 i = 1
 connection = None
