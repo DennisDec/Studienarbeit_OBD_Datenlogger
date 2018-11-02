@@ -3,7 +3,7 @@ import csv
 
 db = mysql.connector.connect(
     user='root',
-    password='OBD2',
+    password='',
     host='192.168.2.113',
     database='obd/gps-datenlogger'
 )
@@ -20,16 +20,4 @@ with open('/home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/
         cursor.execute(sql, row)
         
 db.commit()
-
-##route_name = "test"
-##lat = 20
-##lng = 20
-##
-##cursor = db.cursor()
-##sql = "INSERT INTO gpsdata (route_name, lat, lng) VALUES (%s, %s, %s)"
-##val = (route_name, lat, lng)
-##cursor.execute(sql, val)
-##db.commit()
-
-#print(cursor.lastrowid)
 db.close()
