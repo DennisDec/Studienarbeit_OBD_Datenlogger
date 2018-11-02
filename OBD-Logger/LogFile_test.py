@@ -3,12 +3,30 @@ from LogFile import LogFile, LogStatus
 import unittest
 import time
 import datetime
+from OBDSignal import OBDSignal 
 
 from Signals import signals
 
 filename = 'Unittest.csv'
 
 class TestLogFile(unittest.TestCase):
+
+    def test_EqualOBDSignals(self):
+        o1 = OBDSignal("Signal1", "Test", 1 , 3)
+        o2 = OBDSignal("Signal1", "Test", 1 , 3)
+        o3 = OBDSignal("Signal1", "Test", 2 , 3)
+
+        self.assertEqual(o1, o2)
+        self.assertNotEqual(o2, o3)
+
+    def test_containsMethod(self):
+        o1 = OBDSignal("SPEED", "Test", 1 , 3)
+        o2 = OBDSignal("Signal1", "Test", 1 , 3)
+        
+        self.assertTrue(signals.containsSignal(o1))
+        self.assertFalse(signals.containsSignal(o2))
+
+
 
     def test_StatusNoLogFile(self):
         log = LogFile()
