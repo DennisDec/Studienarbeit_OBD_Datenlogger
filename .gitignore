@@ -18,3 +18,4 @@ OBD-Logger/Files/TestFile.csv
 OBD-Logger/__pycache__/Signals.cpython-35.pyc
 OBD-Logger/__pycache__/OBDSignal.cpython-35.pyc
 OBD-Logger/Test.py
+OBD-Logger/Files/TestFile.csv
