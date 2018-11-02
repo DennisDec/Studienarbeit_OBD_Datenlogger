@@ -1,4 +1,6 @@
-from LogFile import LogFile, SupportedLabels
+# pylint: disable=no-member
+from statistics import mean
+from LogFile import LogFile
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,6 +8,15 @@ import datetime
 import time
 from Signals import signals
 
+#Average Test
+L = [1,2,4,3,6,None,8,0 ,0]
+liste = [x for x in L if x is not None]
+print(mean(liste))
+
+
+
+
+exit()
 filename = 'TestFile.csv'
 log = LogFile()
 log.createLogfile(filename)
@@ -41,13 +52,14 @@ print(files)
 log2 = LogFile()
 log2.loadFromFile(files[0])
 time = log2.getRelTime()
-speed = log2.getLabelData(SupportedLabels.SPEED)
-rpm = log2.getLabelData(SupportedLabels.RPM)
-load = log2.getLabelData(SupportedLabels.ENGINE_LOAD)
-temp = log2.getLabelData(SupportedLabels.AMBIANT_AIR_TEMP)
-pedal = log2.getLabelData(SupportedLabels.RELATIVE_ACCEL_POS)
-maf = log2.getLabelData(SupportedLabels.MAF)
-afr = log2.getLabelData(SupportedLabels.COMMANDED_EQUIV_RATIO)
+speed = log2.getLabelData(signals.SPEED.name)
+afr = log2.getLabelData(signals.COMMANDED_EQUIV_RATIO.name)
+temp = log2.getLabelData(signals.AMBIANT_AIR_TEMP.name)
+rpm = log2.getLabelData(signals.RPM.name)
+load = log2.getLabelData(signals.ENGINE_LOAD.name)
+maf = log2.getLabelData(signals.MAF.name)
+pedal = log2.getLabelData(signals.RELATIVE_ACCEL_POS.name)
+fuel_lvl = log2.getLabelData(signals.FUEL_LEVEL.name)
 
 
 # Numpy Array
