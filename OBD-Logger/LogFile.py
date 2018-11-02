@@ -78,7 +78,7 @@ class LogFile:
 
         for i in timebuffer:
             tList.append(round((datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") -
-                                datetime.datetime.strptime(self._time[1], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
+                                datetime.datetime.strptime(self._time[0], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
         return tList
 
     def getfilename(self):
@@ -107,7 +107,6 @@ class LogFile:
         except:
             raise FileNotFoundError("Error!: Appending file failed")
 
-        # TODO Define LabelList and use for-Loop
         del self._time[:]
         self._data.clear()
 
