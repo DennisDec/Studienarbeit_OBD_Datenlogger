@@ -11,12 +11,9 @@ from Signals import signals
 #Average Test
 L = [1,2,4,3,6,None,8,0 ,0]
 liste = [x for x in L if x is not None]
-print(mean(liste))
+mean(liste)
 
 
-
-
-exit()
 filename = 'TestFile.csv'
 log = LogFile()
 log.createLogfile(filename)
@@ -51,6 +48,7 @@ print(files)
 
 log2 = LogFile()
 log2.loadFromFile(files[0])
+average_speed = log2.getAverageData(signals.SPEED.name)
 time = log2.getRelTime()
 speed = log2.getLabelData(signals.SPEED.name)
 afr = log2.getLabelData(signals.COMMANDED_EQUIV_RATIO.name)
@@ -62,6 +60,9 @@ pedal = log2.getLabelData(signals.RELATIVE_ACCEL_POS.name)
 fuel_lvl = log2.getLabelData(signals.FUEL_LEVEL.name)
 
 
+
+fuelCons = log2.getFuelConsumption()
+
 # Numpy Array
 #time = np.asarray(time)
 #speed = np.asarray(speed)
@@ -69,7 +70,7 @@ fuel_lvl = log2.getLabelData(signals.FUEL_LEVEL.name)
 
 
 # Plot Signals
-fig, (ax1, ax2, ax3, ax4, ax5, ax6, ax7) = plt.subplots(7, 1)
+fig, (ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8) = plt.subplots(8, 1)
 ax1.plot(time, speed)
 ax4.plot(time, temp)
 ax4.set(ylabel='Temperatur [°C]')
@@ -79,6 +80,9 @@ ax6.plot(time, maf)
 ax6.set(ylabel='Mass Air Flow')
 ax7.plot(time, afr)
 ax7.set(ylabel='Air Fuel Ratio')
+
+ax8.plot(time, fuelCons)
+ax8.set(ylabel='FuelCons L/100km')
 
 
 if(len(load) == len(time)):
