@@ -1,6 +1,10 @@
+# pylint: disable=no-member
+
 import csv
 import os
 import datetime
+
+from statistics import mean
 
 from Signals import signals
 
@@ -30,9 +34,10 @@ class LogFile:
         self._data = {
 
         }
-        
+
         for s in signals.getSignalList():
-            self._data[s.name] = []         #Fill Dictionary with Signals from Class Signals
+            # Fill Dictionary with Signals from Class Signals
+            self._data[s.name] = []
 
         self._status = LogStatus.NO_LOGFILE
 
@@ -45,7 +50,8 @@ class LogFile:
         try:
             with open(path+filename, 'w', newline='') as file:
                 wr = csv.writer(file, quoting=csv.QUOTE_MINIMAL)
-                wr.writerow([s.name for s in signals.getSignalList()]) #Auto generate Header from signals in Signals.py
+                # Auto generate Header from signals in Signals.py
+                wr.writerow([s.name for s in signals.getSignalList()])
         except:
             print("Error! Loading File")
 
@@ -102,7 +108,7 @@ class LogFile:
 
                     for s in signals.getSignalList():
                         buffer.append(self._data[s.name][i])
-                    
+
                     wr.writerow(buffer)
         except:
             raise FileNotFoundError("Error!: Appending file failed")
@@ -114,7 +120,7 @@ class LogFile:
         """load data from csv file"""
         try:
             with open(path+filename, 'r') as csvfile:
-                next(csvfile)  #ignore header (first row)
+                next(csvfile)  # ignore header (first row)
                 fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
                 for row in fileReader:
                     self._time.append(row[0])
@@ -124,16 +130,45 @@ class LogFile:
                         if(row[i+1] == ""):
                             self._data[s.name].append(None)
                         else:
-                            self._data[s.name].append(float(row[i+1]))                  #+1 because of time in column 0
-                    
+                            # +1 because of time in column 0
+                            self._data[s.name].append(float(row[i+1]))
+
         except:
             raise FileNotFoundError("Error: Loading File failed!")
 
         self._status = LogStatus.LOG_FILE_LOADED
 
-    def getAverageData(self):
+    def getAverageData(self, signalStr):
         if (not self._status == LogStatus.LOG_FILE_LOADED):
             raise ValueError("Not allowed! You have to loadFromFile first")
-        # TODO return average value of data-Array
+        if not signals.containsSignalByString(signalStr):
+            raise ValueError("Signal is not available!")
+        
+        L = self._data[signalStr]
+        L = [x for x in L if x is not None]
+        return mean(L)
+     
 
-    # TODO Add method: getAverageFuelConsumption() and return Value
+    def getFuelConsumption(self):
+        #Not working yet
+        if (not self._status == LogStatus.LOG_FILE_LOADED):
+            raise ValueError("Not allowed! You have to loadFromFile first")
+        if not (signals.containsSignalByString("MAF")
+                and signals.containsSignalByString("COMMANDED_EQUIV_RATIO")
+                and signals.containsSignalByString("SPEED")):
+            raise ValueError(
+                "There are signals missing to calculate FuelConsumption")
+        if not len(self._data[signals.MAF.name]) == len(self._data[signals.COMMANDED_EQUIV_RATIO.name]):
+            raise ValueError("MAF list and AFR list don't have same shapes")
+        FuelDensity = 0.775
+        fuelcons = []
+        maf = self._data[signals.MAF.name]
+        afr = self._data[signals.COMMANDED_EQUIV_RATIO.name]
+        speed = self._data[signals.SPEED.name]
+        for i, v in enumerate(speed):
+            if(afr[i] != 0 and v != 0): 
+                fuelcons.append((maf[i]*3600)/(1000* 14.5*afr[i]* FuelDensity)* 100/(v))
+            else:
+                fuelcons.append(0)
+            
+        return fuelcons

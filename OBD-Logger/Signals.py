@@ -39,6 +39,12 @@ class Signals:
         #TODO: Sort by column in File
         return self.signals
 
+    def containsSignalByString(self, str):
+        for s in self.signals:
+            if(s.name == str):
+                return True
+        return False
+
     def containsSignal(self, signal):
         if not isinstance(signal, OBDSignal):
             raise ValueError("Value has to be instance of OBDSignal")
