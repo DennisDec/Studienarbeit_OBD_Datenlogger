@@ -13,7 +13,7 @@ def connectToWIFI():
         try:
             output = subprocess.check_output(('ping -q -c 1 -W 1 8.8.8.8'), shell=True)
             print(output)
-            t = False
+            tmp = False
         except subprocess.CalledProcessError:
             print("No wireless networks connected")
 
@@ -26,5 +26,10 @@ except Exception as ex:
     print(ex)
 finally:
     signal.alarm(0)
+    log = LogFile()
+    files = LogFile.getFilenames()
+    print(files[1])
+    log.transmitToSQL(files[1])
+    
 
 

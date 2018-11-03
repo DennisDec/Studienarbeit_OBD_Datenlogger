@@ -5,7 +5,7 @@ import mysql.connector
 
 # Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
-path = os.getcwd() + "\\OBD-Logger\\Files\\"
+path = os.getcwd() + "/Files/"
 
 
 class SupportedLabels:
@@ -176,7 +176,7 @@ class LogFile:
     def transmitToSQL(self, filename):
         db = mysql.connector.connect(
             user='root',
-            password='',
+            password='OBD2',
             host='192.168.2.113',
             database='obd/gps-datenlogger'
         )
