@@ -1,6 +1,7 @@
 import csv
 import os
-import datetime
+import datetime    
+import mysql.connector
 
 # Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
@@ -171,6 +172,31 @@ class LogFile:
             raise FileNotFoundError("Error: Loading File failed!")
 
         self._status = LogStatus.LOG_FILE_LOADED
+
+    def transmitToSQL(self, filename):
+        db = mysql.connector.connect(
+            user='root',
+            password='',
+            host='192.168.2.113',
+            database='obd/gps-datenlogger'
+        )
+        #cursor.execute("SELECT * FROM importobd")
+        cursor = db.cursor()
+        """load data from csv file"""
+        try:
+            with open(path+filename, 'r') as csvfile:
+                next(csvfile)  #ignore header (first row)
+                fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
+                for row in fileReader:
+                    print(row)
+                    sql = "INSERT INTO importobd (time, speed, rpm, engine_load, maf, temperature, pedal, afr, fuel_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    cursor.execute(sql, row)
+        except:
+            raise FileNotFoundError("Error: Loading File failed!")
+
+        self._status = LogStatus.LOG_FILE_LOADED   
+        db.commit()
+        db.close()
 
     def getAverageData(self):
         if (not self._status == LogStatus.LOG_FILE_LOADED):
