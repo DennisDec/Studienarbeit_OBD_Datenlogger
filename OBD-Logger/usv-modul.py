@@ -22,14 +22,14 @@ signal.alarm(10)
 
 try:
     connectToWIFI()
-except Exception as ex:
-    print(ex)
-finally:
-    signal.alarm(0)
     log = LogFile()
     files = LogFile.getFilenames()
     print(files[1])
     log.transmitToSQL(files[1])
+except Exception as ex:
+    print(ex)
+finally:
+    signal.alarm(0)
     
 
 

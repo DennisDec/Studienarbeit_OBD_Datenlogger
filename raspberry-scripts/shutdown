@@ -1,0 +1,4 @@
+#!/bin/sh
+
+/usr/bin/python3 /home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/usv-modul.py
+init 0

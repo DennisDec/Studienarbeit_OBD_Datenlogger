@@ -2,11 +2,12 @@ import csv
 import os
 import datetime    
 import mysql.connector
+import env
 
 # Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
-path = os.getcwd() + "/Files/"
-
+#path = os.getcwd() + "/Files/"
+path = "/home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 
 class SupportedLabels:
     """All Labels which support logging funktion"""
@@ -175,10 +176,10 @@ class LogFile:
 
     def transmitToSQL(self, filename):
         db = mysql.connector.connect(
-            user='root',
-            password='OBD2',
-            host='192.168.2.113',
-            database='obd/gps-datenlogger'
+            user=env.DB_USER,
+            password=env.DB_PASSWORD,
+            host=env.DB_HOST,
+            database=env.DB_NAME
         )
         #cursor.execute("SELECT * FROM importobd")
         cursor = db.cursor()
