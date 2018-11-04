@@ -23,6 +23,13 @@ router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
       console.log('GPS-data saved');
     });
   });
+  db.query('SELECT * FROM importobd', function(err, results, fields) {
+    if(err) throw err;
+    fs.writeFile('src/obd/data.json', JSON.stringify(results), function (err) {
+      if (err) throw err;
+      console.log('OBD-data saved');
+    });
+  });
   res.render('dashboard', { title: 'Dashboard', dashboard: true });
 });
 

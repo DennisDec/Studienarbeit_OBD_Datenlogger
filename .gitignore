@@ -13,3 +13,4 @@ npm-debug.log
 # Local env file with credentials
 .env
 markers.json
+data.json
