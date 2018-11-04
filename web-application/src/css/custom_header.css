@@ -100,14 +100,16 @@ body {
   }
 
   .register {
-    width: 400px;
+    max-width: 400px;
+    width: auto;
     border-radius: 15px;
     text-align: left;
     margin: 0 auto;
   }
 
   .login {
-    width: 400px;
+    max-width: 400px;
+    width: auto;
     border-radius: 15px;
     text-align: left;
     margin: 0 auto;
