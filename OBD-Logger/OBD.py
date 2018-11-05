@@ -10,9 +10,10 @@ from Signals import signals
 i = 1
 connection = None
 NotConnected = True
+errorcnt = 0
+HasConnection = True
 
 filename = datetime.datetime.now().strftime("%y_%m_%d_%H:%M:%S_") + "test.csv"
-
 
 while NotConnected:
     connection = obd.OBD()
@@ -23,33 +24,33 @@ while NotConnected:
     else:
         time.sleep(2)
 
-
-print("Erfolg")
-
+print("Successful connected to OBDII!")
 
 log = LogFile()
 log.createLogfile(filename)
-IgnitionStep2 = True
-while (IgnitionStep2 == False):
 
-    #connection = obd.OBD()
-    if(connection.query(obd.commands.RPM).is_null() == False):
-        IgnitionStep2 = True
-    print("Ignition not on Step 2")
-    time.sleep(2)
 
-while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and (connection.query(obd.commands.RPM).is_null() == False)):
+while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
+
+    if(connection.query(obd.commands.RPM).is_null() == True):
+        print("Error")
+        errorcnt += 1
+        print(errorcnt)
+    else:
+        errorcnt = 0
+
+    if(errorcnt >= 3):
+        print("End")
+        HasConnection = False
 
     i = i+1
-    # Parse String to datetime :  t = datetime.datetime.strptime(t,"%Y-%m-%d %H:%M:%S.%f") --> Calculate Difference: t = t2-t1 --> t = round(t.total_seconds()/60, 2) [Time in Minute]
     timestr = str(datetime.datetime.now())
-
     result = []
 
     for signal in signals.getSignalList():
         # different samplerates
 
-        #TODO: if i % signal.sampleRate (spart code)
+        # TODO: if i % signal.sampleRate (spart code)
         if(signal.sampleRate == 1):
             r = connection.query(obd.commands[signal.name])
             if r.is_null():
@@ -74,4 +75,4 @@ while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and (connection.
         log.appendFile()
         print("Append File")
 
-print("Zündung wurde ausgeschaltet!\n")
+print("Ignition Off\n")

@@ -4,7 +4,7 @@ import csv
 import os
 import datetime    
 import mysql.connector
-#import env
+import env
 
 from statistics import mean
 
@@ -53,9 +53,11 @@ class LogFile:
             with open(path+filename, 'w', newline='') as file:
                 wr = csv.writer(file, quoting=csv.QUOTE_MINIMAL)
                 # Auto generate Header from signals in Signals.py
-                wr.writerow([s.name for s in signals.getSignalList()])
+                header = [s.name for s in signals.getSignalList()]
+                header.insert(0,'TIME')
+                wr.writerow(header)
         except:
-            print("Error! Loading File")
+            print("Error! Creating File failed")
 
         self._filename = filename
         self._status = LogStatus.LOG_CREATED
@@ -117,6 +119,10 @@ class LogFile:
 
         del self._time[:]
         self._data.clear()
+        for s in signals.getSignalList():
+            # Fill Dictionary with Signals from Class Signals
+            self._data[s.name] = []
+        
 
     def loadFromFile(self, filename):
         """load data from csv file"""
