@@ -12,8 +12,8 @@ from Signals import signals
 
 # Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
-#path = os.getcwd() + "/Files/"
-path = "/home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
+path = os.getcwd() + "\\OBD-Logger\\Files\\"
+#path = "/home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 
 class LogStatus:
     """ Values for the Log status flags """
