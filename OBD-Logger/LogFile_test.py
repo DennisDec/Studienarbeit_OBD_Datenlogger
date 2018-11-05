@@ -26,8 +26,6 @@ class TestLogFile(unittest.TestCase):
         self.assertTrue(signals.containsSignal(o1))
         self.assertFalse(signals.containsSignal(o2))
 
-
-
     def test_StatusNoLogFile(self):
         log = LogFile()
         self.assertEqual(log.status(), LogStatus.NO_LOGFILE)
