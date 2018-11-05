@@ -1,17 +1,22 @@
-from LogFile import LogFile, SupportedLabels
+# pylint: disable=no-member
+from statistics import mean
+from LogFile import LogFile
 import os
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
 import time
+from Signals import signals
 
-LabelList = [SupportedLabels.SPEED, SupportedLabels.RPM, SupportedLabels.ENGINE_LOAD, SupportedLabels.MAF,
-             SupportedLabels.AMBIANT_AIR_TEMP, SupportedLabels.RELATIVE_ACCEL_POS, SupportedLabels.COMMANDED_EQUIV_RATIO, SupportedLabels.FUEL_LEVEL]
+#Average Test
+L = [1,2,4,3,6,None,8,0 ,0]
+liste = [x for x in L if x is not None]
+mean(liste)
+
 
 filename = 'TestFile.csv'
 log = LogFile()
-log.createLogfile(filename, ["Time", "Speed", "RPM", "Engine_Load",
-                             "MAF", "Temperature", "Pedal", "AFR", "Fuel Level"])
+log.createLogfile(filename)
 
 
 speed = [34, 35, 36, 24, 23, 56]
@@ -25,16 +30,16 @@ fuel_lvl = [80, 80, 80, 79, 79, 79]
 
 for i in range(0, len(speed)):
     t1 = str(datetime.datetime.now())
-    log.addData(t1, speed[i], rpm[i], load[i], maf[i],
-                temp[i], pedal[i], afr[i], fuel_lvl[i])
+    log.addData(t1, [speed[i], rpm[i], load[i], maf[i],
+                temp[i], pedal[i], afr[i], fuel_lvl[i]])
 
 log.appendFile()
 
 log2 = LogFile()
 log2.loadFromFile(filename)
 
-for label in LabelList:
-    print(label + str(log2.getLabelData(label)))
+for label in signals.getSignalList():
+    print(str(label.name) + str(log2.getLabelData(label.name)))
 
 
 files = LogFile.getFilenames()  # static Method
@@ -43,15 +48,20 @@ print(files)
 
 log2 = LogFile()
 log2.loadFromFile(files[0])
+average_speed = log2.getAverageData(signals.SPEED.name)
 time = log2.getRelTime()
-speed = log2.getLabelData(SupportedLabels.SPEED)
-rpm = log2.getLabelData(SupportedLabels.RPM)
-load = log2.getLabelData(SupportedLabels.ENGINE_LOAD)
-temp = log2.getLabelData(SupportedLabels.AMBIANT_AIR_TEMP)
-pedal = log2.getLabelData(SupportedLabels.RELATIVE_ACCEL_POS)
-maf = log2.getLabelData(SupportedLabels.MAF)
-afr = log2.getLabelData(SupportedLabels.COMMANDED_EQUIV_RATIO)
+speed = log2.getLabelData(signals.SPEED.name)
+afr = log2.getLabelData(signals.COMMANDED_EQUIV_RATIO.name)
+temp = log2.getLabelData(signals.AMBIANT_AIR_TEMP.name)
+rpm = log2.getLabelData(signals.RPM.name)
+load = log2.getLabelData(signals.ENGINE_LOAD.name)
+maf = log2.getLabelData(signals.MAF.name)
+pedal = log2.getLabelData(signals.RELATIVE_ACCEL_POS.name)
+fuel_lvl = log2.getLabelData(signals.FUEL_LEVEL.name)
 
+
+
+fuelCons = log2.getFuelConsumption()
 
 # Numpy Array
 #time = np.asarray(time)
@@ -60,7 +70,7 @@ afr = log2.getLabelData(SupportedLabels.COMMANDED_EQUIV_RATIO)
 
 
 # Plot Signals
-fig, (ax1, ax2, ax3, ax4, ax5, ax6, ax7) = plt.subplots(7, 1)
+fig, (ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8) = plt.subplots(8, 1)
 ax1.plot(time, speed)
 ax4.plot(time, temp)
 ax4.set(ylabel='Temperatur [°C]')
@@ -70,6 +80,9 @@ ax6.plot(time, maf)
 ax6.set(ylabel='Mass Air Flow')
 ax7.plot(time, afr)
 ax7.set(ylabel='Air Fuel Ratio')
+
+ax8.plot(time, fuelCons)
+ax8.set(ylabel='FuelCons L/100km')
 
 
 if(len(load) == len(time)):
