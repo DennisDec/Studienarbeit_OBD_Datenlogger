@@ -17,7 +17,8 @@ var users = require('./routes/users');
 
 var app = express();
 
-require('dotenv').config();         // needed to use process.env
+var testFunction = require('dotenv').config();         // needed to use process.env
+console.log(testFunction);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
