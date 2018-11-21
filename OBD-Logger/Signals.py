@@ -3,15 +3,19 @@ import numpy as np
 
 
 __signals__ = [
-  #           SignalName                  description                 sampleRate      Index
-    OBDSignal("SPEED"                   , "Car speed"                     , 1         , 1),
-    OBDSignal("RPM"                     , "Revolutions per minute"        , 1         , 2),
-    OBDSignal("ENGINE_LOAD"             , "Engine load"                   , 1         , 3),
-    OBDSignal("MAF"                     , "Description"                   , 1         , 4),
-    OBDSignal("AMBIANT_AIR_TEMP"        , "Description"                   , 1         , 5),
-    OBDSignal("RELATIVE_ACCEL_POS"      , "Description"                   , 1         , 6),
-    OBDSignal("COMMANDED_EQUIV_RATIO"   , "Description"                   , 1         , 7),
-    OBDSignal("FUEL_LEVEL"              , "Description"                   , 2         , 8),
+  #           SignalName                  description               isOBDSignal  sampleRate      Index
+    OBDSignal("Time"                    , "Date and Time"                ,False     , 1         , 0),
+    OBDSignal("SPEED"                   , "Car speed"                    ,True      , 1         , 1),
+    OBDSignal("RPM"                     , "Revolutions per minute"       ,True      , 1         , 2),
+    OBDSignal("ENGINE_LOAD"             , "Engine load"                  ,True      , 1         , 3),
+    OBDSignal("MAF"                     , "Description"                  ,True      , 1         , 4),
+    OBDSignal("AMBIANT_AIR_TEMP"        , "Description"                  ,True      , 1         , 5),
+    OBDSignal("RELATIVE_ACCEL_POS"      , "Description"                  ,True      , 1         , 6),
+    OBDSignal("COMMANDED_EQUIV_RATIO"   , "Description"                  ,True      , 1         , 7),
+    OBDSignal("FUEL_LEVEL"              , "Description"                  ,True      , 2         , 8),
+    OBDSignal("GPS_Long"                , "Longitude"                    ,False      , 2         , 8),
+    OBDSignal("GPS_Lat"                 , "Latitude"                     ,False      , 2         , 8),
+    OBDSignal("GPS_Alt"                 , "Altitude"                     ,False      , 2         , 8),
 ]
 
 
@@ -26,7 +30,6 @@ class Signals:
     def __getitem__(self, key):
         """
             Signals can be accessed by different ways
-
             signals.RPM
             signals.["RPM"]
             signals.[1]
@@ -38,7 +41,7 @@ class Signals:
 
     def getSignalList(self):
         #TODO: Sort by column in File
-        return self.signals
+        return [x for x in self.signals if x.isOBDSignal == True]
 
     def containsSignalByString(self, str):
         for s in self.signals:
@@ -53,7 +56,6 @@ class Signals:
             if(s == signal):
                 return True
         return False
-
 
 
 signals = Signals()
