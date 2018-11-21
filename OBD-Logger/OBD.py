@@ -56,7 +56,7 @@ while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnectio
             if r.is_null():
                 result.append(0)
             else:
-                result.append(r.value.magnitude)
+                result.append(round(r.value.magnitude,2))
 
         elif(signal.sampleRate == 2):
             if(i % 5 == 0):
