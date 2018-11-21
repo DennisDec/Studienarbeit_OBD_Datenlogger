@@ -2,9 +2,9 @@
 
 class OBDSignal:
 
-    def __init__(self, name, description, isOBDSignal, sampleRate, columnInFile):
+    def __init__(self, name, db_name, isOBDSignal, sampleRate, columnInFile):
         self.name = name
-        self.description = description
+        self.db_name = db_name
         self.isOBDSignal = isOBDSignal
         self.sampleRate = sampleRate
         self.columnInFile = columnInFile

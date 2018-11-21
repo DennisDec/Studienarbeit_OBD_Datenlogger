@@ -1,4 +1,5 @@
-from LogFile import LogFile, LogStatus, SupportedLabels
+# pylint: disable=no-member
+from LogFile import LogFile
 import subprocess
 import signal
 import time

@@ -1,23 +1,21 @@
 from OBDSignal import OBDSignal
 import numpy as np
 
-
 __signals__ = [
-  #           SignalName                  description               isOBDSignal  sampleRate      Index
-    OBDSignal("Time"                    , "Date and Time"                ,False     , 1         , 0),
-    OBDSignal("SPEED"                   , "Car speed"                    ,True      , 1         , 1),
-    OBDSignal("RPM"                     , "Revolutions per minute"       ,True      , 1         , 2),
-    OBDSignal("ENGINE_LOAD"             , "Engine load"                  ,True      , 1         , 3),
-    OBDSignal("MAF"                     , "Description"                  ,True      , 1         , 4),
-    OBDSignal("AMBIANT_AIR_TEMP"        , "Description"                  ,True      , 1         , 5),
-    OBDSignal("RELATIVE_ACCEL_POS"      , "Description"                  ,True      , 1         , 6),
-    OBDSignal("COMMANDED_EQUIV_RATIO"   , "Description"                  ,True      , 1         , 7),
-    OBDSignal("FUEL_LEVEL"              , "Description"                  ,True      , 2         , 8),
-    OBDSignal("GPS_Long"                , "Longitude"                    ,False      , 2         , 8),
-    OBDSignal("GPS_Lat"                 , "Latitude"                     ,False      , 2         , 8),
-    OBDSignal("GPS_Alt"                 , "Altitude"                     ,False      , 2         , 8),
+  #           SignalName                  db-name                       isOBDSignal  sampleRate     Index
+    OBDSignal("TIME"                    , "time"                            ,False      , 1         , 0),
+    OBDSignal("SPEED"                   , "speed"                           ,True       , 1         , 1),
+    OBDSignal("RPM"                     , "rpm"                             ,True       , 1         , 2),
+    OBDSignal("ENGINE_LOAD"             , "engine_load"                     ,True       , 1         , 3),
+    OBDSignal("MAF"                     , "maf"                             ,True       , 1         , 4),
+    OBDSignal("AMBIANT_AIR_TEMP"        , "temperature"                     ,True       , 1         , 5),
+    OBDSignal("RELATIVE_ACCEL_POS"      , "pedal"                           ,True       , 1         , 6),
+    OBDSignal("COMMANDED_EQUIV_RATIO"   , "afr"                             ,True       , 1         , 7),
+    OBDSignal("FUEL_LEVEL"              , "fuel_level"                      ,True       , 2         , 8),
+    #OBDSignal("GPS_Long"               , "Longitude"                       ,False      , 2         , 8),
+    #OBDSignal("GPS_Lat"                , "Latitude"                        ,False      , 2         , 8),
+    #OBDSignal("GPS_Alt"                , "Altitude"                        ,False      , 2         , 8),
 ]
-
 
 class Signals:
     def __init__(self):
@@ -38,10 +36,17 @@ class Signals:
             return self.signals[key]
         elif isinstance(key, str):
             return self.__dict__[key]
+    
+    def getTimeSignal(self):
+        return [x for x in self.signals if x.name == "TIME"][0]
+
+    def getOBDSignalList(self):
+        return [x for x in self.signals if x.isOBDSignal == True]
+
 
     def getSignalList(self):
         #TODO: Sort by column in File
-        return [x for x in self.signals if x.isOBDSignal == True]
+        return self.signals
 
     def containsSignalByString(self, str):
         for s in self.signals:

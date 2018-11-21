@@ -32,12 +32,11 @@ class LogFile:
 
     def __init__(self):
         self._filename = ""
-        self._time = []
         self._data = {
 
         }
 
-        for s in signals.getSignalList():
+        for s in signals.getSignalList():    #Get OBD Signals
             # Fill Dictionary with Signals from Class Signals
             self._data[s.name] = []
 
@@ -54,7 +53,6 @@ class LogFile:
                 wr = csv.writer(file, quoting=csv.QUOTE_MINIMAL)
                 # Auto generate Header from signals in Signals.py
                 header = [s.name for s in signals.getSignalList()]
-                header.insert(0,'TIME')
                 wr.writerow(header)
         except:
             print("Error! Creating File failed")
@@ -63,12 +61,13 @@ class LogFile:
         self._status = LogStatus.LOG_CREATED
 
     # TODO User List instead of single parameter
-    def addData(self, time, signalList):
+    def addData(self, signalList):
         """add data to buffer"""
-        self._time.append(time)
-
-        for i, s in enumerate(signals.getSignalList()):
-            self._data[s.name].append(signalList[i])
+        if(len(signals.getSignalList()) == len(signalList)):
+            for i, s in enumerate(signals.getSignalList()):
+                self._data[s.name].append(signalList[i])
+        else:
+            raise ValueError("Error: signalList has to have the same shape as signals.getSignalList()")
 
     def getLabelData(self, SupportedLabels):
         if (not self._status == LogStatus.LOG_FILE_LOADED):
@@ -76,15 +75,11 @@ class LogFile:
         return self._data[SupportedLabels]
 
     def getTime(self):
-        if (not self._status == LogStatus.LOG_FILE_LOADED):
-            raise ValueError("Not allowed! You have to loadFromFile first")
-        return self._time
+        return self.getLabelData(signals.getTimeSignal().name)
 
     def getRelTime(self):
-        if (not self._status == LogStatus.LOG_FILE_LOADED):
-            raise ValueError("Not allowed! You have to loadFromFile first")
         tList = []
-        timebuffer = self._time
+        timebuffer = self.getTime()
 
         for i in timebuffer:
             tList.append(round((datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") -
@@ -104,11 +99,8 @@ class LogFile:
                 wr = csv.writer(
                     file, quoting=csv.QUOTE_MINIMAL, quotechar='"')
 
-                for i in range(0, len(self._time)):
+                for i in range(0, len(self._data["TIME"])):
                     buffer = []
-                    buffer.append(self._time[i])
-
-                    # TODO: Use for-Loop instead
 
                     for s in signals.getSignalList():
                         buffer.append(self._data[s.name][i])
@@ -117,7 +109,6 @@ class LogFile:
         except:
             raise FileNotFoundError("Error!: Appending file failed")
 
-        del self._time[:]
         self._data.clear()
         for s in signals.getSignalList():
             # Fill Dictionary with Signals from Class Signals
@@ -131,43 +122,64 @@ class LogFile:
                 next(csvfile)  # ignore header (first row)
                 fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
                 for row in fileReader:
-                    self._time.append(row[0])
 
                     for i, s in enumerate(signals.getSignalList()):
-
-                        if(row[i+1] == ""):
+                        
+                        if(row[i] == ""):
                             self._data[s.name].append(None)
                         else:
-                            # +1 because of time in column 0
-                            self._data[s.name].append(float(row[i+1]))
+                            if(s.name == "TIME"):
+                                self._data[s.name].append(row[i])
+                            else:
+                                self._data[s.name].append(float(row[i]))
 
         except:
             raise FileNotFoundError("Error: Loading File failed!")
 
         self._status = LogStatus.LOG_FILE_LOADED
 
-    def transmitToSQL(self, filename):
+    def transmitToSQL(self, filename):                      #Connecting to SQL Server
         db = mysql.connector.connect(
             user=env.DB_USER,
             password=env.DB_PASSWORD,
             host=env.DB_HOST,
             database=env.DB_NAME
         )
+
+
+
         #cursor.execute("SELECT * FROM importobd")
         cursor = db.cursor()
-        """load data from csv file"""
-        try:
-            with open(path+filename, 'r') as csvfile:
-                next(csvfile)  #ignore header (first row)
-                fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
-                for row in fileReader:
-                    print(row)
-                    sql = "INSERT INTO importobd (time, speed, rpm, engine_load, maf, temperature, pedal, afr, fuel_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    cursor.execute(sql, row)
-        except:
-            raise FileNotFoundError("Error: Loading File failed!")
+        
+        # """load data from csv file"""
+        # try:
+        #     with open(path+filename, 'r') as csvfile:
+        #         next(csvfile)  #ignore header (first row)
+        #         fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        #         for row in fileReader:
+        #             print(row)
+        #             sql = "INSERT INTO importobd (time, speed, rpm, engine_load, maf, temperature, pedal, afr, fuel_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        #             cursor.execute(sql, row)
+        # except:
+        #     raise FileNotFoundError("Error: Loading File failed!")
 
-        self._status = LogStatus.LOG_FILE_LOADED   
+        # self._status = LogStatus.LOG_FILE_LOADED
+        sql = "INSERT INTO importobd ("
+        s = []
+        for signal in signals.getSignalList():
+            s.append(signal.db_name)
+        sql += ", ".join(s)
+        sql += ") VALUES ("
+        tmp = []
+        for i in range(len(s)):
+            tmp.append("%s")
+        sql += ", ".join(tmp)
+        sql += ")"                    
+        for i in enumerate(len(self._data["TIME"])):
+            row = []
+            for s in signals.getSignalList()):
+                row.append(self._data[s.name][i])                
+            cursor.execute(sql, row)
         db.commit()
         db.close()
 

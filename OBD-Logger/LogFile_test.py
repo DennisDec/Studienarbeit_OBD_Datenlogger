@@ -11,6 +11,24 @@ filename = 'Unittest.csv'
 
 class TestLogFile(unittest.TestCase):
 
+
+    def test_SQLString(self):
+        sql = "INSERT INTO importobd ("
+        s = []
+        for signal in signals.getSignalList():
+            s.append(signal.db_name)
+        sql += ", ".join(s)
+        sql += ") VALUES ("
+        tmp = []
+        for i in range(len(s)):
+            tmp.append("%s")
+        sql += ", ".join(tmp)
+        sql += ")" 
+
+        print(sql)
+        #INSERT INTO importobd (time, speed, rpm, engine_load, maf, temperature, pedal, afr, fuel_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+
+
     def test_EqualOBDSignals(self):
         o1 = OBDSignal("Signal1", "Test", True, 1 , 3)
         o2 = OBDSignal("Signal1", "Test", True, 1 , 3)
@@ -61,7 +79,7 @@ class TestLogFile(unittest.TestCase):
         fuel_lvl = [80, 80, 80, 79, 79, 79]
        
         for i in  range(0, len(speed)):
-            log.addData(t1, [speed[i], rpm[i], load[i], maf[i], temp[i], pedal[i], afr[i], fuel_lvl[i]])
+            log.addData([t1, speed[i], rpm[i], load[i], maf[i], temp[i], pedal[i], afr[i], fuel_lvl[i]])
             
 
         log.appendFile()
