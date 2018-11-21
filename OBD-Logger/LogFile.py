@@ -21,6 +21,24 @@ class LogStatus:
     LOG_CREATED = "LogFile created"
     LOG_FILE_LOADED = "LogFile loaded from File"
 
+class Stringbuilder:
+
+    @staticmethod
+    def SqlBuidler(tableName):
+
+        #TODO: Call different getSignalList()-method, depending on tableName!
+        sql = "INSERT INTO" + str(tableName) + "("
+        s = []
+        for signal in signals.getSignalList():
+            s.append(signal.db_name)
+        sql += ", ".join(s)
+        sql += ") VALUES ("
+        tmp = []
+        for i in range(len(s)):
+            tmp.append("%s")
+        sql += ", ".join(tmp)
+        sql += ")" 
+        return sql
 
 class LogFile:
     """Class to log data from OBDII adapter"""
@@ -138,7 +156,7 @@ class LogFile:
 
         self._status = LogStatus.LOG_FILE_LOADED
 
-    def transmitToSQL(self, filename):                      #Connecting to SQL Server
+    def transmitToSQL(self):                      #Connecting to SQL Server
         db = mysql.connector.connect(
             user=env.DB_USER,
             password=env.DB_PASSWORD,
@@ -146,40 +164,13 @@ class LogFile:
             database=env.DB_NAME
         )
 
+        cursor = db.cursor()                   
 
-
-        #cursor.execute("SELECT * FROM importobd")
-        cursor = db.cursor()
-        
-        # """load data from csv file"""
-        # try:
-        #     with open(path+filename, 'r') as csvfile:
-        #         next(csvfile)  #ignore header (first row)
-        #         fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
-        #         for row in fileReader:
-        #             print(row)
-        #             sql = "INSERT INTO importobd (time, speed, rpm, engine_load, maf, temperature, pedal, afr, fuel_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        #             cursor.execute(sql, row)
-        # except:
-        #     raise FileNotFoundError("Error: Loading File failed!")
-
-        # self._status = LogStatus.LOG_FILE_LOADED
-        sql = "INSERT INTO importobd ("
-        s = []
-        for signal in signals.getSignalList():
-            s.append(signal.db_name)
-        sql += ", ".join(s)
-        sql += ") VALUES ("
-        tmp = []
-        for i in range(len(s)):
-            tmp.append("%s")
-        sql += ", ".join(tmp)
-        sql += ")"                    
-        for i in enumerate(len(self._data["TIME"])):
+        for i in range(len(self._data["TIME"])):
             row = []
-            for s in signals.getSignalList()):
+            for s in signals.getSignalList():
                 row.append(self._data[s.name][i])                
-            cursor.execute(sql, row)
+            cursor.execute(Stringbuilder.SqlBuidler("importobd"), row)
         db.commit()
         db.close()
 
