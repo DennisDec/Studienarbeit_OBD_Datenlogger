@@ -27,7 +27,7 @@ class Stringbuilder:
     def SqlBuidler(tableName):
 
         #TODO: Call different getSignalList()-method, depending on tableName!
-        sql = "INSERT INTO" + str(tableName) + "("
+        sql = "INSERT INTO " + str(tableName) + "("
         s = []
         for signal in signals.getSignalList():
             s.append(signal.db_name)

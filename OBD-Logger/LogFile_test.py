@@ -1,4 +1,4 @@
-from LogFile import LogFile, LogStatus
+from LogFile import LogFile, LogStatus, Stringbuilder
 # pylint: disable=no-member
 import unittest
 import time
@@ -11,6 +11,9 @@ filename = 'Unittest.csv'
 
 class TestLogFile(unittest.TestCase):
 
+    def test_SQL(self):
+        print(Stringbuilder.SqlBuidler("test"))
+        
 
     def test_SQLString(self):
         sql = "INSERT INTO importobd ("

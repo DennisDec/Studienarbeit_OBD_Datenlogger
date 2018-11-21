@@ -25,8 +25,8 @@ try:
     connectToWIFI()
     log = LogFile()
     files = LogFile.getFilenames()
-    print(files[1])
-    log.transmitToSQL(files[1])
+    log.loadFromFile(files[1])
+    log.transmitToSQL()
 except Exception as ex:
     print(ex)
 finally:
