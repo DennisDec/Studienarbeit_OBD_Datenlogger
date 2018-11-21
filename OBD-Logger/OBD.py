@@ -46,29 +46,20 @@ while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnectio
     i = i+1
     timestr = str(datetime.datetime.now())
     result = []
-
+    result.append(timestr)
     for signal in signals.getSignalList():
         # different samplerates
-
-        # TODO: if i % signal.sampleRate (spart code)
-        if(signal.sampleRate == 1):
+        
+        if(i % signal.sampleRate == 0):
             r = connection.query(obd.commands[signal.name])
             if r.is_null():
                 result.append(0)
             else:
-                result.append(round(r.value.magnitude,2))
+                result.append(r.value.magnitude)
+        else:
+            result.append(None)
 
-        elif(signal.sampleRate == 2):
-            if(i % 5 == 0):
-                r = connection.query(obd.commands[signal.name])
-                if r.is_null():
-                    result.append(0)
-                else:
-                    result.append(r.value.magnitude)
-            else:
-                result.append(None)
-
-    log.addData(timestr, result)
+    log.addData(result)
     time.sleep(1)
 
     if(i % 10 == 0):
