@@ -4,6 +4,8 @@ import numpy as np
 __signals__ = [
   #           SignalName                  db-name                       isOBDSignal  sampleRate     Index
     OBDSignal("TIME"                    , "time"                            ,False      , 1         , 0),
+
+    #OBD SIGNALS:
     OBDSignal("SPEED"                   , "speed"                           ,True       , 1         , 1),
     OBDSignal("RPM"                     , "rpm"                             ,True       , 1         , 2),
     OBDSignal("ENGINE_LOAD"             , "engine_load"                     ,True       , 1         , 3),
@@ -12,6 +14,8 @@ __signals__ = [
     OBDSignal("RELATIVE_ACCEL_POS"      , "pedal"                           ,True       , 1         , 6),
     OBDSignal("COMMANDED_EQUIV_RATIO"   , "afr"                             ,True       , 1         , 7),
     OBDSignal("FUEL_LEVEL"              , "fuel_level"                      ,True       , 2         , 8),
+
+    #Other SIGNALS:
     #OBDSignal("GPS_Long"               , "Longitude"                       ,False      , 2         , 8),
     #OBDSignal("GPS_Lat"                , "Latitude"                        ,False      , 2         , 8),
     #OBDSignal("GPS_Alt"                , "Altitude"                        ,False      , 2         , 8),

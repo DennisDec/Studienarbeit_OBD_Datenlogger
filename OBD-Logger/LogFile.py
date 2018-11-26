@@ -25,6 +25,10 @@ class Stringbuilder:
 
     @staticmethod
     def SqlBuidler(tableName):
+        """ 
+        Creates a string with SQL INSTERT command to load all measurements to a sql table 
+
+        """
 
         #TODO: Call different getSignalList()-method, depending on tableName!
         sql = "INSERT INTO " + str(tableName) + "("
@@ -45,7 +49,7 @@ class LogFile:
 
     @staticmethod
     def getFilenames():
-        """returns a List of filenames"""
+        """returns a List of filenames which are located in path """
         return [f for f in os.listdir(path) if f.endswith('.csv')]
 
     def __init__(self):
@@ -63,7 +67,9 @@ class LogFile:
     def status(self):
         return self._status
 
-    # TODO: header can be set inside this Class
+    def getDataDict(self):
+        return self._data
+
     def createLogfile(self, filename):
         """Create logfile to track OBDII data"""
         try:
@@ -78,33 +84,49 @@ class LogFile:
         self._filename = filename
         self._status = LogStatus.LOG_CREATED
 
-    # TODO User List instead of single parameter
     def addData(self, signalList):
         """add data to buffer"""
         if(len(signals.getSignalList()) == len(signalList)):
             for i, s in enumerate(signals.getSignalList()):
-                self._data[s.name].append(signalList[i])
+                if(s.name == "TIME" or signalList[i] == None):
+                    self._data[s.name].append(signalList[i])
+                else:
+                    self._data[s.name].append(round(float(signalList[i]),2))
         else:
             raise ValueError("Error: signalList has to have the same shape as signals.getSignalList()")
 
-    def getLabelData(self, SupportedLabels):
+    def getLabelData(self, labelName):
+        """
+            returns measurement data by labelName. Call loadFrimFile() first
+        """
         if (not self._status == LogStatus.LOG_FILE_LOADED):
             raise ValueError("Not allowed! You have to loadFromFile first")
-        return self._data[SupportedLabels]
+        return self._data[labelName]
 
     def getTime(self):
+        """ 
+            returns time array  
+        """
         return self.getLabelData(signals.getTimeSignal().name)
 
     def getRelTime(self):
+        """
+            returns relative time array in second based on the start time
+        """
+
         tList = []
         timebuffer = self.getTime()
 
         for i in timebuffer:
             tList.append(round((datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") -
-                                datetime.datetime.strptime(self._time[0], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
+                                datetime.datetime.strptime(self._data[signals.TIME.name][0], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
         return tList
 
     def getfilename(self):
+        """
+            returns the current fileName
+        """
+
         return self._filename
 
     def appendFile(self):
@@ -149,14 +171,18 @@ class LogFile:
                             if(s.name == "TIME"):
                                 self._data[s.name].append(row[i])
                             else:
-                                self._data[s.name].append(float(row[i]))
+                                self._data[s.name].append(round(float(row[i]),2))
 
         except:
             raise FileNotFoundError("Error: Loading File failed!")
-
+        self._filename = filename
         self._status = LogStatus.LOG_FILE_LOADED
 
     def transmitToSQL(self):                      #Connecting to SQL Server
+        """
+            Connecting to SQL server and transmit all data stored in this Class
+            --> Call loadFromFile()-method first
+        """
         db = mysql.connector.connect(
             user=env.DB_USER,
             password=env.DB_PASSWORD,
@@ -175,6 +201,10 @@ class LogFile:
         db.close()
 
     def getAverageData(self, signalStr):
+        """
+            returns averange array from
+        """
+
         if (not self._status == LogStatus.LOG_FILE_LOADED):
             raise ValueError("Not allowed! You have to loadFromFile first")
         if not signals.containsSignalByString(signalStr):
@@ -184,27 +214,25 @@ class LogFile:
         L = [x for x in L if x is not None]
         return mean(L)
      
-
-    def getFuelConsumption(self):
-        #Not working yet
-        if (not self._status == LogStatus.LOG_FILE_LOADED):
-            raise ValueError("Not allowed! You have to loadFromFile first")
-        if not (signals.containsSignalByString("MAF")
-                and signals.containsSignalByString("COMMANDED_EQUIV_RATIO")
-                and signals.containsSignalByString("SPEED")):
-            raise ValueError(
-                "There are signals missing to calculate FuelConsumption")
-        if not len(self._data[signals.MAF.name]) == len(self._data[signals.COMMANDED_EQUIV_RATIO.name]):
-            raise ValueError("MAF list and AFR list don't have same shapes")
-        FuelDensity = 0.775
-        fuelcons = []
-        maf = self._data[signals.MAF.name]
-        afr = self._data[signals.COMMANDED_EQUIV_RATIO.name]
-        speed = self._data[signals.SPEED.name]
-        for i, v in enumerate(speed):
-            if(afr[i] != 0 and v != 0): 
-                fuelcons.append((maf[i]*3600)/(1000* 14.5*afr[i]* FuelDensity)* 100/(v))
-            else:
-                fuelcons.append(0)
-            
-        return fuelcons
+    # def getFuelConsumption(self):
+    #     #Not working yet
+    #     if (not self._status == LogStatus.LOG_FILE_LOADED):
+    #         raise ValueError("Not allowed! You have to loadFromFile first")
+    #     if not (signals.containsSignalByString("MAF")
+    #             and signals.containsSignalByString("COMMANDED_EQUIV_RATIO")
+    #             and signals.containsSignalByString("SPEED")):
+    #         raise ValueError(
+    #             "There are signals missing to calculate FuelConsumption")
+    #     if not len(self._data[signals.MAF.name]) == len(self._data[signals.COMMANDED_EQUIV_RATIO.name]):
+    #         raise ValueError("MAF list and AFR list don't have same shapes")
+    #     FuelDensity = 0.775
+    #     fuelcons = []
+    #     maf = self._data[signals.MAF.name]
+    #     afr = self._data[signals.COMMANDED_EQUIV_RATIO.name]
+    #     speed = self._data[signals.SPEED.name]
+    #     for i, v in enumerate(speed):
+    #         if(afr[i] != 0 and v != 0): 
+    #             fuelcons.append((maf[i]*3600)/(1000* 14.5*afr[i]* FuelDensity)* 100/(v))
+    #         else:
+    #             fuelcons.append(0)
+    #      return fuelcons
