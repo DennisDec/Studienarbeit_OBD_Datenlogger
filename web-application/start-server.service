@@ -1,0 +1,10 @@
+[Unit]
+Description=Start the web-application automatically
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/home/pi/Studienarbeit_OBD_Datenlogger/web-application/start-server
+
+[Install]
+WantedBy=multi-user.target
