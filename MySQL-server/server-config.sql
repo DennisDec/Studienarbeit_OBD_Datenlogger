@@ -17,7 +17,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema obd/gps-datenlogger
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `obd/gps-datenlogger` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+CREATE SCHEMA IF NOT EXISTS `obd/gps-datenlogger`;
 USE `obd/gps-datenlogger` ;
 
 -- -----------------------------------------------------
@@ -28,13 +28,8 @@ CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`gpsdata` (
   `route_name` VARCHAR(50) NULL DEFAULT NULL,
   `lat` FLOAT NULL DEFAULT NULL,
   `lng` FLOAT NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `idgps-data_UNIQUE` (`id` ASC) VISIBLE)
-ENGINE = InnoDB
-AUTO_INCREMENT = 1
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
+  PRIMARY KEY (`id`)
+);
 
 -- -----------------------------------------------------
 -- Table `obd/gps-datenlogger`.`importobd`
@@ -50,13 +45,8 @@ CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`importobd` (
   `pedal` DOUBLE NULL DEFAULT NULL,
   `afr` DOUBLE NULL DEFAULT NULL,
   `fuel_level` DOUBLE NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE)
-ENGINE = InnoDB
-AUTO_INCREMENT = 1
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
+  PRIMARY KEY (`id`)
+);
 
 -- -----------------------------------------------------
 -- Table `obd/gps-datenlogger`.`sessions`
@@ -65,11 +55,8 @@ CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`sessions` (
   `session_id` VARCHAR(128) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_bin' NOT NULL,
   `expires` INT(11) UNSIGNED NOT NULL,
   `data` TEXT CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_bin' NULL DEFAULT NULL,
-  PRIMARY KEY (`session_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
+  PRIMARY KEY (`session_id`)
+);
 
 -- -----------------------------------------------------
 -- Table `obd/gps-datenlogger`.`users`
@@ -79,15 +66,5 @@ CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`users` (
   `username` VARCHAR(20) NULL DEFAULT NULL,
   `email` VARCHAR(100) NULL DEFAULT NULL,
   `password` BINARY(60) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
-  UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE)
-ENGINE = InnoDB
-AUTO_INCREMENT = 1
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+  PRIMARY KEY (`id`)
+);
