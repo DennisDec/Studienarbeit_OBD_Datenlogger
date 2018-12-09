@@ -62,7 +62,7 @@ def main():
         result.append(timestr)
         lon = None
         lat = None
-        if(i % 5 == 0):
+        if(i % 4 == 0):
             report = session.next()
             if report['class'] == 'TPV':
                 if hasattr(report, 'lon') and hasattr(report, 'lat'):
@@ -90,7 +90,7 @@ def main():
 
         time.sleep(0.5)                      #Sleep 500ms to get not that much ammount of data 
 
-        if(i % 10 == 0):                     #Appand file every 10 rows of measurement data
+        if(i % 20 == 0):                     #Appand file every 20 rows of measurement data
             log.appendFile()
             print("Appending File ...")
 

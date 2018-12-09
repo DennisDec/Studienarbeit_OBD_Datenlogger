@@ -2,23 +2,23 @@ from OBDSignal import OBDSignal
 import numpy as np
 
 __signals__ = [
-  #           SignalName                  db-name                       isOBDSignal  sampleRate     Index
+  #           SignalName                  db-name                       isOBDSignal  sampleRate     round
     OBDSignal("TIME"                    , "time"                            ,False      , 1         , 0),
 
     #OBD SIGNALS:
-    OBDSignal("SPEED"                   , "speed"                           ,True       , 1         , 1),
+    OBDSignal("SPEED"                   , "speed"                           ,True       , 1         , 2),
     OBDSignal("RPM"                     , "rpm"                             ,True       , 1         , 2),
-    OBDSignal("ENGINE_LOAD"             , "engine_load"                     ,True       , 1         , 3),
-    OBDSignal("MAF"                     , "maf"                             ,True       , 1         , 4),
-    OBDSignal("AMBIANT_AIR_TEMP"        , "temperature"                     ,True       , 1         , 5),
-    OBDSignal("RELATIVE_ACCEL_POS"      , "pedal"                           ,True       , 1         , 6),
-    OBDSignal("COMMANDED_EQUIV_RATIO"   , "afr"                             ,True       , 1         , 7),
-    OBDSignal("FUEL_LEVEL"              , "fuel_level"                      ,True       , 2         , 8),
+    OBDSignal("ENGINE_LOAD"             , "engine_load"                     ,True       , 1         , 2),
+    OBDSignal("MAF"                     , "maf"                             ,True       , 1         , 2),
+    OBDSignal("AMBIANT_AIR_TEMP"        , "temperature"                     ,True       , 1         , 2),
+    OBDSignal("RELATIVE_ACCEL_POS"      , "pedal"                           ,True       , 1         , 2),
+    OBDSignal("COMMANDED_EQUIV_RATIO"   , "afr"                             ,True       , 1         , 2),
+    OBDSignal("FUEL_LEVEL"              , "fuel_level"                      ,True       , 2         , 2),
 
     #Other SIGNALS:
-    OBDSignal("GPS_Long"               , "Longitude"                       ,False      , 2         , 8),
-    OBDSignal("GPS_Lat"                , "Latitude"                        ,False      , 2         , 8),
-    #OBDSignal("GPS_Alt"                , "Altitude"                        ,False      , 2         , 8),
+    OBDSignal("GPS_Long"               , "Longitude"                       ,False      , 2         , 9),
+    OBDSignal("GPS_Lat"                , "Latitude"                        ,False      , 2         , 9),
+    #OBDSignal("GPS_Alt"                , "Altitude"                       ,False      , 2         , 8),
 ]
 
 class Signals:

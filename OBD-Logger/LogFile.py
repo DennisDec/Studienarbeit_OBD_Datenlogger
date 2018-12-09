@@ -91,7 +91,7 @@ class LogFile:
                 if(s.name == "TIME" or signalList[i] == None):
                     self._data[s.name].append(signalList[i])
                 else:
-                    self._data[s.name].append(round(float(signalList[i]),2))
+                    self._data[s.name].append(round(float(signalList[i]),s.roundDigit))
         else:
             raise ValueError("Error: signalList has to have the same shape as signals.getSignalList()")
 
@@ -171,7 +171,7 @@ class LogFile:
                             if(s.name == "TIME"):
                                 self._data[s.name].append(row[i])
                             else:
-                                self._data[s.name].append(round(float(row[i]),2))
+                                self._data[s.name].append(round(float(row[i]),s.roundDigit))
 
         except:
             raise FileNotFoundError("Error: Loading File failed!")
