@@ -16,8 +16,8 @@ __signals__ = [
     OBDSignal("FUEL_LEVEL"              , "fuel_level"                      ,True       , 2         , 8),
 
     #Other SIGNALS:
-    #OBDSignal("GPS_Long"               , "Longitude"                       ,False      , 2         , 8),
-    #OBDSignal("GPS_Lat"                , "Latitude"                        ,False      , 2         , 8),
+    OBDSignal("GPS_Long"               , "Longitude"                       ,False      , 2         , 8),
+    OBDSignal("GPS_Lat"                , "Latitude"                        ,False      , 2         , 8),
     #OBDSignal("GPS_Alt"                , "Altitude"                        ,False      , 2         , 8),
 ]
 

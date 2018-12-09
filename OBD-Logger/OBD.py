@@ -4,10 +4,20 @@ import obd
 import time
 import csv
 import datetime
+import gps
+import sys
+import os
 from LogFile import LogFile, LogStatus
 from Signals import signals
 
+
+
 def main():
+
+    os.system("sudo gpsd /dev/serial0 -F /var/run/gpsd.sock")
+
+    session = gps.gps("localhost", "2947")
+    session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
 
     i = 1                                   #This line counter for output file is needed to manage different sample rates
     connection = None           
@@ -50,6 +60,17 @@ def main():
         timestr = str(datetime.datetime.now())
         result = []
         result.append(timestr)
+        lon = None
+        lat = None
+        if(i % 5 == 0):
+            report = session.next()
+            if report['class'] == 'TPV':
+                if hasattr(report, 'lon') and hasattr(report, 'lat'):
+                    lon = report.lon
+                    lat = report.lat
+                    print("Laengengrad:  ", lon)
+                    print("Breitengrad: ", lat)
+
         for signal in signals.getOBDSignalList():
 
             if(i % signal.sampleRate == 0):  #Handle different Sample Rates
@@ -60,7 +81,10 @@ def main():
                     result.append(r.value.magnitude)
             else:
                 result.append(None)
-
+        
+        #Appending GPS-Data
+        result.append(lon)
+        result.append(lat)
         #Append GPS Data first (if available) 
         log.addData(result)
 
