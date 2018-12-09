@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd /home/pi/Studienarbeit_OBD_Datenlogger/web-application
+node www > /var/log/start-server.log
