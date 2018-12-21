@@ -3,12 +3,23 @@ var router = express.Router();
 var expressValidator = require('express-validator');
 var passport = require('passport');
 const bcrypt = require('bcrypt');
+var nodemailer = require('nodemailer');
 
 const saltRounds = 10;
+
 
 // GET home page
 router.get('/', function(req, res) {
   res.render('home', { title: 'Home', home: true });
+});
+
+router.get('/confirmation/:token', function(req, res) {
+  var db = require('../db.js');
+  console.log(req.params.token);
+  db.query('UPDATE users SET confirmed = 1 WHERE id = ?', [req.params.token], function(err, results, fields) {
+    if(err) throw err;
+  });
+  res.redirect('/login');
 });
 
 // GET dashboard page; only accessable for authenticated users
@@ -113,12 +124,35 @@ router.post('/register', function(req, res, next) {
           // login in the user with the user_id that was automatically created by MySQL
           db.query('SELECT LAST_INSERT_ID() as user_id', function(error, results, fields) {
             if(error) throw error;
-            const user_id = results[0];
+            const user_id = results[0].user_id;
             console.log(user_id);
             // login (passport) uses serialization-function
-            req.login(user_id, function(err) {
+            /*req.login(user_id, function(err) {
               res.redirect('/');
+            });*/
+            console.log(process.env.MAIL_PASSWORD)
+            var transporter = nodemailer.createTransport({
+              service: 'gmail',
+              auth: {
+                user: process.env.MAIL_NAME,
+                pass: process.env.MAIL_PASSWORD
+              }
             });
+            const url = `http://localhost:3000/confirmation/${user_id}`;
+            var mailOptions = {
+              from: process.env.MAIL_NAME,
+              to: req.body.email,
+              subject: 'Confirm your email!',
+              html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`
+            };
+            transporter.sendMail(mailOptions, async (error, info) => {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log('Email sent: ' + info.response);
+              }
+            });
+            res.redirect('/login');
           });
         }
       });
