@@ -5,8 +5,10 @@ var passport = require('passport');
 const bcrypt = require('bcrypt');
 var nodemailer = require('nodemailer');
 
-const saltRounds = 10;
+var jwt = require('jsonwebtoken');
 
+const saltRounds = 10;
+const MAIL_SECRET = 'awdhiquh3knn99ajdj93';
 
 // GET home page
 router.get('/', function(req, res) {
@@ -16,7 +18,10 @@ router.get('/', function(req, res) {
 router.get('/confirmation/:token', function(req, res) {
   var db = require('../db.js');
   console.log(req.params.token);
-  db.query('UPDATE users SET confirmed = 1 WHERE id = ?', [req.params.token], function(err, results, fields) {
+  
+  var id = jwt.verify(req.params.token, MAIL_SECRET);
+  console.log(id);
+  db.query('UPDATE users SET confirmed = 1 WHERE id = ?', [id.user], function(err, results, fields) {
     if(err) throw err;
   });
   res.redirect('/login');
@@ -131,27 +136,37 @@ router.post('/register', function(req, res, next) {
               res.redirect('/');
             });*/
             console.log(process.env.MAIL_PASSWORD)
-            var transporter = nodemailer.createTransport({
-              service: 'gmail',
-              auth: {
-                user: process.env.MAIL_NAME,
-                pass: process.env.MAIL_PASSWORD
-              }
-            });
-            const url = `http://localhost:3000/confirmation/${user_id}`;
-            var mailOptions = {
-              from: process.env.MAIL_NAME,
-              to: req.body.email,
-              subject: 'Confirm your email!',
-              html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`
-            };
-            transporter.sendMail(mailOptions, async (error, info) => {
-              if (error) {
-                console.log(error);
-              } else {
-                console.log('Email sent: ' + info.response);
-              }
-            });
+            jwt.sign(
+              {
+                user: user_id,
+              },
+                MAIL_SECRET,
+              {
+                expiresIn: '1d',
+              },
+              (err, emailToken) => {
+                var transporter = nodemailer.createTransport({
+                  service: 'gmail',
+                  auth: {
+                    user: process.env.MAIL_NAME,
+                    pass: process.env.MAIL_PASSWORD
+                  }
+                });
+                const url = `http://localhost:3000/confirmation/${emailToken}`;
+                var mailOptions = {
+                  from: process.env.MAIL_NAME,
+                  to: req.body.email,
+                  subject: 'Confirm your email!',
+                  html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`
+                };
+                transporter.sendMail(mailOptions, async (error, info) => {
+                  if (error) {
+                    console.log(error);
+                  } else {
+                    console.log('Email sent: ' + info.response);
+                  }
+                });
+              });
             res.redirect('/login');
           });
         }
