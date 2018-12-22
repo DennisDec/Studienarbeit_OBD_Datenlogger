@@ -84,9 +84,10 @@ passport.use(new LocalStrategy(
         bcrypt.compare(password, hash, function(err, response) {
           if (response === true && results[0].confirmed != null) {
             return done(null, {user_id: results[0].id});
+          } else if (response === true) {
+            return done(null, false, {message: 'Confirm your email!'});
           } else {
-            return done(null, false, {message: 'Incorrect password!'});
-          }
+            return done(null, false, {message: 'Incorrect password!'});}
         });
       }
     });  

@@ -181,7 +181,7 @@ router.post('/register', function(req, res, next) {
                   from: process.env.MAIL_NAME,
                   to: req.body.email,
                   subject: 'Confirm your email!',
-                  html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`
+                  html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`
                 };
                 transporter.sendMail(mailOptions, async (error, info) => {
                   if (error) {
