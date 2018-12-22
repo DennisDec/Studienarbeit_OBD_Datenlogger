@@ -64,6 +64,8 @@ router.post('/login', function(req, res, next) {
     if (!user) { 
       console.log(info.message);
       req.data = info.message;
+      req.id = info.user_id;
+      req.email = info.email;
       return next(); 
     }
     req.logIn(user, function(err) {
@@ -75,6 +77,39 @@ router.post('/login', function(req, res, next) {
   var error = [{
     msg: req.data
   }]
+  if (req.data === 'Confirm your email!') {
+    jwt.sign(
+      {
+        user: req.id,
+      },
+        MAIL_SECRET,
+      {
+        expiresIn: '1d',
+      },
+      (err, emailToken) => {
+        var transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.MAIL_NAME,
+            pass: process.env.MAIL_PASSWORD
+          }
+        });
+        const url = `http://localhost:3000/confirmation/${emailToken}`;
+        var mailOptions = {
+          from: process.env.MAIL_NAME,
+          to: req.email,
+          subject: 'Confirm your email!',
+          html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`
+        };
+        transporter.sendMail(mailOptions, async (error, info) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+      });
+  }
   console.log(`errors: ${JSON.stringify(error)}`);
   res.render('login', { 
     title: 'Login failed',

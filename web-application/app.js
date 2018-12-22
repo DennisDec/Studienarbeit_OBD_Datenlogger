@@ -74,10 +74,10 @@ passport.use(new LocalStrategy(
   function(username, password, done) {
     console.log(username);
     const db = require('./db.js');
-    db.query('SELECT id, password, confirmed FROM users WHERE username = ?', [username], function(err, results, fields) {
+    db.query('SELECT id, email, password, confirmed FROM users WHERE username = ?', [username], function(err, results, fields) {
       if (err) done(err);
       if(results.length === 0) {    
-        done(null, false, {message: 'Incorrect username!'});
+        done(null, false, {message: 'Incorrect username!', user_id: null, email: null});
       } else {
         const hash = results[0].password.toString();
         console.log(results[0].confirmed);
@@ -85,9 +85,10 @@ passport.use(new LocalStrategy(
           if (response === true && results[0].confirmed != null) {
             return done(null, {user_id: results[0].id});
           } else if (response === true) {
-            return done(null, false, {message: 'Confirm your email!'});
+            return done(null, false, {message: 'Confirm your email!', user_id: results[0].id, email: results[0].email});
           } else {
-            return done(null, false, {message: 'Incorrect password!'});}
+            return done(null, false, {message: 'Incorrect password!', user_id: null, email: null});
+          }
         });
       }
     });  
