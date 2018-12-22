@@ -9,11 +9,17 @@ import sys
 import os
 from LogFile import LogFile, LogStatus
 from Signals import signals
+import pygame
 
 
 
 def main():
-
+    
+    pygame.mixer.init()
+    pygame.mixer.music.load("/home/pi/Musik/success_sound") #Load Success Sound
+    
+    
+    #Run GPS Deamon
     os.system("sudo gpsd /dev/serial0 -F /var/run/gpsd.sock")
 
     session = gps.gps("localhost", "2947")
@@ -24,27 +30,65 @@ def main():
     NotConnected = True
     errorcnt = 0                            #Error count to detect the moment if ignition is off at the end of a Driving Cycle
     HasConnection = True
-
+    OnlyGPSMode = 0
+    OBDError = 0
     filename = datetime.datetime.now().strftime("%y_%m_%d_%H:%M:%S_") + "test.csv"
 
     while NotConnected:
-        connection = obd.OBD()              #Try to connect to OBD dongle
-        print(connection.status())          #Print OBD Status for debugging
+        try:
+                           
+            connection = obd.OBD()              #Try to connect to OBD dongle
+            print(connection.status())          #Print OBD Status for debugging
+            
+            #if the return of query RPM signal is not null --> Connecting succeeded 
+            if(connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and (connection.query(obd.commands.RPM).is_null() == False)):
+                NotConnected = False
+                print("Successful connected to OBDII!") #Connecting to OBD dongle succeeded
+                pygame.mixer.music.play()
+                time.sleep(5)
+            else:
+                time.sleep(1)                   #Sleep 1s before trying to connect to OBD dongle again
+        except:
+            print("Error Connecting to OBD-Adapter (" + str(OBDError) + ")")
+            
+            time.sleep(2)
+            OBDError +=1
+        
+        if(OBDError == 4):
+                NotConnected = False
+                OnlyGPSMode = 1
+             
 
-        #if the return of query RPM signal is not null --> Connecting succeeded 
-        if(connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and (connection.query(obd.commands.RPM).is_null() == False)):
-            NotConnected = False
-        else:
-            time.sleep(1)                   #Sleep 1s before trying to connect to OBD dongle again
-
-    print("Successful connected to OBDII!") #Connecting to OBD dongle succeeded
-
+    
+    pygame.mixer.music.load("/home/pi/Musik/success_1")
+    
     log = LogFile()
-    log.createLogfile(filename)
-
-
+    
+    OBDError = 0
+    temp = True
+    stri = ""
+    
+    while(temp and OnlyGPSMode == 1):
+        report = session.next()
+        if report['class'] == 'TPV':
+            if hasattr(report, 'lon') and hasattr(report, 'lat'):
+                print("GPS found-> Only GPS Mode")
+                stri = "GPS_"
+                pygame.mixer.music.play()
+                OnlyGPSMode = 2
+                temp = False
+        else:
+            time.sleep(1)
+      
+    log.createLogfile(stri + filename)
+    
+    while(OnlyGPSMode == 2):
+        i = i+1
+        GPS_Only(session, log, i)
+ 
     while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
-
+        
+        #Error handling to detect IGNITION OFF Signal
         if(connection.query(obd.commands.RPM).is_null() == True): 
             print("Error")
             errorcnt += 1
@@ -62,6 +106,8 @@ def main():
         result.append(timestr)
         lon = None
         lat = None
+
+        #Get GPS Information if possible
         if(i % 4 == 0):
             report = session.next()
             if report['class'] == 'TPV':
@@ -93,9 +139,47 @@ def main():
         if(i % 20 == 0):                     #Appand file every 20 rows of measurement data
             log.appendFile()
             print("Appending File ...")
+    log.appendFile()
+    print("Ignition Off") 
+    pygame.mixer.music.load("/home/pi/Musik/end")
+    pygame.mixer.music.play()
+    time.sleep(4)
 
-    print("Ignition Off")     
+
+
+def GPS_Only(session, log, count):
+
+    timestr = str(datetime.datetime.now())
+    result = []
+    result.append(timestr)
+    lon = None
+    lat = None
+        
+    report = session.next()
+    
+    if report['class'] == 'TPV':
+        if hasattr(report, 'lon') and hasattr(report, 'lat'):
+            lon = report.lon
+            lat = report.lat
+            OBDError = 0 
+
+    for signal in signals.getOBDSignalList():
+        result.append(None)
+    
+    #Appending GPS-Data
+    result.append(lon)
+    result.append(lat)
+    #Appending all other OBD Siganls
+    log.addData(result)
+
+    time.sleep(1.0)                      #Sleep 500ms to get not that much ammount of data 
+
+    if(count % 10 == 0):                     #Appand file every 20 rows of measurement data
+        log.appendFile()
+        print("Appending File ...")
+
 
 
 if __name__ == "__main__":
     main()
+  
