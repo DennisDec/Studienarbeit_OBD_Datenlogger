@@ -63,16 +63,27 @@ router.post('/login', function(req, res, next) {
     if (err) { return next(err);}
     if (!user) { 
       console.log(info.message);
-      return res.redirect('/loginFail'); 
+      req.data = info.message;
+      return next(); 
     }
     req.logIn(user, function(err) {
       if (err) { return next(err); }
       return res.redirect('/dashboard');
     });
   })(req, res, next);
+}, function(req, res, next) {
+  var error = [{
+    msg: req.data
+  }]
+  console.log(`errors: ${JSON.stringify(error)}`);
+  res.render('login', { 
+    title: 'Login failed',
+    errors: error,
+    login: true
+  });
 });
 // after unsuccessful login head to route /loginFail and show error message
-router.get('/loginFail', function(req, res, next) {
+/*router.get('/loginFail', function(req, res, next) {
   var error = [{
     msg: 'Incorrect username or password.'
   }]
@@ -82,7 +93,7 @@ router.get('/loginFail', function(req, res, next) {
     errors: error,
     login: true
   });
-});
+});*/
 
 // Destroy session via logout button
 router.get('/logout', function(req, res, next) {
