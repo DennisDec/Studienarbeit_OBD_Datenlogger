@@ -12,13 +12,14 @@ from Signals import signals
 import pygame
 
 
+
 def main():
     
     pygame.mixer.init()
-    pygame.mixer.music.load("/home/pi/Musik/success_sound")
+    pygame.mixer.music.load("/home/pi/Musik/success_sound") #Load Success Sound
     
     
-    
+    #Run GPS Deamon
     os.system("sudo gpsd /dev/serial0 -F /var/run/gpsd.sock")
 
     session = gps.gps("localhost", "2947")
@@ -78,50 +79,16 @@ def main():
                 temp = False
         else:
             time.sleep(1)
-    
-    
+      
     log.createLogfile(stri + filename)
     
-    
     while(OnlyGPSMode == 2):
-        
         i = i+1
-        timestr = str(datetime.datetime.now())
-        result = []
-        result.append(timestr)
-        lon = None
-        lat = None
-        
-        report = session.next()
-        
-        if report['class'] == 'TPV':
-            if hasattr(report, 'lon') and hasattr(report, 'lat'):
-                lon = report.lon
-                lat = report.lat
-                #print(report.time) TIME From GPS
-                OBDError = 0 
-                #print("Laengengrad:  ", lon)
-                #print("Breitengrad: ", lat)
-        
-        for signal in signals.getOBDSignalList():
-            result.append(None)
-        
-        #Appending GPS-Data
-        result.append(lon)
-        result.append(lat)
-        #Append GPS Data first (if available) 
-        log.addData(result)
-
-        time.sleep(1.0)                      #Sleep 500ms to get not that much ammount of data 
-
-        if(i % 10 == 0):                     #Appand file every 20 rows of measurement data
-            log.appendFile()
-            print("Appending File ...")
-        
-    play = True
-    
+        GPS_Only(session, log, i)
+ 
     while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
         
+        #Error handling to detect IGNITION OFF Signal
         if(connection.query(obd.commands.RPM).is_null() == True): 
             print("Error")
             errorcnt += 1
@@ -139,15 +106,14 @@ def main():
         result.append(timestr)
         lon = None
         lat = None
+
+        #Get GPS Information if possible
         if(i % 4 == 0):
             report = session.next()
             if report['class'] == 'TPV':
                 if hasattr(report, 'lon') and hasattr(report, 'lat'):
                     lon = report.lon
                     lat = report.lat
-                    if play == True:
-                        pygame.mixer.music.play()
-                        play = False
                     print("Laengengrad:  ", lon)
                     print("Breitengrad: ", lat)
 
@@ -174,10 +140,44 @@ def main():
             log.appendFile()
             print("Appending File ...")
     log.appendFile()
+    print("Ignition Off") 
     pygame.mixer.music.load("/home/pi/Musik/end")
     pygame.mixer.music.play()
+    time.sleep(4)
+
+
+
+def GPS_Only(session, log, count):
+
+    timestr = str(datetime.datetime.now())
+    result = []
+    result.append(timestr)
+    lon = None
+    lat = None
+        
+    report = session.next()
     
-    print("Ignition Off")     
+    if report['class'] == 'TPV':
+        if hasattr(report, 'lon') and hasattr(report, 'lat'):
+            lon = report.lon
+            lat = report.lat
+            OBDError = 0 
+
+    for signal in signals.getOBDSignalList():
+        result.append(None)
+    
+    #Appending GPS-Data
+    result.append(lon)
+    result.append(lat)
+    #Appending all other OBD Siganls
+    log.addData(result)
+
+    time.sleep(1.0)                      #Sleep 500ms to get not that much ammount of data 
+
+    if(count % 10 == 0):                     #Appand file every 20 rows of measurement data
+        log.appendFile()
+        print("Appending File ...")
+
 
 
 if __name__ == "__main__":
