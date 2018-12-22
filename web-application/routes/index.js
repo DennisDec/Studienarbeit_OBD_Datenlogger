@@ -54,10 +54,23 @@ router.get('/login', function(req, res, next) {
   res.render('login', { title: 'Login', login: true });
 });
 // handle POST of login page; use passport to authenticate the user
-router.post('/login', passport.authenticate('local', {
+/*router.post('/login', passport.authenticate('local', {
   successRedirect: '/dashboard',
   failureRedirect: '/loginFail'
-}));
+}));*/
+router.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) { return next(err);}
+    if (!user) { 
+      console.log(info.message);
+      return res.redirect('/loginFail'); 
+    }
+    req.logIn(user, function(err) {
+      if (err) { return next(err); }
+      return res.redirect('/dashboard');
+    });
+  })(req, res, next);
+});
 // after unsuccessful login head to route /loginFail and show error message
 router.get('/loginFail', function(req, res, next) {
   var error = [{

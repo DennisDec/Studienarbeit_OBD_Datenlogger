@@ -77,7 +77,7 @@ passport.use(new LocalStrategy(
     db.query('SELECT id, password, confirmed FROM users WHERE username = ?', [username], function(err, results, fields) {
       if (err) done(err);
       if(results.length === 0) {    
-        done(null, false);
+        done(null, false, {message: 'Incorrect username!'});
       } else {
         const hash = results[0].password.toString();
         console.log(results[0].confirmed);
@@ -85,7 +85,7 @@ passport.use(new LocalStrategy(
           if (response === true && results[0].confirmed != null) {
             return done(null, {user_id: results[0].id});
           } else {
-            return done(null, false);
+            return done(null, false, {message: 'Incorrect password!'});
           }
         });
       }
