@@ -4,11 +4,12 @@ var expressValidator = require('express-validator');
 var passport = require('passport');
 const bcrypt = require('bcrypt');
 var nodemailer = require('nodemailer');
+var fs = require('fs');
 
+var mailer = require('../mailer.js');
 var jwt = require('jsonwebtoken');
 
 const saltRounds = 10;
-const MAIL_SECRET = 'awdhiquh3knn99ajdj93';
 
 // GET home page
 router.get('/', function(req, res) {
@@ -16,11 +17,10 @@ router.get('/', function(req, res) {
 });
 
 router.get('/confirmation/:token', function(req, res) {
-  var db = require('../db.js');
   console.log(req.params.token);
-  
-  var id = jwt.verify(req.params.token, MAIL_SECRET);
+  var id = jwt.verify(req.params.token, process.env.MAIL_SECRET);
   console.log(id);
+  var db = require('../db.js');
   db.query('UPDATE users SET confirmed = 1 WHERE id = ?', [id.user], function(err, results, fields) {
     if(err) throw err;
   });
@@ -29,9 +29,8 @@ router.get('/confirmation/:token', function(req, res) {
 
 // GET dashboard page; only accessable for authenticated users
 router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
-  // get GPS-data from the MySQL-server and save it into a json-file  
+  // get GPS-data from the MySQL-server and save it into a json-file 
   var db = require('../db.js');
-  var fs = require('fs');
   db.query('SELECT * FROM gpsdata', function(err, results, fields) {
     if(err) throw err;
     fs.writeFile('src/maps/markers.json', JSON.stringify(results), function (err) {
@@ -78,37 +77,7 @@ router.post('/login', function(req, res, next) {
     msg: req.data
   }]
   if (req.data === 'Confirm your email!') {
-    jwt.sign(
-      {
-        user: req.id,
-      },
-        MAIL_SECRET,
-      {
-        expiresIn: '1d',
-      },
-      (err, emailToken) => {
-        var transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.MAIL_NAME,
-            pass: process.env.MAIL_PASSWORD
-          }
-        });
-        const url = `http://localhost:3000/confirmation/${emailToken}`;
-        var mailOptions = {
-          from: process.env.MAIL_NAME,
-          to: req.email,
-          subject: 'Confirm your email!',
-          html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`
-        };
-        transporter.sendMail(mailOptions, async (error, info) => {
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        });
-      });
+    mailer(req.id, req.email, "confirmation");
   }
   console.log(`errors: ${JSON.stringify(error)}`);
   res.render('login', { 
@@ -129,6 +98,84 @@ router.post('/login', function(req, res, next) {
     login: true
   });
 });*/
+router.get('/resetpw', function(req, res, next) {
+  res.render('resetpw', { title: 'Reset your password' });
+});
+
+router.post('/resetpw', function(req, res, next) {
+  var db = require('../db.js');
+  db.query('SELECT id, email FROM users WHERE username = ?', [req.body.username], function(error, results, fields) {    // use ? so that you can't hack the server with unwanted inputs
+    if(error) {
+      var error = [{
+        msg: 'Username doesn\'t exists.'
+      }]
+      console.log(`errors: ${JSON.stringify(error)}`);
+      res.render('resetpw', { 
+        title: 'Resetting password failed!',
+        errors: error
+      });
+    } else if (results[0].email === req.body.email) {
+      mailer(results[0].id, req.body.email, "resetpw")
+      res.redirect('/login');
+    } else {
+      var error = [{
+        msg: 'Email is wrong.'
+      }]
+      console.log(results[0].username);
+      console.log(`errors: ${JSON.stringify(error)}`);
+      res.render('resetpw', { 
+        title: 'Resetting password failed!',
+        errors: error
+      });
+    }
+  });
+});
+
+router.get('/resetpw:token', function(req, res, next) {
+  res.render('resetpw_confirmed', { 
+    title: 'Reset your password',
+    token: req.params.token
+  });
+});
+
+router.post('/resetpw_confirmed:token', function(req, res, next) {
+  req.checkBody('password', 'Password must be between 8-100 characters long.').len(8, 100);
+  req.checkBody("password", "Password must include one lowercase character, one uppercase character, a number, and a special character.").matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.* )(?=.*[^a-zA-Z0-9]).{8,}$/, "i");
+  req.checkBody('passwordMatch', 'Password must be between 8-100 characters long.').len(8, 100);
+  req.checkBody('passwordMatch', 'Passwords do not match, please try again.').equals(req.body.password);
+       
+  const errors = req.validationErrors();
+  
+  if(errors) {
+    // if errors occur they should be outputted on the register page
+    console.log(`errors: ${JSON.stringify(errors)}`);
+    res.render(`resetpw${req.params.token}`, { 
+      title: 'Resetting failed',
+      errors: errors
+    });
+  } else {
+    var id = jwt.verify(req.params.token, process.env.MAIL_SECRET);
+    console.log(id);
+    const password = req.body.password;
+    // connect to a MySQL server 
+    var db = require('../db.js');
+    // hash the password and save the hash into the MySQL server
+    bcrypt.hash(password, saltRounds, function(err, hash) {
+      db.query('UPDATE users SET confirmed = 1, password = ? WHERE id = ?', [hash, id.user], function(error, results, fields) {    // use ? so that you can't hack the server with unwanted inputs
+        if(error) {
+
+          console.log(`errors: ${JSON.stringify(error)}`);
+          res.render(`resetpw${req.params.token}`, { 
+            title: 'Resetting failed',
+            errors: errors
+          });
+        } else {
+            res.redirect('/login');
+        }
+      });
+    });
+  }
+});
 
 // Destroy session via logout button
 router.get('/logout', function(req, res, next) {
@@ -169,8 +216,8 @@ router.post('/register', function(req, res, next) {
     const username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;
-    // connect to a MySQL server
-    const db = require('../db.js');
+    // connect to a MySQL server 
+    var db = require('../db.js');
     // hash the password and save the hash into the MySQL server
     bcrypt.hash(password, saltRounds, function(err, hash) {
       db.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hash], function(error, results, fields) {    // use ? so that you can't hack the server with unwanted inputs
@@ -195,37 +242,7 @@ router.post('/register', function(req, res, next) {
               res.redirect('/');
             });*/
             console.log(process.env.MAIL_PASSWORD)
-            jwt.sign(
-              {
-                user: user_id,
-              },
-                MAIL_SECRET,
-              {
-                expiresIn: '1d',
-              },
-              (err, emailToken) => {
-                var transporter = nodemailer.createTransport({
-                  service: 'gmail',
-                  auth: {
-                    user: process.env.MAIL_NAME,
-                    pass: process.env.MAIL_PASSWORD
-                  }
-                });
-                const url = `http://localhost:3000/confirmation/${emailToken}`;
-                var mailOptions = {
-                  from: process.env.MAIL_NAME,
-                  to: req.body.email,
-                  subject: 'Confirm your email!',
-                  html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`
-                };
-                transporter.sendMail(mailOptions, async (error, info) => {
-                  if (error) {
-                    console.log(error);
-                  } else {
-                    console.log('Email sent: ' + info.response);
-                  }
-                });
-              });
+            mailer(user_id, req.body.email, "confirmation")
             res.redirect('/login');
           });
         }

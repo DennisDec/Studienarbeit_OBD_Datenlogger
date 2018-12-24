@@ -11,17 +11,16 @@
         {{/each}}
     {{/if}}
 
-    <form method="POST" action="/login">
+    <form method="POST" action="/resetpw">
         <div class="form-group">
             <label for="username">Username</label>
             <input type="text" name="username" class="form-control" placeholder="Username">
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" name="password" class="form-control" placeholder="Password">
+            <label for="email">Email</label>
+            <input type="email" name="email" class="form-control" placeholder="Email">
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <a href="/resetpw">Forgot your password?</a>
+        <button type="submit" class="btn btn-primary">Send mail</button>
     </form>
 </div>
 </main>
