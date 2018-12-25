@@ -1,5 +1,9 @@
 var nodemailer = require('nodemailer');
 var jwt = require('jsonwebtoken');
+var os = require( 'os' );
+
+var interfaces = os.networkInterfaces( );
+
 
 function mailer(id, email, mode) {
     if (mode === "confirmation") {
@@ -20,6 +24,18 @@ function mailer(id, email, mode) {
                 }
             });
             const url = `http://localhost:3000/confirmation/${emailToken}`;
+            console.log("IPIPIPIPIPIPIPIIPIPIPIPIPI")
+            var addresses = [];
+            for (var k in interfaces) {
+                for (var k2 in interfaces[k]) {
+                    var address = interfaces[k][k2];
+                    if (address.family === 'IPv4' && !address.internal) {
+                        addresses.push(address.address);
+                    }
+                }
+            }
+
+            console.log(addresses);
             var mailOptions = {
                 from: process.env.MAIL_NAME,
                 to: email,
