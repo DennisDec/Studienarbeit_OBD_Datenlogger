@@ -23,19 +23,23 @@ function mailer(id, email, mode) {
                     pass: process.env.MAIL_PASSWORD
                 }
             });
-            const url = `http://localhost:3000/confirmation/${emailToken}`;
-            console.log("IPIPIPIPIPIPIPIIPIPIPIPIPI")
+
             var addresses = [];
+            var add = null;
             for (var k in interfaces) {
                 for (var k2 in interfaces[k]) {
                     var address = interfaces[k][k2];
                     if (address.family === 'IPv4' && !address.internal) {
                         addresses.push(address.address);
+                        if (address.address.slice(0, 3) === '192') {
+                            add = address.address
+                        }
                     }
                 }
             }
-
-            console.log(addresses);
+            console.log(add);
+            
+            const url = `http://${add}:3000/confirmation/${emailToken}`;
             var mailOptions = {
                 from: process.env.MAIL_NAME,
                 to: email,
