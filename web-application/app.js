@@ -20,6 +20,11 @@ var app = express();
 var testFunction = require('dotenv').config();         // needed to use process.env
 console.log(testFunction);
 
+var getIP = require('./getIP.js');
+console.log('IP: ' + getIP());
+var mailer = require('./mailer.js');
+mailer(null, process.env.MAIL_TESTMAIL, "getIP");
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
