@@ -27,34 +27,28 @@ var getData = async function() {
         data[0][i] = res - startTime;
         data[1][i] = allData[i].speed;
     }
-    var ctx = document.getElementById("myChart");
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data[0],
-            datasets: [{
-                data: data[1],
-                lineTension: 0,
-                backgroundColor: 'transparent',
-                borderColor: '#007bff',
-                borderWidth: 2,
-                pointBackgroundColor: '#007bff',
-                pointRadius: 0
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: false
-                    }
-                }]
-            },
-            legend: {
-                display: false,
-            }
-        }
-    });
-}
 
+    var speedTrace = {
+        type: "scatter",
+        mode: "lines",
+        name: 'AAPL Low',
+        x: data[0],
+        y: data[1],
+        line: {color: '#7F7F7F'}
+    }
+      
+    var data = [speedTrace];
+          
+    var layout = {
+        title: 'Data', 
+    };
+    config = {
+        'modeBarButtonsToRemove': ['sendDataToCloud', 'hoverClosestCartesian', 'toggleSpikelines', 'resetScale2d', 'hoverCompareCartesian'],
+        'displayModeBar': true,
+        'displaylogo': false,
+        'responsive': true
+    }
+    Plotly.newPlot('myDiv', data, layout, config);
+}
+  
 getData();
