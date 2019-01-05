@@ -7,10 +7,12 @@ var map = L.map( 'map', {
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+
 var printMarkers = async function() {
     let response = await fetch("maps/markers.json");
     let markers = await response.json();
-
+    markers = await removeNull(markers);
+    console.log("Markeranzahl: " + markers.length)
     for ( var i=0; i < markers.length; ++i ) 
     {
         L.marker( [markers[i].lat, markers[i].lng] )
@@ -31,6 +33,22 @@ var printMarkers = async function() {
     }
     var bounds = L.latLngBounds(markers);
     map.fitBounds(bounds);
+}
+
+var removeNull = function(markers) {
+    let markerList = new Array();
+    for ( var i=0; i < markers.length; ++i ) 
+    {
+        console.log((i+1) + ". marker: " + markers[i].lng + ", " + markers[i].lat);
+        if(markers[i].lng === null || markers[i].lat === null) {
+            continue;
+        }
+        markerList.push({ 
+            "lat": markers[i].lat,
+            "lng": markers[i].lng
+        });
+    }
+    return markerList;
 }
 
 printMarkers();
