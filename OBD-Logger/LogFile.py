@@ -13,6 +13,7 @@ from Signals import signals
 # Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
 path = "/home/pi/Schreibtisch/Test_Pascal/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
+#"/home/pi/Schreibtisch/Test_Pascal/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 #path = "/home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 
 class LogStatus:
@@ -197,6 +198,13 @@ class LogFile:
             for s in signals.getSignalList():
                 row.append(self._data[s.name][i])                
             cursor.execute(Stringbuilder.SqlBuidler("importobd"), row)
+                    
+##            row1 =[]
+##            row1.append("test")
+##            row1.append(self._data["GPS_Long"][i])
+##            row1.append(self._data["GPS_Lat"][i])
+##            cursor.execute(Stringbuilder.SqlBuidler("gpsdata"), row1)
+
         db.commit()
         db.close()
 
