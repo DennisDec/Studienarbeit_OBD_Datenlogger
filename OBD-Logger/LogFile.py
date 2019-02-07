@@ -53,7 +53,7 @@ class Stringbuilder:
         """
         Create query string to load new file to db
         """
-        sql = "INSERT INTO  data ( filename ) VALUES (" + str(filename) + ")"
+        sql = "INSERT INTO  data ( filename ) VALUES ('" + str(filename) + "\')"
         
         return sql
 
