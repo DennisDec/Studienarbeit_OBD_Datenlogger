@@ -32,9 +32,10 @@ router.get('/getOBD', authenticationMiddleware(), function(req, res) {
   db.query('SELECT filename FROM data WHERE id=1', function(err, results, fields) {
     if(err) throw err;
     var address = '../../datafiles/' + results[0].filename;
-    fs.writeFile(address, JSON.stringify(results), function (err) {
+    // TODO: CVS auslesen und in JSON umwandeln
+    fs.readFile(address, JSON.stringify(results), function (err) {
       if (err) throw err;
-      console.log('OBD-data saved');
+      console.log('All data saved');
       res.send(JSON.stringify(results))
     });
   });
