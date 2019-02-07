@@ -5,6 +5,9 @@ import os
 import datetime    
 import mysql.connector
 import env
+import os
+import subprocess
+import socket
 
 from statistics import mean
 
@@ -52,6 +55,28 @@ class LogFile:
     def getFilenames():
         """returns a List of filenames which are located in path """
         return [f for f in os.listdir(path) if f.endswith('.csv')]
+
+    @staticmethod
+    def copyFileToServer(filename):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 1))
+        own_ip = s.getsockname()[0]
+
+        ip_mask = ".".join(own_ip.split('.')[0:-1]) + ".*"
+
+        stri = subprocess.check_output(('nmap -p22 ' + str(ip_mask)), shell=True)
+        output = stri.split('\n')
+        ip = []
+
+        for i, line in enumerate(output):
+            if(line.find("open") != -1 and output[i-3].split(' ')[-1] != own_ip):
+                ip.append(output[i-3].split(' ')[-1])
+                print(ip)
+        for i, tmp in enumerate(ip):
+            os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + filename + " pi@" + (ip[i]) + ":")
+
+
+
 
     def __init__(self):
         self._filename = ""
