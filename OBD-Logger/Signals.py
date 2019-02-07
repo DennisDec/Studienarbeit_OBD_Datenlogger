@@ -49,7 +49,6 @@ class Signals:
 
 
     def getSignalList(self):
-        #TODO: Sort by column in File
         return self.signals
 
     def containsSignalByString(self, str):
