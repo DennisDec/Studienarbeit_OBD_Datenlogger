@@ -48,6 +48,16 @@ class Stringbuilder:
         sql += ")" 
         return sql
 
+    @staticmethod
+    def SqlAddEntry(filename):
+        """
+        Create query string to load new file to db
+        """
+        sql = "INSERT INTO  data ( filename ) VALUES (" + str(filename) + ")"
+        
+        return sql
+
+
 class LogFile:
     """Class to log data from OBDII adapter"""
 
@@ -204,7 +214,8 @@ class LogFile:
         self._filename = filename
         self._status = LogStatus.LOG_FILE_LOADED
 
-    def transmitToSQL(self):                      #Connecting to SQL Server
+    @staticmethod
+    def transmitToSQL(filename):                      #Connecting to SQL Server
         """
             Connecting to SQL server and transmit all data stored in this Class
             --> Call loadFromFile()-method first
@@ -217,18 +228,18 @@ class LogFile:
         )
 
         cursor = db.cursor()                   
-
-        for i in range(len(self._data["TIME"])):
-            row = []
-            for s in signals.getSignalList():
-                row.append(self._data[s.name][i])                
-            cursor.execute(Stringbuilder.SqlBuidler("importobd"), row)
+        cursor.execute(Stringbuilder.SqlAddEntry(filename))
+        # for i in range(len(self._data["TIME"])):
+        #     row = []
+        #     for s in signals.getSignalList():
+        #         row.append(self._data[s.name][i])                
+        #     cursor.execute(Stringbuilder.SqlBuidler("importobd"), row)
                     
-##            row1 =[]
-##            row1.append("test")
-##            row1.append(self._data["GPS_Long"][i])
-##            row1.append(self._data["GPS_Lat"][i])
-##            cursor.execute(Stringbuilder.SqlBuidler("gpsdata"), row1)
+        ##            row1 =[]
+        ##            row1.append("test")
+        ##            row1.append(self._data["GPS_Long"][i])
+        ##            row1.append(self._data["GPS_Lat"][i])
+        ##            cursor.execute(Stringbuilder.SqlBuidler("gpsdata"), row1)
 
         db.commit()
         db.close()
