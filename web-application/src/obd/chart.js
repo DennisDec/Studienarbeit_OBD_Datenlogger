@@ -1,7 +1,10 @@
 var getData = async function() {
-    let response = await fetch("obd/data.json");
+    /*let response = await fetch("obd/data.json");
+    let allData = await response.json();*/
+    let response = await fetch("/getOBD");
     let allData = await response.json();
-    
+    /*console.log("Test: " + test)
+    console.log(testData)*/
     var time = [];
     var speed = [];/*
     var rpm = [];

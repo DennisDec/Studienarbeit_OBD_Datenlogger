@@ -27,6 +27,14 @@ router.get('/confirmation/:token', function(req, res) {
   res.redirect('/login');
 });
 
+router.get('/getOBD', authenticationMiddleware(), function(req, res) {
+  var db = require('../db.js');
+  db.query('SELECT * FROM importobd', function(err, results, fields) {
+    if(err) throw err;
+    res.send(JSON.stringify(results))
+  });
+})
+
 // GET dashboard page; only accessable for authenticated users
 router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
   // get GPS-data from the MySQL-server and save it into a json-file 
@@ -37,14 +45,14 @@ router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
       if (err) throw err;
       console.log('GPS-data saved');
     });
-  });
+  });/*
   db.query('SELECT * FROM importobd', function(err, results, fields) {
     if(err) throw err;
     fs.writeFile('src/obd/data.json', JSON.stringify(results), function (err) {
       if (err) throw err;
       console.log('OBD-data saved');
     });
-  });
+  });*/
   res.render('dashboard', { title: 'Dashboard', dashboard: true });
 });
 
