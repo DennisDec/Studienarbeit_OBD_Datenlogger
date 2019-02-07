@@ -29,9 +29,14 @@ router.get('/confirmation/:token', function(req, res) {
 
 router.get('/getOBD', authenticationMiddleware(), function(req, res) {
   var db = require('../db.js');
-  db.query('SELECT * FROM importobd', function(err, results, fields) {
+  db.query('SELECT filename FROM data WHERE id=1', function(err, results, fields) {
     if(err) throw err;
-    res.send(JSON.stringify(results))
+    var address = '../../datafiles/' + results[0].filename;
+    fs.writeFile(address, JSON.stringify(results), function (err) {
+      if (err) throw err;
+      console.log('OBD-data saved');
+      res.send(JSON.stringify(results))
+    });
   });
 })
 
