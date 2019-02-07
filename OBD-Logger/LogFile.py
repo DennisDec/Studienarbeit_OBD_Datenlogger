@@ -13,9 +13,9 @@ from statistics import mean
 
 from Signals import signals
 
-# Für Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
+# Fuer Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
-path = "/home/pi/Schreibtisch/Test_Pascal/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
+path = "/home/pi/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 #"/home/pi/Schreibtisch/Test_Pascal/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 #path = "/home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 
@@ -53,7 +53,7 @@ class Stringbuilder:
         """
         Create query string to load new file to db
         """
-        sql = "INSERT INTO  data ( filename ) VALUES (" + str(filename) + ")"
+        sql = "INSERT INTO  data ( filename ) VALUES ('" + str(filename) + "\')"
         
         return sql
 
@@ -70,12 +70,12 @@ class LogFile:
     def copyFileToServer(filename):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('8.8.8.8', 1))
-        own_ip = s.getsockname()[0]
+        own_ip = str(s.getsockname()[0])
 
         ip_mask = ".".join(own_ip.split('.')[0:-1]) + ".*"
 
-        stri = subprocess.check_output(('nmap -p22 ' + str(ip_mask)), shell=True)
-        output = stri.split('\n')
+        stri = str(subprocess.check_output(('nmap -p22 ' + str(ip_mask)), shell=True))
+        output = stri.split("\\n")
         ip = []
 
         for i, line in enumerate(output):
@@ -83,7 +83,7 @@ class LogFile:
                 ip.append(output[i-3].split(' ')[-1])
                 print(ip)
         for i, tmp in enumerate(ip):
-            os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + filename + " pi@" + (ip[i]) + ":")
+            os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
 
 
 
