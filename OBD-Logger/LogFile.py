@@ -15,7 +15,7 @@ from Signals import signals
 
 # Fuer Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
-path = "/home/pi/Schreibtisch/Test_Pascal/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
+path = "/home/pi/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 #"/home/pi/Schreibtisch/Test_Pascal/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 #path = "/home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 
@@ -83,7 +83,7 @@ class LogFile:
                 ip.append(output[i-3].split(' ')[-1])
                 print(ip)
         for i, tmp in enumerate(ip):
-            os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
+            os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
 
 
 
