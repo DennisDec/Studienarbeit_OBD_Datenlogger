@@ -8,6 +8,7 @@ import env
 import os
 import subprocess
 import socket
+import json
 
 from statistics import mean
 
@@ -15,9 +16,8 @@ from Signals import signals
 
 # Fuer Raspberry bzw. Linux --> + "/Files/" Bei Windows: "\\OBD-Logger\\Files\\"
 # "/Files/" #"\\OBD-Logger\\Files\\"
-path = "/home/pi/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
-#"/home/pi/Schreibtisch/Test_Pascal/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
-#path = "/home/pi/Schreibtisch/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
+path = env.PATH #"\\OBD-Logger\\Files\\" # 
+#path = "/home/pi/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
 
 class LogStatus:
     """ Values for the Log status flags """
@@ -65,6 +65,16 @@ class LogFile:
     def getFilenames():
         """returns a List of filenames which are located in path """
         return [f for f in os.listdir(path) if f.endswith('.csv')]
+
+    @staticmethod
+    def transferToJson(filename):
+        jsonPath = "OBD-Logger\\Files\\JSON\\"
+        with open(path +filename, 'r') as csvfile:
+            next(csvfile)
+            fileReader = csv.DictReader(csvfile, fieldnames=("TIME", "SPEED", "RPM", "ENGINE_LOAD", "MAF" ,"AMBIANT_AIR_TEMP", "RELATIVE_ACCEL_POS", "COMMANDED_EQUIV_RATIO","FUEL_LEVEL" ,"GPS_Long", "GPS_Lat"))
+            out = json.dumps( [ row for row in fileReader ] ) 
+            f = open( jsonPath + filename + ".json", 'w')  
+            f.write(out)    
 
     @staticmethod
     def copyFileToServer(filename):
@@ -189,7 +199,6 @@ class LogFile:
         for s in signals.getSignalList():
             # Fill Dictionary with Signals from Class Signals
             self._data[s.name] = []
-        
 
     def loadFromFile(self, filename):
         """load data from csv file"""
@@ -257,26 +266,4 @@ class LogFile:
         L = self._data[signalStr]
         L = [x for x in L if x is not None]
         return mean(L)
-     
-    # def getFuelConsumption(self):
-    #     #Not working yet
-    #     if (not self._status == LogStatus.LOG_FILE_LOADED):
-    #         raise ValueError("Not allowed! You have to loadFromFile first")
-    #     if not (signals.containsSignalByString("MAF")
-    #             and signals.containsSignalByString("COMMANDED_EQUIV_RATIO")
-    #             and signals.containsSignalByString("SPEED")):
-    #         raise ValueError(
-    #             "There are signals missing to calculate FuelConsumption")
-    #     if not len(self._data[signals.MAF.name]) == len(self._data[signals.COMMANDED_EQUIV_RATIO.name]):
-    #         raise ValueError("MAF list and AFR list don't have same shapes")
-    #     FuelDensity = 0.775
-    #     fuelcons = []
-    #     maf = self._data[signals.MAF.name]
-    #     afr = self._data[signals.COMMANDED_EQUIV_RATIO.name]
-    #     speed = self._data[signals.SPEED.name]
-    #     for i, v in enumerate(speed):
-    #         if(afr[i] != 0 and v != 0): 
-    #             fuelcons.append((maf[i]*3600)/(1000* 14.5*afr[i]* FuelDensity)* 100/(v))
-    #         else:
-    #             fuelcons.append(0)
-    #      return fuelcons
+
