@@ -33,11 +33,15 @@ router.get('/getOBD', authenticationMiddleware(), function(req, res) {
     if(err) throw err;
     var address = '../../datafiles/' + results[0].filename;
     // TODO: CVS auslesen und in JSON umwandeln
-    fs.readFile(address, JSON.stringify(results), function (err) {
+    var data = fs.readFileSync(address, 'utf8');
+    //var words = JSON.stringify(data);
+    //console.log(words)
+    res.send(JSON.stringify(data))
+    /*fs.readFile(address, JSON.stringify(results), function (err) {
       if (err) throw err;
       console.log('All data saved');
       res.send(JSON.stringify(results))
-    });
+    });*/
   });
 })
 
