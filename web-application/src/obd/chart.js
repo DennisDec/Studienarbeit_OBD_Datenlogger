@@ -1,7 +1,12 @@
 var getData = async function() {
     /*let response = await fetch("obd/data.json");
     let allData = await response.json();*/
-    let response = await fetch("/getOBD");
+
+    // sends a request with credentials included
+    let response = await fetch("/getOBD", {
+        credentials: 'same-origin'
+    });
+    //console.log(response)
     let allData = await response.json();
     //console.log("Test: " + allData)
     var time = [];
