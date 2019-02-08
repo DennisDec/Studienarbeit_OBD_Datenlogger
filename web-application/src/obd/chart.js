@@ -3,8 +3,7 @@ var getData = async function() {
     let allData = await response.json();*/
     let response = await fetch("/getOBD");
     let allData = await response.json();
-    /*console.log("Test: " + test)
-    console.log(testData)*/
+    //console.log("Test: " + allData)
     var time = [];
     var speed = [];/*
     var rpm = [];
@@ -15,12 +14,12 @@ var getData = async function() {
     var afr = [];
     var fuel_level = [];*/
     var data = [time, speed/*, rpm, engine_load, maf, temperature, pedal, afr, fuel_level*/];
-    var tmp = allData[0].time;
+    var tmp = allData[0].TIME;
     var startTime = parseInt(tmp.slice(11, 13))*60*60+parseInt(tmp.slice(14, 16))*60+parseFloat(tmp.slice(17));
     var index = 0;
     for ( var i=0; i < allData.length; ++i ) 
     {
-        tmp = allData[i].time;
+        tmp = allData[i].TIME;
         var res = parseInt(tmp.slice(11, 13))*60*60+parseInt(tmp.slice(14, 16))*60+parseFloat(tmp.slice(17));
         //data[0][i] = (Math.floor(res/3600)).toString()+":"+(Math.floor((res/60)%60)).toString()+":"+(Math.floor(res%60)).toString()+"."+((res%1).toString()).slice(2,5);
         if(i > 0 && (res - startTime) < data[0][i-1]) {
@@ -28,7 +27,7 @@ var getData = async function() {
             break;
         }
         data[0][i] = res - startTime;
-        data[1][i] = allData[i].speed;
+        data[1][i] = allData[i].SPEED;
     }
 
     var speedTrace = {
