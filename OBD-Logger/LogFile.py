@@ -68,7 +68,7 @@ class LogFile:
 
     @staticmethod
     def transferToJson(filename):
-        jsonPath = path + "\\JSON\\"
+        jsonPath = path + "JSON/"
         with open(path +filename, 'r') as csvfile:
             next(csvfile)
             fileReader = csv.DictReader(csvfile, fieldnames=("TIME", "SPEED", "RPM", "ENGINE_LOAD", "MAF" ,"AMBIANT_AIR_TEMP", "RELATIVE_ACCEL_POS", "COMMANDED_EQUIV_RATIO","FUEL_LEVEL" ,"GPS_Long", "GPS_Lat"))
@@ -94,7 +94,7 @@ class LogFile:
                 ip.append(output[i-3].split(' ')[-1])
                 print(ip)
         for i, tmp in enumerate(ip):
-            os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON\\" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
+            os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
 
 
 
