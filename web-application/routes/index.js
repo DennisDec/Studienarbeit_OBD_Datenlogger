@@ -29,6 +29,7 @@ router.get('/confirmation/:token', function(req, res) {
 
 router.get('/getOBD', authenticationMiddleware(), function(req, res) {
   var db = require('../db.js');
+  //TODO: Where id = 1 macht keinen sinn, hier entscheiden welche fahrt dargestellt werden soll!!!!
   db.query('SELECT filename FROM data WHERE id=1', function(err, results, fields) {
     if(err) throw err;
     var address = '../../datafiles/' + results[0].filename;
