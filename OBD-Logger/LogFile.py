@@ -9,7 +9,6 @@ import os
 import subprocess
 import socket
 import json
-import ipAddress
 
 from statistics import mean
 
@@ -82,7 +81,9 @@ class LogFile:
     def copyFileToServer(filename):
         errcnt = 0
         ip = []
-        if(not ipAddress.IP == None):
+        f = open("ipAddress.ip", "r")
+        ipAddress = f.read()
+        if(not ipAddress == ""):
             stri = str(subprocess.check_output(('nmap -p22 ' + str(ipAddress.IP)), shell=True))
             if(stri.find("open") != -1):
                 ip.append(str(ip))
@@ -102,14 +103,12 @@ class LogFile:
                     print(ip)
 
 
-            
-
         for i, tmp in enumerate(ip):
             #os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
             try:
                 subprocess.check_output(("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/"), shell=True)
                 LogFile.transmitToSQL(filename, str(ip[i]))
-                f = open("ipAddress.py", "w")
+                f = open("ipAddress.ip", "w")
                 f.write("IP = '" + str(ip[i]) + "'")
 
 
