@@ -109,7 +109,7 @@ class LogFile:
                 subprocess.check_output(("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/"), shell=True)
                 LogFile.transmitToSQL(filename, str(ip[i]))
                 f = open("ipAddress.ip", "w")
-                f.write("IP = '" + str(ip[i]) + "'")
+                f.write(str(ip[i]))
 
 
                 return True
