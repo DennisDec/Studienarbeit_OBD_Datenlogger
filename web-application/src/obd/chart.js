@@ -10,15 +10,15 @@ var getData = async function(filename) {
     let allData = await response.json();
     //console.log("Test: " + allData.SPEED)
     var time = [];
-    var speed = allData.SPEED;/*
-    var rpm = [];
+    var speed = allData.SPEED;
+    var rpm = allData.RPM;/*
     var engine_load = [];
     var maf = [];
     var temperature = [];
     var pedal = [];
     var afr = [];
     var fuel_level = [];*/
-    var data = [time, speed/*, rpm, engine_load, maf, temperature, pedal, afr, fuel_level*/];
+    var data = [time, speed, rpm/*, engine_load, maf, temperature, pedal, afr, fuel_level*/];
     var tmp = allData.TIME[0];
     console.log(tmp)
     var startTime = parseInt(tmp.slice(11, 13))*60*60+parseInt(tmp.slice(14, 16))*60+parseFloat(tmp.slice(17));
@@ -39,13 +39,22 @@ var getData = async function(filename) {
     var speedTrace = {
         type: "scatter",
         mode: "lines",
-        name: 'AAPL Low',
+        name: 'Speed',
         x: data[0],
         y: data[1],
         line: {color: '#7F7F7F'}
     }
+
+    var rpmTrace = {
+        type: "scatter",
+        mode: "lines",
+        name: 'RPM',
+        x: data[0],
+        y: data[2],
+        line: {color: '#E92197'}
+    }
       
-    var data = [speedTrace];
+    var data = [speedTrace, rpmTrace];
           
     var layout = {
         title: 'Data', 
