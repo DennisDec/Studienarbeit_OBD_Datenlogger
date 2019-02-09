@@ -29,15 +29,15 @@ signal.alarm(20)
 try:
     #connectToWIFI()
     #TODO: Add for - Loop here
-    #TODO: Delete file after successful transmission
     log = LogFile()
     files = LogFile.getFilenames()
     print(files[2])
-    filename = LogFile.transferToJson(files[2])
-    #log.loadFromFile(files[1])
+    log.loadFromFile(files[2])
+    filename = log.transferToJson()
     print(filename)
     if(LogFile.copyFileToServer(filename)):
         print("Success!!")
+    #TODO: Delete file after successful transmission
 except Exception as ex:
     print(ex)
 finally:

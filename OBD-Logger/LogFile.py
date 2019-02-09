@@ -66,16 +66,23 @@ class LogFile:
         """returns a List of filenames which are located in path """
         return [f for f in os.listdir(path) if f.endswith('.csv')]
 
-    @staticmethod
-    def transferToJson(filename):
+    # @staticmethod
+    # def transferToJson(filename):
+    #     jsonPath = path + "JSON/"
+    #     with open(path +filename, 'r') as csvfile:
+    #         next(csvfile)
+    #         fileReader = csv.DictReader(csvfile, fieldnames=("TIME", "SPEED", "RPM", "ENGINE_LOAD", "MAF" ,"AMBIANT_AIR_TEMP", "RELATIVE_ACCEL_POS", "COMMANDED_EQUIV_RATIO","FUEL_LEVEL" ,"GPS_Long", "GPS_Lat"))
+    #         out = json.dumps( [ row for row in fileReader ] ) 
+    #         f = open( jsonPath + filename.split(".csv")[0] + ".json", 'w')  
+    #         f.write(out)
+    #         return filename.split(".csv")[0] + ".json"
+
+    def transferToJson(self):
         jsonPath = path + "JSON/"
-        with open(path +filename, 'r') as csvfile:
-            next(csvfile)
-            fileReader = csv.DictReader(csvfile, fieldnames=("TIME", "SPEED", "RPM", "ENGINE_LOAD", "MAF" ,"AMBIANT_AIR_TEMP", "RELATIVE_ACCEL_POS", "COMMANDED_EQUIV_RATIO","FUEL_LEVEL" ,"GPS_Long", "GPS_Lat"))
-            out = json.dumps( [ row for row in fileReader ] ) 
-            f = open( jsonPath + filename.split(".csv")[0] + ".json", 'w')  
-            f.write(out)
-            return filename.split(".csv")[0] + ".json"    
+        filename = self._filename
+        with open( jsonPath + filename.split(".csv")[0] + ".json", 'w') as fp:
+            json.dump(self._data, fp)
+        return filename.split(".csv")[0] + ".json"    
 
     @staticmethod
     def copyFileToServer(filename):
@@ -84,9 +91,9 @@ class LogFile:
         f = open("ipAddress.ip", "r")
         ipAddress = f.read()
         if(not ipAddress == ""):
-            stri = str(subprocess.check_output(('nmap -p22 ' + str(ipAddress.IP)), shell=True))
+            stri = str(subprocess.check_output(('nmap -p22 ' + str(ipAddress)), shell=True))
             if(stri.find("open") != -1):
-                ip.append(str(ip))
+                ip.append(str(ipAddress))
         else:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect(('8.8.8.8', 1))
@@ -224,6 +231,7 @@ class LogFile:
 
     def loadFromFile(self, filename):
         """load data from csv file"""
+        
         try:
             with open(path+filename, 'r') as csvfile:
                 next(csvfile)  # ignore header (first row)
@@ -239,6 +247,7 @@ class LogFile:
                                 self._data[s.name].append(row[i])
                             else:
                                 self._data[s.name].append(round(float(row[i]),s.roundDigit))
+            self._filename = filename
 
         except:
             raise FileNotFoundError("Error: Loading File failed!")
