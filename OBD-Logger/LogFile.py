@@ -9,6 +9,7 @@ import os
 import subprocess
 import socket
 import json
+import ipAddress
 
 from statistics import mean
 
@@ -80,24 +81,38 @@ class LogFile:
     @staticmethod
     def copyFileToServer(filename):
         errcnt = 0
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 1))
-        own_ip = str(s.getsockname()[0])
-
-        ip_mask = ".".join(own_ip.split('.')[0:-1]) + ".*"
-
-        stri = str(subprocess.check_output(('nmap -p22 ' + str(ip_mask)), shell=True))
-        output = stri.split("\\n")
         ip = []
+        if(not ipAddress.IP == None):
+            stri = str(subprocess.check_output(('nmap -p22 ' + str(ipAddress.IP)), shell=True))
+            if(stri.find("open") != -1):
+                ip.append(str(ip))
+        else:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(('8.8.8.8', 1))
+            own_ip = str(s.getsockname()[0])
 
-        for i, line in enumerate(output):
-            if(line.find("open") != -1 and output[i-3].split(' ')[-1] != own_ip):
-                ip.append(output[i-3].split(' ')[-1])
-                print(ip)
+            ip_mask = ".".join(own_ip.split('.')[0:-1]) + ".*"
+
+            stri = str(subprocess.check_output(('nmap -p22 ' + str(ip_mask)), shell=True))
+            output = stri.split("\\n")
+
+            for i, line in enumerate(output):
+                if(line.find("open") != -1 and output[i-3].split(' ')[-1] != own_ip):
+                    ip.append(output[i-3].split(' ')[-1])
+                    print(ip)
+
+
+            
+
         for i, tmp in enumerate(ip):
             #os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
             try:
                 subprocess.check_output(("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/"), shell=True)
+                LogFile.transmitToSQL(filename, str(ip[i]))
+                f = open("ipAddress.py", "w")
+                f.write("IP = '" + str(ip[i]) + "'")
+
+
                 return True
             except subprocess.CalledProcessError:
                 errcnt = errcnt + 1
@@ -232,15 +247,15 @@ class LogFile:
         self._status = LogStatus.LOG_FILE_LOADED
 
     @staticmethod
-    def transmitToSQL(filename):                      #Connecting to SQL Server
+    def transmitToSQL(filename, ip):                      #Connecting to SQL Server
         """
             Connecting to SQL server and transmit all data stored in this Class
-            --> Call loadFromFile()-method first
+            
         """
         db = mysql.connector.connect(
             user=env.DB_USER,
             password=env.DB_PASSWORD,
-            host=env.DB_HOST,
+            host=ip,
             database=env.DB_NAME
         )
 

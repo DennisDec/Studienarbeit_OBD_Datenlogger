@@ -37,8 +37,7 @@ try:
     #log.loadFromFile(files[1])
     print(filename)
     if(LogFile.copyFileToServer(filename)):
-        print("test")
-        LogFile.transmitToSQL(filename)
+        print("Success!!")
 except Exception as ex:
     print(ex)
 finally:
