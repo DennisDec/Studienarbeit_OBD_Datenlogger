@@ -86,7 +86,7 @@ class LogFile:
         if(not ipAddress == ""):
             stri = str(subprocess.check_output(('nmap -p22 ' + str(ipAddress)), shell=True))
             if(stri.find("open") != -1):
-                ip.append(str(ip))
+                ip.append(str(ipAddress))
         else:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect(('8.8.8.8', 1))
