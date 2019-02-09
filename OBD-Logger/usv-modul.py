@@ -33,8 +33,8 @@ try:
     log = LogFile()
     files = LogFile.getFilenames()
     #log.loadFromFile(files[1])
-    log.copyFileToServer(files[1])
-    LogFile.transmitToSQL(files[1])
+    if(log.copyFileToServer(files[1])):
+        LogFile.transmitToSQL(files[1])
 except Exception as ex:
     print(ex)
 finally:

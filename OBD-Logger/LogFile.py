@@ -79,6 +79,7 @@ class LogFile:
 
     @staticmethod
     def copyFileToServer(filename):
+        errcnt = 0
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('8.8.8.8', 1))
         own_ip = str(s.getsockname()[0])
@@ -94,9 +95,15 @@ class LogFile:
                 ip.append(output[i-3].split(' ')[-1])
                 print(ip)
         for i, tmp in enumerate(ip):
-            os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
-
-
+            #os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
+            try:
+                subprocess.check_output(('sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/'), shell=True)
+                return True
+            except subprocess.CalledProcessError:
+                errcnt = errcnt + 1
+                if(len(ip)-1  == i):
+                    return False
+                pass
 
 
     def __init__(self):
