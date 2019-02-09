@@ -1,16 +1,16 @@
-var getData = async function() {
+var getData = async function(filename) {
     /*let response = await fetch("obd/data.json");
     let allData = await response.json();*/
 
     // sends a request with credentials included
-    let response = await fetch("/getOBD", {
+    let response = await fetch("/getOBD/" + filename, {
         credentials: 'same-origin'
     });
     //console.log(response)
     let allData = await response.json();
-    //console.log("Test: " + allData)
+    //console.log("Test: " + allData.SPEED)
     var time = [];
-    var speed = [];/*
+    var speed = allData.SPEED;/*
     var rpm = [];
     var engine_load = [];
     var maf = [];
@@ -19,12 +19,14 @@ var getData = async function() {
     var afr = [];
     var fuel_level = [];*/
     var data = [time, speed/*, rpm, engine_load, maf, temperature, pedal, afr, fuel_level*/];
-    var tmp = allData[0].TIME;
+    var tmp = allData.TIME[0];
+    console.log(tmp)
     var startTime = parseInt(tmp.slice(11, 13))*60*60+parseInt(tmp.slice(14, 16))*60+parseFloat(tmp.slice(17));
     var index = 0;
-    for ( var i=0; i < allData.length; ++i ) 
+    for ( var i=0; i < allData.TIME.length; ++i ) 
     {
-        tmp = allData[i].TIME;
+        tmp = allData.TIME[i];
+        //console.log(tmp)
         var res = parseInt(tmp.slice(11, 13))*60*60+parseInt(tmp.slice(14, 16))*60+parseFloat(tmp.slice(17));
         //data[0][i] = (Math.floor(res/3600)).toString()+":"+(Math.floor((res/60)%60)).toString()+":"+(Math.floor(res%60)).toString()+"."+((res%1).toString()).slice(2,5);
         if(i > 0 && (res - startTime) < data[0][i-1]) {
@@ -32,7 +34,6 @@ var getData = async function() {
             break;
         }
         data[0][i] = res - startTime;
-        data[1][i] = allData[i].SPEED;
     }
 
     var speedTrace = {
@@ -58,4 +59,4 @@ var getData = async function() {
     Plotly.newPlot('myDiv', data, layout, config);
 }
   
-getData();
+getData("undefined");

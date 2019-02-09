@@ -27,34 +27,75 @@ router.get('/confirmation/:token', function(req, res) {
   res.redirect('/login');
 });
 
-router.get('/getOBD', authenticationMiddleware(), function(req, res) {
-  var db = require('../db.js');
-  //TODO: Where id = 1 macht keinen sinn, hier entscheiden welche fahrt dargestellt werden soll!!!!
-  db.query('SELECT filename FROM data WHERE id=1', function(err, results, fields) {
-    if(err) throw err;
-    var address = '../../datafiles/' + results[0].filename;
-    var data = fs.readFileSync(address, 'utf8');
-    //console.log(data);
+router.get('/getOBD/:token', authenticationMiddleware(), function(req, res) {
+  //console.log(req.params.token)
+  if(req.params.token != "undefined") {
+    var address = '../../datafiles/' + req.params.token;
+    var data = JSON.parse(fs.readFileSync(address, 'utf8'));
     res.send(data);
-    /*fs.readFile(address, JSON.stringify(results), function (err) {
-      if (err) throw err;
-      console.log('All data saved');
-      res.send(JSON.stringify(results))
-    });*/
-  });
-})
+  } else {
+    var db = require('../db.js');
+    //TODO: Where id = 1 macht keinen sinn, hier entscheiden welche fahrt dargestellt werden soll!!!!
+    db.query('SELECT filename FROM data', function(err, results, fields) {
+      if(err) throw err;
+      console.log(results[0].filename)
+      var address = '../../datafiles/' + results[0].filename;
+      var data = JSON.parse(fs.readFileSync(address, 'utf8'));
+      //console.log(data);
+      res.send(data);
+      /*fs.readFile(address, JSON.stringify(results), function (err) {
+        if (err) throw err;
+        console.log('All data saved');
+        res.send(JSON.stringify(results))
+      });*/
+    });
+  }
+});
+
+router.get('/getGPS/:token', authenticationMiddleware(), function(req, res) {
+  if(req.params.token != "undefined") {
+    var address = '../../datafiles/' + req.params.token;
+    var data = JSON.parse(fs.readFileSync(address, 'utf8'));
+    delete data['AMBIANT_AIR_TEMP'];
+    delete data['RPM'];
+    delete data['RELATIVE_ACCEL_POS'];
+    delete data['FUEL_LEVEL'];
+    delete data['MAF'];
+    delete data['COMMANDED_EQUIV_RATIO'];
+    delete data['SPEED'];
+    delete data['ENGINE_LOAD'];
+    res.send(data);
+  } else {
+    var db = require('../db.js');
+    //TODO: Where id = 1 macht keinen sinn, hier entscheiden welche fahrt dargestellt werden soll!!!!
+    db.query('SELECT filename FROM data', function(err, results, fields) {
+      if(err) throw err;
+      var address = '../../datafiles/' + results[0].filename;
+      var data = JSON.parse(fs.readFileSync(address));
+      delete data['AMBIANT_AIR_TEMP'];
+      delete data['RPM'];
+      delete data['RELATIVE_ACCEL_POS'];
+      delete data['FUEL_LEVEL'];
+      delete data['MAF'];
+      delete data['COMMANDED_EQUIV_RATIO'];
+      delete data['SPEED'];
+      delete data['ENGINE_LOAD'];
+      res.send(data);
+    });
+  }
+});
 
 // GET dashboard page; only accessable for authenticated users
 router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
   // get GPS-data from the MySQL-server and save it into a json-file 
-  var db = require('../db.js');
+  /*var db = require('../db.js');
   db.query('SELECT * FROM gpsdata', function(err, results, fields) {
     if(err) throw err;
     fs.writeFile('src/maps/markers.json', JSON.stringify(results), function (err) {
       if (err) throw err;
       console.log('GPS-data saved');
     });
-  });/*
+  });
   db.query('SELECT * FROM importobd', function(err, results, fields) {
     if(err) throw err;
     fs.writeFile('src/obd/data.json', JSON.stringify(results), function (err) {
@@ -62,7 +103,16 @@ router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
       console.log('OBD-data saved');
     });
   });*/
-  res.render('dashboard', { title: 'Dashboard', dashboard: true });
+  var db = require('../db.js');
+  db.query('SELECT filename FROM data', function(err, results, fields) {
+    if(err) throw err;
+    filenames = [];
+    console.log(results[0].filename)
+    for(var i = 0; i < results.length; i++) {
+      filenames[i] = results[i]. filename;
+    }
+    res.render('dashboard', { title: 'Dashboard', dashboard: true,  filenames: filenames});
+  });
 });
 
 // GET login page

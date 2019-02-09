@@ -45,10 +45,16 @@
               <button class="btn btn-sm btn-outline-secondary">Share</button>
               <button class="btn btn-sm btn-outline-secondary">Export</button>
             </div>
-            <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
-              <span data-feather="calendar"></span>
-              This week
-            </button>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown button
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {{#each filenames}}
+                  <a class="dropdown-item" onclick="getData('{{this}}'); printMarkers('{{this}}')">{{this}}</a>
+                {{/each}}
+              </div>
+            </div>
           </div>
           <section id="tripMap">
             <h2>Map</h2>
