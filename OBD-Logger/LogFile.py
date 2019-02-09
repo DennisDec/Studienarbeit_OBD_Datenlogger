@@ -84,7 +84,7 @@ class LogFile:
         f = open("ipAddress.ip", "r")
         ipAddress = f.read()
         if(not ipAddress == ""):
-            stri = str(subprocess.check_output(('nmap -p22 ' + str(ipAddress.IP)), shell=True))
+            stri = str(subprocess.check_output(('nmap -p22 ' + str(ipAddress)), shell=True))
             if(stri.find("open") != -1):
                 ip.append(str(ip))
         else:
