@@ -25,8 +25,13 @@ var printMarkers = async function(filename) {
     //console.log("Markeranzahl: " + markers.length)
     for ( var i=0; i < markers.length; ++i ) 
     {
-        test = L.marker( [markers[i].lat, markers[i].lng])
-            //.bindPopup( '<p>' + markers[i].route_name + '</p>' )
+        var tmp = 0;
+        if(i === 0 || i === (markers.length - 1)) {
+            tmp = 1;
+        }
+        L.marker( [markers[i].lat, markers[i].lng], {opacity: tmp})
+            //TODO: show start and stop time
+            .bindPopup( '<p>Start-Time' + markers[i].route_name + '</p>' )
             .addTo( map );
         if ((i + 1)  < markers.length) {
             var latlngs = Array();
