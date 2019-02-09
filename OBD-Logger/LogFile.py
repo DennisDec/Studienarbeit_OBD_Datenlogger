@@ -97,7 +97,7 @@ class LogFile:
         for i, tmp in enumerate(ip):
             #os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
             try:
-                subprocess.check_output(("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/'), shell=True)
+                subprocess.check_output(("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/"), shell=True)
                 return True
             except subprocess.CalledProcessError:
                 errcnt = errcnt + 1

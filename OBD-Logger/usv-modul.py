@@ -22,7 +22,7 @@ def connectToWIFI():
             print("No wireless networks connected")
 
 signal.signal(signal.SIGALRM, timeout_handler)
-signal.alarm(10)
+signal.alarm(20)
 
 
 
@@ -32,9 +32,13 @@ try:
     #TODO: Delete file after successful transmission
     log = LogFile()
     files = LogFile.getFilenames()
+    print(files[2])
+    filename = LogFile.transferToJson(files[2])
     #log.loadFromFile(files[1])
-    if(log.copyFileToServer(files[1])):
-        LogFile.transmitToSQL(files[1])
+    print(filename)
+    if(LogFile.copyFileToServer(filename)):
+        print("test")
+        LogFile.transmitToSQL(filename)
 except Exception as ex:
     print(ex)
 finally:
