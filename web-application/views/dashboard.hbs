@@ -45,7 +45,7 @@
               <button class="btn btn-sm btn-outline-secondary">Share</button>
               <button class="btn btn-sm btn-outline-secondary">Export</button>
             </div>
-            <div class="dropdown">
+            <!--<div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Dropdown button
               </button>
@@ -54,7 +54,7 @@
                   <a class="dropdown-item" onclick="getData('{{this}}'); printMarkers('{{this}}')">{{this}}</a>
                 {{/each}}
               </div>
-            </div>
+            </div>-->
           </div>
           <section id="tripMap">
             <h2>Map</h2>
@@ -67,11 +67,28 @@
             <div id="myDiv"></div>
             <script type='text/javascript' src='obd/chart.js'></script>
           </section>
+          <div class="btn-group-toggle" data-toggle="buttons">
+            {{#each filenames}}
+              <label class="btn btn-secondary active">
+                <input type="checkbox" checked class="filename" filename={{this}} autocomplete="off"> {{this}}
+              </label>
+            {{/each}}
+          </div>
         </main>
       </div>
     </div>
+    <script type='text/javascript'>
+      var getFilenames = function() {
+        var fn = []
+        {{#each filenames}}
+        fn.push("{{this}}");
+        {{/each}}
+        return fn;
+      }
+    </script>
     <script type='text/javascript' src='maps/leaf.js'></script>
     <script type='text/javascript' src='js/scroll.js'></script>
+    <script type='text/javascript' src='js/checkbox.js'></script>
     <!-- Icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
     <script>

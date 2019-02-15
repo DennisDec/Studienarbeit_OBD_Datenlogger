@@ -28,7 +28,6 @@ router.get('/confirmation/:token', function(req, res) {
 });
 
 router.get('/getOBD/:token', authenticationMiddleware(), function(req, res) {
-  //console.log(req.params.token)
   if(req.params.token != "undefined") {
     var address = '../../datafiles/' + req.params.token;
     var data = JSON.parse(fs.readFileSync(address, 'utf8'));
@@ -109,7 +108,7 @@ router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
     filenames = [];
     console.log(results[0].filename)
     for(var i = 0; i < results.length; i++) {
-      filenames[i] = results[i]. filename;
+      filenames[i] = results[i].filename;
     }
     res.render('dashboard', { title: 'Dashboard', dashboard: true,  filenames: filenames});
   });
