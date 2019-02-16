@@ -84,6 +84,26 @@ router.get('/getGPS/:token', authenticationMiddleware(), function(req, res) {
     });
   }
 });
+router.get('/getAllGPS', authenticationMiddleware(), function(req, res) {
+  var db = require('../db.js');
+  db.query('SELECT filename FROM data', function(err, results, fields) {
+    if(err) throw err;
+    var data = [];
+    for(var i = 0; i < results.length; i++) {
+      var address = '../../datafiles/' + results[i].filename;
+      data[i] = JSON.parse(fs.readFileSync(address));
+      delete data[i]['AMBIANT_AIR_TEMP'];
+      delete data[i]['RPM'];
+      delete data[i]['RELATIVE_ACCEL_POS'];
+      delete data[i]['FUEL_LEVEL'];
+      delete data[i]['MAF'];
+      delete data[i]['COMMANDED_EQUIV_RATIO'];
+      delete data[i]['SPEED'];
+      delete data[i]['ENGINE_LOAD'];
+    }
+    res.send(data);
+  });
+});
 
 // GET dashboard page; only accessable for authenticated users
 router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {

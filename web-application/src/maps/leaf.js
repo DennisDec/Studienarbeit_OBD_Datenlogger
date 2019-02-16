@@ -1,3 +1,33 @@
+var printAllMarkers = async function() {
+    var map0 = L.map( 'map0', {
+        center: [20.0, 5.0],
+        minZoom: 2,
+        zoom: 2
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map0);
+
+    let response = await fetch("/getAllGPS", {
+        credentials: 'same-origin'
+    });
+    let markers = await response.json();
+    console.log(markers)
+    console.log(markers[0].GPS_Long[0])
+    for(var i = 0; i < markers.length; i++) {
+        console.log(markers[i].GPS_Long.length)
+        for (let g = 0; g < markers[i].GPS_Long.length; g++) {
+            if(!(markers[i].GPS_Long[g] === null || markers[i].GPS_Lat[g] === null)) {
+                console.log("test")
+                L.marker( [markers[i].GPS_Lat[g], markers[i].GPS_Long[g]], {opacity: 1})
+                    .addTo( map0 );
+            }
+        }
+    }
+}
+printAllMarkers();
+
 var map = L.map( 'map1', {
     center: [20.0, 5.0],
     minZoom: 2,
