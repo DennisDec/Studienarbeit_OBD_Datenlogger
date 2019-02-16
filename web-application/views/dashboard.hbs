@@ -56,7 +56,8 @@
               </div>
             </div>-->
           </div>
-          <input data-toggle="datepicker">
+          <input data-toggle="datepicker" id="datepicker">
+          <button type="button" class="btn btn-primary" onclick="update()">Primary</button>
           <section id="tripMap">
             <h2>Map</h2>
             <div class="table-responsive">
@@ -68,10 +69,12 @@
             <div id="myDiv"></div>
             <script type='text/javascript' src='obd/chart.js'></script>
           </section>
-          <div class="btn-group-toggle" data-toggle="buttons">
-            {{#each filenames}}
+          <div class="btn-group-toggle" id="allTrips" data-toggle="buttons">
+            {{#each data}}
               <label class="btn btn-secondary active">
-                <input type="checkbox" checked class="filename" filename={{this}} autocomplete="off"> {{this}}
+                {{#this}}
+                    <input type="checkbox" class="filename" filename={{filenames}} checked autocomplete="off"> {{filenames}}
+                {{/this}}
               </label>
             {{/each}}
           </div>
@@ -91,7 +94,8 @@
     <script type='text/javascript' src='js/scroll.js'></script>
     <script type='text/javascript' src='js/checkbox.js'></script>
     <script type='text/javascript' src='js/datepicker.js'></script>
-          <script type='text/javascript' src='js/jquery_datepicker.js'></script>
+    <script type='text/javascript' src='js/jquery_datepicker.js'></script>
+    <script type='text/javascript' src='js/updateTripField.js'></script>
     <!-- Icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
     <script>

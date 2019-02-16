@@ -106,13 +106,69 @@ router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
   db.query('SELECT filename FROM data', function(err, results, fields) {
     if(err) throw err;
     filenames = [];
+    data = [];
     console.log(results[0].filename)
     for(var i = 0; i < results.length; i++) {
+      //filenames[i] = results[i].filename;
+      data.push({filenames: results[i].filename})
+    }
+    res.render('dashboard', { title: 'Dashboard', dashboard: true,  data: data});
+  });
+});
+
+router.get('/getTrips/:token', authenticationMiddleware(), function(req, res) {
+  var date = req.params.token;
+  if(req.params.token === "undefined") {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    }
+    if(mm<10) {
+        mm = '0'+mm
+    }
+    date = mm + '-' + dd + '-' + yyyy;
+  } 
+  console.log(date)
+  var db = require('../db.js');
+  db.query('SELECT filename FROM data WHERE date=?', [date], function(err, results, fields) {
+    if(err) throw err;
+    var data = [];
+    for(var i = 0; i < results.length; i++) {
+      data.push({filename: results[i].filename});
+    }
+    res.send(data);
+  });
+});
+
+/*router.get('/dashboard:token', authenticationMiddleware(), function(req, res, next) {
+  console.log("Date: " + req.params.token)
+  var db = require('../db.js');
+  db.query('SELECT filename FROM data WHERE date=?', [req.params.token], function(err, results, fields) {
+    if(err) throw err;
+    filenames = [];
+    for(var i = 0; i < results.length; i++) {
       filenames[i] = results[i].filename;
+      console.log(filenames[i])
     }
     res.render('dashboard', { title: 'Dashboard', dashboard: true,  filenames: filenames});
   });
-});
+})
+router.post('/dashboard', authenticationMiddleware(), function(req, res, next) {
+  console.log("Date: " + req.body.date)
+  var db = require('../db.js');
+  db.query('SELECT filename FROM data WHERE date=?', [req.body.date], function(err, results, fields) {
+    if(err) throw err;
+    filenames = [];
+    for(var i = 0; i < results.length; i++) {
+      filenames[i] = results[i].filename;
+      console.log(filenames[i])
+    }
+    res.render('dashboard', { title: 'Dashboard', dashboard: true,  data: [{filenames: filenames}]});
+  });
+});*/
 
 // GET login page
 router.get('/login', function(req, res, next) {
