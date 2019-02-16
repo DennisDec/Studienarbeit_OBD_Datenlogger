@@ -35,7 +35,10 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
               <h1 class="h2">General Data</h1>
             </div>
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.s autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. t wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur</p>
+            <h2>Map</h2>
+            <div class="table-responsive">
+              <div id="map" style="height: 440px; border: 1px solid #AAA;"></div>
+            </div>
           </section>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Trip Information</h1>
@@ -58,30 +61,35 @@
           </div>
           <input data-toggle="datepicker" id="datepicker">
           <button type="button" class="btn btn-primary" onclick="update()">Primary</button>
+          <div class="col-md-6 mb-4">
+            <div class="card example-1 scrollbar-ripe-malinka">
+              <div class="card-body">
+                <div class="btn-group-toggle" id="allTrips" data-toggle="buttons">
+                  <!--{{#each data}}
+                    <label class="btn btn-secondary active">
+                      {{#this}}
+                          <input type="checkbox" class="filename" filename={{filenames}} checked autocomplete="off">Fahrt {{count}}
+                      {{/this}}
+                    </label>
+                  {{/each}}-->
+                </div>
+              </div>
+            </div>
+          </div>
           <section id="tripMap">
             <h2>Map</h2>
             <div class="table-responsive">
-              <div id="map" style="height: 440px; border: 1px solid #AAA;"></div>
+              <div id="map1" style="height: 440px; border: 1px solid #AAA;"></div>
             </div>
           </section>
           <section id="tripData">
             <h2>Data</h2>
-            <div id="myDiv"></div>
-            <script type='text/javascript' src='obd/chart.js'></script>
+            <div id="charts"></div>
           </section>
-          <div class="btn-group-toggle" id="allTrips" data-toggle="buttons">
-            <!--{{#each data}}
-              <label class="btn btn-secondary active">
-                {{#this}}
-                    <input type="checkbox" class="filename" filename={{filenames}} checked autocomplete="off">Fahrt {{count}}
-                {{/this}}
-              </label>
-            {{/each}}-->
-          </div>
         </main>
       </div>
     </div>
-    <script type='text/javascript'>
+    <!--<script type='text/javascript'>
       var getFilenames = function() {
         var fn = []
         {{#each filenames}}
@@ -89,10 +97,11 @@
         {{/each}}
         return fn;
       }
-    </script>
+    </script>-->
+    <script type='text/javascript' src='obd/chart.js'></script>
     <script type='text/javascript' src='maps/leaf.js'></script>
     <script type='text/javascript' src='js/scroll.js'></script>
-    <script type='text/javascript' src='js/checkbox.js'></script>
+    <!--<script type='text/javascript' src='js/checkbox.js'></script>-->
     <script type='text/javascript' src='js/datepicker.js'></script>
     <script type='text/javascript' src='js/jquery_datepicker.js'></script>
     <script type='text/javascript' src='js/updateTripField.js'></script>

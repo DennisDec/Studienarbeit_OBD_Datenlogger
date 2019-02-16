@@ -65,6 +65,7 @@ router.get('/getGPS/:token', authenticationMiddleware(), function(req, res) {
     delete data['ENGINE_LOAD'];
     res.send(data);
   } else {
+    //TODO: dieser Teil wird nie benutzt
     var db = require('../db.js');
     //TODO: Where id = 1 macht keinen sinn, hier entscheiden welche fahrt dargestellt werden soll!!!!
     db.query('SELECT filename FROM data', function(err, results, fields) {

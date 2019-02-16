@@ -1,4 +1,4 @@
-var map = L.map( 'map', {
+var map = L.map( 'map1', {
     center: [20.0, 5.0],
     minZoom: 2,
     zoom: 2
@@ -7,7 +7,7 @@ var map = L.map( 'map', {
 var printMarkers = async function(filename, nof) {
     map.remove();
 
-    map = L.map( 'map', {
+    map = L.map( 'map1', {
         center: [20.0, 5.0],
         minZoom: 2,
         zoom: 2
@@ -80,5 +80,5 @@ var removeNull = function(markers) {
     }
     return markerList;
 }
-var fn = getFilenames();
-printMarkers(fn, fn.length);
+//var fn = getFilenames();
+//printMarkers(fn, fn.length);

@@ -28,7 +28,13 @@ var update = async function() {
         nof++;
         $("#allTrips").append("<label class='btn btn-secondary active'><input type='checkbox' class='filename' filename='" + file.filename + "' checked autocomplete='off'>Fahrt " + nof + "</label>")
     });
-    printMarkers(fn, nof)
+    printMarkers(fn, nof);
+    $("#charts").empty()
+    for(var h = 1; h <= nof; h++) {
+        console.log("Filename: " + fn[h-1])
+        $("#charts").append("<div id='Fahrt " + h + "'></div>")
+        getData(fn[h-1], "Fahrt " + h);
+    }
     $(function() {
         console.log($(".filename").length);
         //console.log($(".test:eq(0)").attr('test'));
@@ -48,6 +54,11 @@ var update = async function() {
                 }
                 console.log(filenames);
                 printMarkers(filenames, nof);
+                $("#charts").empty()
+                for(var h = 1; h <= nof; h++) {
+                    $("#charts").append("<div id='Fahrt " + h + "'></div>")
+                    getData(filenames[h-1], "Fahrt " + h);
+                }
             });
         }
     });

@@ -1,15 +1,14 @@
-var getData = async function(filename) {
+var getData = async function(filename, name) {
     /*let response = await fetch("obd/data.json");
     let allData = await response.json();*/
-
     // sends a request with credentials included
     let response = await fetch("/getOBD/" + filename, {
         credentials: 'same-origin'
     });
-    //console.log(response)
     let allData = await response.json();
+    //console.log(response)
     //console.log("Test: " + allData.SPEED)
-    var time = [];
+    var time = allData.TIME;
     var speed = allData.SPEED;
     var rpm = allData.RPM;/*
     var engine_load = [];
@@ -19,7 +18,7 @@ var getData = async function(filename) {
     var afr = [];
     var fuel_level = [];*/
     var data = [time, speed, rpm/*, engine_load, maf, temperature, pedal, afr, fuel_level*/];
-    var tmp = allData.TIME[0];
+    /*var tmp = allData.TIME[0];
     console.log(tmp)
     var startTime = parseInt(tmp.slice(11, 13))*60*60+parseInt(tmp.slice(14, 16))*60+parseFloat(tmp.slice(17));
     var index = 0;
@@ -34,7 +33,7 @@ var getData = async function(filename) {
             break;
         }
         data[0][i] = res - startTime;
-    }
+    }*/
 
     var speedTrace = {
         type: "scatter",
@@ -53,11 +52,11 @@ var getData = async function(filename) {
         y: data[2],
         line: {color: '#E92197'}
     }
-      
+    
     var data = [speedTrace, rpmTrace];
-          
+        
     var layout = {
-        title: 'Data', 
+        title: name, 
     };
     config = {
         'modeBarButtonsToRemove': ['sendDataToCloud', 'hoverClosestCartesian', 'toggleSpikelines', 'resetScale2d', 'hoverCompareCartesian'],
@@ -65,7 +64,7 @@ var getData = async function(filename) {
         'displaylogo': false,
         'responsive': true
     }
-    Plotly.newPlot('myDiv', data, layout, config);
+    Plotly.newPlot(name, data, layout, config);
 }
-  
-getData("undefined");
+
+//getData("undefined");

@@ -16,6 +16,7 @@ $(function() {
                 }
             }
             console.log(filenames);
+            //getData(filenames, nof);
             printMarkers(filenames, nof);
         });
     }
