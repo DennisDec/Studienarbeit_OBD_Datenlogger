@@ -101,7 +101,7 @@ router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
       if (err) throw err;
       console.log('OBD-data saved');
     });
-  });*/
+  });*//*
   var db = require('../db.js');
   db.query('SELECT filename FROM data', function(err, results, fields) {
     if(err) throw err;
@@ -110,10 +110,14 @@ router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
     console.log(results[0].filename)
     for(var i = 0; i < results.length; i++) {
       //filenames[i] = results[i].filename;
-      data.push({filenames: results[i].filename})
+      data.push({
+        filenames: results[i].filename,
+        count: (i + 1)
+      })
     }
     res.render('dashboard', { title: 'Dashboard', dashboard: true,  data: data});
-  });
+  });*/
+  res.render('dashboard', { title: 'Dashboard', dashboard: true});
 });
 
 router.get('/getTrips/:token', authenticationMiddleware(), function(req, res) {
