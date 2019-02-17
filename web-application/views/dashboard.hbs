@@ -31,18 +31,22 @@
         </nav>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+          <div style="height: 600px;">
           <section id="generalData">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
               <h1 class="h2">General Data</h1>
             </div>
             <h2>Map</h2>
+            <div style="float:left; width: 50%;">
             <div class="table-responsive">
               <div id="map0" style="height: 440px; border: 1px solid #AAA;"></div>
+            </div></div>
+            <div style="margin-left: 3%; float: right; width: 47%;">
+              <p>test</p>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Launch demo modal
+              </button>
             </div>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-              Launch demo modal
-            </button>
-
             <!-- Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
@@ -62,6 +66,7 @@
                   </div>
                 </div>
               </div>
+            </div>
             </div>
           </section>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
