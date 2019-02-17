@@ -158,11 +158,15 @@ router.get('/getTrips/:token', authenticationMiddleware(), function(req, res) {
   } 
   console.log(date)
   var db = require('../db.js');
-  db.query('SELECT filename FROM data WHERE date=?', [date], function(err, results, fields) {
+  db.query('SELECT filename, starttime, totalKM FROM data WHERE date=?', [date], function(err, results, fields) {
     if(err) throw err;
     var data = [];
     for(var i = 0; i < results.length; i++) {
-      data.push({filename: results[i].filename});
+      data.push({
+        filename: results[i].filename, 
+        starttime: results[i].starttime,
+        totalKM: results[i].totalKM
+      });
     }
     res.send(data);
   });

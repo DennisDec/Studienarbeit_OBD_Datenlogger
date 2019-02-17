@@ -137,10 +137,54 @@ body {
   .example-1 {
     position: relative;
     overflow-y: scroll;
-    height: 200px; 
-    width: 170px;
+    margin-top: 46px;
+    height: 440px;
+    width: 200px;
+  }
+
+  .tripButtons {
+    float: left;
+    width: 200px;
+  }
+
+  .mapAndChart {
+    float: right;
+    min-width: 70%;
+    margin-right: 10px
+  }
+
+  .btn-group-toggle>.btn, .btn-group-toggle>.btn-group>.btn {
+    margin-top: 10px;
+  }
+
+  .tripButton {
+    width: 100%;
+    text-align: left;
+  }
+
+  .buttonText {
+    font-size: 70%;
+    text-align: left;
+  }
+
+  .btn-secondary {
+    background-color: #bbbbbb;
+    border-color: #bbbbbb;
   }
     
+  .mapHeading {
+    width: 100px;
+    float: left;
+  }
+
+  .showButton {
+    padding: 1px;
+    margin-bottom: 4px;
+  }
+
+  #datepicker {
+    width: 66%;
+  }
 /* 
   :root {
     --breakpoint-xs: 0;

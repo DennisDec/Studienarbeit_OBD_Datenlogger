@@ -28,7 +28,15 @@ var update = async function() {
         console.log(file.filename)
         fn.push(file.filename)
         nof++;
-        $("#allTrips").append("<label class='btn btn-secondary active'><input type='checkbox' class='filename' filename='" + file.filename + "' checked autocomplete='off'>Fahrt " + nof + "</label>")
+        var innerHTML = `<label class='tripButton btn btn-secondary active'>
+                            <input type='checkbox' class='filename' filename='${file.filename}' checked autocomplete='off'>
+                                Fahrt ${nof}<br>
+                                <div class='buttonText'>
+                                    Startzeit: ${file.starttime} Uhr<br>
+                                    gef. KM: ${file.totalKM} km<br>
+                                </div>
+                        </label>`
+        $("#allTrips").append(innerHTML)
     });
     printMarkers(fn, nof);
     $("#charts").empty()
