@@ -1,5 +1,7 @@
 var update = async function() {
-    var date = (document.getElementById('datepicker').value).replace(/\//g,  '-')
+    var dateArray = (document.getElementById('datepicker').value).split(".")
+    var date = (dateArray[1] + '-' + dateArray[0]+ '-' + dateArray[2])
+    //var date = (document.getElementById('datepicker').value).replace(/\//g,  '-')
     if(document.getElementById('datepicker').value === "") {
         var today = new Date();
         var dd = today.getDate();
