@@ -42,6 +42,7 @@ var update = async function() {
             $(".filename:eq(" + i + ")").change(function(){
                 var filenames = [];
                 var nof = 0;
+                $("#charts").empty()
                 //console.log($(this).prop('checked'));
                 //console.log($(".test").length);
                 for(var g = 0; g < $(".filename").length; g++) {
@@ -50,15 +51,12 @@ var update = async function() {
                         //console.log($(".test:eq(" + g + ")").attr('test'));
                         filenames.push($(".filename:eq(" + g + ")").attr('filename'));
                         nof++;
+                        $("#charts").append("<div id='Fahrt " + (g + 1) + "'></div>")
+                        getData($(".filename:eq(" + g + ")").attr('filename'), "Fahrt " + (g + 1));
                     }
                 }
                 console.log(filenames);
                 printMarkers(filenames, nof);
-                $("#charts").empty()
-                for(var h = 1; h <= nof; h++) {
-                    $("#charts").append("<div id='Fahrt " + h + "'></div>")
-                    getData(filenames[h-1], "Fahrt " + h);
-                }
             });
         }
     });
