@@ -44,7 +44,7 @@
             <div style="margin-left: 3%; float: right; width: 47%;">
               <p>test</p>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                Launch demo modal
+                Welches E-Auto passt zu mir?
               </button>
             </div>
             <!-- Modal -->
@@ -52,17 +52,39 @@
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Mein Fahrprofil konfigurieren</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
                   <div class="modal-body">
-                    ...
+                    <form>
+                      <div class="form-group">
+                        <!--<label for="recipient-name" class="col-form-label">Recipient:</label>
+                        <input type="text" class="form-control" id="recipient-name">-->
+                        <label for="input01" class="col-form-label">Fahrzeugtyp</label>
+                        <div class="input-group mb-3">
+                          <select class="custom-select" id="input01">
+                            <option value="1">Kleinstwagen (z.B. Smart)</option>
+                            <option value="2" selected>Kleinwagen (z.B. VW Golf)</option>
+                            <option value="3">Mittelklassewagen (z.B. BMW 5er)</option>
+                            <option value="4">SUV (z.B. Audi Q5)</option>
+                          </select>
+                        </div>
+                        <label for="input02" class="col-form-label">Fahrstil</label>
+                        <div class="input-group mb-3">
+                          <select class="custom-select" id="input02">
+                            <option value="1">Eco</option>
+                            <option value="2" selected>Normal</option>
+                            <option value="3">Sportlich</option>
+                          </select>
+                        </div>
+                      </div>
+                    </form>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="calculateBattery()">Mein E-Auto</button>
                   </div>
                 </div>
               </div>
