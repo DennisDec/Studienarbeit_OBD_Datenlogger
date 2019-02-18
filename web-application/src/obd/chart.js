@@ -59,12 +59,17 @@ var getData = async function(filename, name) {
     var layout = {
         title: name,
         width: 800,
-        xaxis: {domain: [0.25, 1]},
+        xaxis: 
+        {
+            domain: [0.25, 1],
+            showgrid: false
+        },
         yaxis: 
         {
             title: 'RPM',
             titlefont: {color: '#1f77b4'},
             tickfont: {color: '#1f77b4'},
+            showgrid: false
         },
         yaxis2: 
         {
@@ -74,7 +79,8 @@ var getData = async function(filename, name) {
             anchor: 'free',
             overlaying: 'y',
             side: 'left',
-            position: 0.15
+            position: 0.15,
+            showgrid: false
         }
     };
     config = {
