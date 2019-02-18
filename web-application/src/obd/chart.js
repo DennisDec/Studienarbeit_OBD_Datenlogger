@@ -58,7 +58,7 @@ var getData = async function(filename, name) {
         
     var layout = {
         title: name,
-        width: 800,
+        width: 1100,
         xaxis: 
         {
             domain: [0.25, 1],

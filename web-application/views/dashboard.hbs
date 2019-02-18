@@ -68,7 +68,7 @@
                             <option value="1">Kleinstwagen (z.B. Smart)</option>
                             <option value="2" selected>Kleinwagen (z.B. VW Golf)</option>
                             <option value="3">Mittelklassewagen (z.B. BMW 5er)</option>
-                            <option value="4">SUV (z.B. Audi Q5)</option>
+                            <option value="4">Oberklasse inkl. SUV (z.B. Mercedes S-Klasse)</option>
                           </select>
                         </div>
                         <label for="input02" class="col-form-label">Fahrstil</label>
@@ -124,22 +124,24 @@
             </div>
           </div>
           <div class="mapAndChart">
-          <section id="tripMap">
-            <div class="mapHeading"><h2>Map</h2></div>
-            <div style="margin-top: 7px; float: right;" class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group mr-2">
-                <button class="btn btn-sm btn-outline-secondary">Share</button>
-                <button class="btn btn-sm btn-outline-secondary">Export</button>
+            <section id="tripMap">
+              <div class="mapHeading"><h2>Map</h2></div>
+              <div style="margin-top: 7px; float: right;" class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group mr-2">
+                  <button class="btn btn-sm btn-outline-secondary">Share</button>
+                  <button class="btn btn-sm btn-outline-secondary">Export</button>
+                </div>
               </div>
-            </div>
-            <div class="table-responsive">
-              <div id="map1" style="height: 440px; border: 1px solid #AAA;"></div>
-            </div>
-          </section>
-          <section id="tripData">
-            <h2>Data</h2>
-            <div id="charts"></div>
-          </section>
+              <div class="table-responsive">
+                <div id="map1" style="height: 440px; border: 1px solid #AAA;"></div>
+              </div>
+            </section>
+          </div>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom" style="width: inherit;">
+            <section id="tripData">
+              <h2>Data</h2>
+              <div id="charts"></div>
+            </section>
           </div>
         </main>
       </div>
