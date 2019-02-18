@@ -41,6 +41,7 @@ var getData = async function(filename, name) {
         name: 'Speed',
         x: data[0],
         y: data[1],
+        yaxis: 'y2',
         line: {color: '#7F7F7F'}
     }
 
@@ -50,13 +51,31 @@ var getData = async function(filename, name) {
         name: 'RPM',
         x: data[0],
         y: data[2],
-        line: {color: '#E92197'}
+        line: {color: '#1f77b4'}
     }
     
     var data = [speedTrace, rpmTrace];
         
     var layout = {
-        title: name, 
+        title: name,
+        width: 800,
+        xaxis: {domain: [0.25, 1]},
+        yaxis: 
+        {
+            title: 'RPM',
+            titlefont: {color: '#1f77b4'},
+            tickfont: {color: '#1f77b4'},
+        },
+        yaxis2: 
+        {
+            title: 'Speed',
+            titlefont: {color: '#7F7F7F'},
+            tickfont: {color: '#7F7F7F'},
+            anchor: 'free',
+            overlaying: 'y',
+            side: 'left',
+            position: 0.15
+        }
     };
     config = {
         'modeBarButtonsToRemove': ['sendDataToCloud', 'hoverClosestCartesian', 'toggleSpikelines', 'resetScale2d', 'hoverCompareCartesian'],
