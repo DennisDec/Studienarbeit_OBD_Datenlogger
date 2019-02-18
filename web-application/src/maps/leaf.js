@@ -24,7 +24,6 @@ var printAllMarkers = async function() {
         for (let g = 0; g < markers[i].GPS_Long.length; g++) {
             if(!(markers[i].GPS_Long[g] === null || markers[i].GPS_Lat[g] === null)) {
                 console.log("test")
-                // L.Icon.Default.prototype.options(shadowSize [0,0]) // size of the shadow 
                 allMarkers.push({ 
                     "lat": markers[i].GPS_Lat[g],
                     "lng": markers[i].GPS_Long[g]
