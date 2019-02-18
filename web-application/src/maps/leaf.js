@@ -5,6 +5,7 @@ var printAllMarkers = async function() {
         zoom: 2
     });
 
+    var allMarkers = [];
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map0);
@@ -13,6 +14,9 @@ var printAllMarkers = async function() {
         credentials: 'same-origin'
     });
     let markers = await response.json();
+
+    allMarkers.push(markers)
+
     console.log(markers)
     console.log(markers[0].GPS_Long[0])
     for(var i = 0; i < markers.length; i++) {
@@ -20,11 +24,17 @@ var printAllMarkers = async function() {
         for (let g = 0; g < markers[i].GPS_Long.length; g++) {
             if(!(markers[i].GPS_Long[g] === null || markers[i].GPS_Lat[g] === null)) {
                 console.log("test")
-                L.marker( [markers[i].GPS_Lat[g], markers[i].GPS_Long[g]], {opacity: 1})
+                // L.Icon.Default.prototype.options(shadowSize [0,0]) // size of the shadow 
+                
+                L.marker( [markers[i].GPS_Lat[g], markers[i].GPS_Long[g]], {icon: customIcon} ,{opacity : 1} )
                     .addTo( map0 );
             }
         }
+
     }
+    
+    var bounds = L.latLngBounds(allMarkers);
+    map0.fitBounds(bounds);
 }
 printAllMarkers();
 
@@ -32,6 +42,16 @@ var map = L.map( 'map1', {
     center: [20.0, 5.0],
     minZoom: 2,
     zoom: 2
+});
+
+var customIcon = L.icon({
+    iconUrl: '../img/dot.png',
+
+    iconSize:     [4, 4], // size of the icon
+    shadowSize:   [0, 0], // size of the shadow
+    iconAnchor:   [2, 2], // point of the icon which will correspond to marker's location
+    shadowAnchor: [4, 62],  // the same for the shadow
+    popupAnchor:  [2, 2] // point from which the popup should open relative to the iconAnchor
 });
 
 var printMarkers = async function(filename, nof) {
