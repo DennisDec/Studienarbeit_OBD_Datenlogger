@@ -15,7 +15,7 @@ var printAllMarkers = async function() {
     });
     let markers = await response.json();
 
-    allMarkers.push(markers)
+    var allMarkers = []
 
     console.log(markers)
     console.log(markers[0].GPS_Long[0])
@@ -25,7 +25,10 @@ var printAllMarkers = async function() {
             if(!(markers[i].GPS_Long[g] === null || markers[i].GPS_Lat[g] === null)) {
                 console.log("test")
                 // L.Icon.Default.prototype.options(shadowSize [0,0]) // size of the shadow 
-                
+                allMarkers.push({ 
+                    "lat": markers[i].GPS_Lat[g],
+                    "lng": markers[i].GPS_Long[g]
+                });
                 L.marker( [markers[i].GPS_Lat[g], markers[i].GPS_Long[g]], {icon: customIcon} ,{opacity : 1} )
                     .addTo( map0 );
             }
