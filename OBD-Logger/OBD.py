@@ -35,6 +35,7 @@ def main():
     OnlyGPSMode = 0
     OBDError = 0
     filename = datetime.datetime.now().strftime("%y_%m_%d_%H:%M:%S_") + "test.csv"
+    start = uptime()
 
     while NotConnected:
         try:
@@ -86,7 +87,7 @@ def main():
     
     while(OnlyGPSMode == 2):
         i = i+1
-        GPS_Only(session, log, i)
+        GPS_Only(session, log, i, start)
  
     while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
         
@@ -105,6 +106,7 @@ def main():
         i = i+1
         #timestr = str(datetime.datetime.now())
         timestr = uptime()
+        timestr = timestr - start
         result = []
         result.append(timestr)
         lon = None
@@ -153,13 +155,16 @@ def main():
 
 
 
-def GPS_Only(session, log, count):
+def GPS_Only(session, log, count, start):
 
-    timestr = str(datetime.datetime.now())
+    #timestr = str(datetime.datetime.now())
+    timestr = uptime()
+    timestr = timestr - start
     result = []
     result.append(timestr)
     lon = None
     lat = None
+    gpsTime = None
         
     report = session.next()
     
