@@ -163,7 +163,7 @@ class LogFile:
         """add data to buffer"""
         if(len(signals.getSignalList()) == len(signalList)):
             for i, s in enumerate(signals.getSignalList()):
-                if(s.name == "TIME" or signalList[i] == None):
+                if(s.name == "GPS_Time" or signalList[i] == None):
                     self._data[s.name].append(signalList[i])
                 else:
                     self._data[s.name].append(round(float(signalList[i]),s.roundDigit))
@@ -243,7 +243,7 @@ class LogFile:
                         if(row[i] == ""):
                             self._data[s.name].append(None)
                         else:
-                            if(s.name == "TIME"):
+                            if(s.name == "GPS_Time"):
                                 self._data[s.name].append(row[i])
                             else:
                                 self._data[s.name].append(round(float(row[i]),s.roundDigit))
@@ -297,4 +297,27 @@ class LogFile:
         L = self._data[signalStr]
         L = [x for x in L if x is not None]
         return mean(L)
+
+    # def getFuelConsumption(self):
+    #     #Not working yet
+    #     if (not self._status == LogStatus.LOG_FILE_LOADED):
+    #         raise ValueError("Not allowed! You have to loadFromFile first")
+    #     if not (signals.containsSignalByString("MAF")
+    #             and signals.containsSignalByString("COMMANDED_EQUIV_RATIO")
+    #             and signals.containsSignalByString("SPEED")):
+    #         raise ValueError(
+    #             "There are signals missing to calculate FuelConsumption")
+    #     if not len(self._data[signals.MAF.name]) == len(self._data[signals.COMMANDED_EQUIV_RATIO.name]):
+    #         raise ValueError("MAF list and AFR list don't have same shapes")
+    #     FuelDensity = 0.775
+    #     fuelcons = []
+    #     maf = self._data[signals.MAF.name]
+    #     afr = self._data[signals.COMMANDED_EQUIV_RATIO.name]
+    #     speed = self._data[signals.SPEED.name]
+    #     for i, v in enumerate(speed):
+    #         if(afr[i] != 0 and v != 0): 
+    #             fuelcons.append((maf[i]*3600)/(1000* 14.5*afr[i]* FuelDensity)* 100/(v))
+    #         else:
+    #             fuelcons.append(0)
+    #      return fuelcons
 

@@ -10,6 +10,8 @@ import os
 from LogFile import LogFile, LogStatus
 from Signals import signals
 import pygame
+from uptime import uptime
+
 
 
 
@@ -101,11 +103,13 @@ def main():
             HasConnection = False
 
         i = i+1
-        timestr = str(datetime.datetime.now())
+        #timestr = str(datetime.datetime.now())
+        timestr = uptime()
         result = []
         result.append(timestr)
         lon = None
         lat = None
+        gpsTime = None
 
         #Get GPS Information if possible
         if(i % 4 == 0):
@@ -113,7 +117,8 @@ def main():
             if report['class'] == 'TPV':
                 if hasattr(report, 'lon') and hasattr(report, 'lat'):
                     lon = report.lon
-                    lat = report.lat
+                    lat = report.lat                    
+                    gpsTime = report.time
                     print("Laengengrad:  ", lon)
                     print("Breitengrad: ", lat)
 
@@ -131,6 +136,7 @@ def main():
         #Appending GPS-Data
         result.append(lon)
         result.append(lat)
+        result.append(gpsTime)
         #Append GPS Data first (if available) 
         log.addData(result)
 
@@ -161,6 +167,7 @@ def GPS_Only(session, log, count):
         if hasattr(report, 'lon') and hasattr(report, 'lat'):
             lon = report.lon
             lat = report.lat
+            gpsTime = report.time
             OBDError = 0 
 
     for signal in signals.getOBDSignalList():
@@ -169,6 +176,7 @@ def GPS_Only(session, log, count):
     #Appending GPS-Data
     result.append(lon)
     result.append(lat)
+    result.append(gpsTime)
     #Appending all other OBD Siganls
     log.addData(result)
 
