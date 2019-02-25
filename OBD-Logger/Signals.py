@@ -3,7 +3,7 @@ import numpy as np
 
 __signals__ = [
   #           SignalName                  db-name                       isOBDSignal  sampleRate     round
-    OBDSignal("TIME"                    , "time"                            ,False      , 1         , 0),
+    OBDSignal("TIME"                    , "time"                            ,False      , 1         , 2),
 
     #OBD SIGNALS:
     OBDSignal("SPEED"                   , "speed"                           ,True       , 1         , 2),
@@ -18,7 +18,7 @@ __signals__ = [
     #Other SIGNALS:
     OBDSignal("GPS_Long"               , "Longitude"                       ,False      , 2         , 9),
     OBDSignal("GPS_Lat"                , "Latitude"                        ,False      , 2         , 9),
-    #OBDSignal("GPS_Alt"                , "Altitude"                       ,False      , 2         , 8),
+    OBDSignal("GPS_Time"                , "time"                           ,False      , 2         , 0),
 ]
 
 class Signals:

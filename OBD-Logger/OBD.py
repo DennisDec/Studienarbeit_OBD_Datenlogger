@@ -10,6 +10,8 @@ import os
 from LogFile import LogFile, LogStatus
 from Signals import signals
 import pygame
+from uptime import uptime
+
 
 
 
@@ -33,6 +35,7 @@ def main():
     OnlyGPSMode = 0
     OBDError = 0
     filename = datetime.datetime.now().strftime("%y_%m_%d_%H:%M:%S_") + "test.csv"
+    start = uptime()
 
     while NotConnected:
         try:
@@ -84,7 +87,7 @@ def main():
     
     while(OnlyGPSMode == 2):
         i = i+1
-        GPS_Only(session, log, i)
+        GPS_Only(session, log, i, start)
  
     while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
         
@@ -101,11 +104,14 @@ def main():
             HasConnection = False
 
         i = i+1
-        timestr = str(datetime.datetime.now())
+        #timestr = str(datetime.datetime.now())
+        timestr = uptime()
+        timestr = timestr - start
         result = []
         result.append(timestr)
         lon = None
         lat = None
+        gpsTime = None
 
         #Get GPS Information if possible
         if(i % 4 == 0):
@@ -113,7 +119,8 @@ def main():
             if report['class'] == 'TPV':
                 if hasattr(report, 'lon') and hasattr(report, 'lat'):
                     lon = report.lon
-                    lat = report.lat
+                    lat = report.lat                    
+                    gpsTime = report.time
                     print("Laengengrad:  ", lon)
                     print("Breitengrad: ", lat)
 
@@ -131,6 +138,7 @@ def main():
         #Appending GPS-Data
         result.append(lon)
         result.append(lat)
+        result.append(gpsTime)
         #Append GPS Data first (if available) 
         log.addData(result)
 
@@ -147,13 +155,16 @@ def main():
 
 
 
-def GPS_Only(session, log, count):
+def GPS_Only(session, log, count, start):
 
-    timestr = str(datetime.datetime.now())
+    #timestr = str(datetime.datetime.now())
+    timestr = uptime()
+    timestr = timestr - start
     result = []
     result.append(timestr)
     lon = None
     lat = None
+    gpsTime = None
         
     report = session.next()
     
@@ -161,6 +172,7 @@ def GPS_Only(session, log, count):
         if hasattr(report, 'lon') and hasattr(report, 'lat'):
             lon = report.lon
             lat = report.lat
+            gpsTime = report.time
             OBDError = 0 
 
     for signal in signals.getOBDSignalList():
@@ -169,6 +181,7 @@ def GPS_Only(session, log, count):
     #Appending GPS-Data
     result.append(lon)
     result.append(lat)
+    result.append(gpsTime)
     #Appending all other OBD Siganls
     log.addData(result)
 
