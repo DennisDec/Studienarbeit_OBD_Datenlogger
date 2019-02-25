@@ -2,7 +2,7 @@ var os = require( 'os' );
 var interfaces = os.networkInterfaces();
 
 function getIP() {
-    var addresses = [];
+    /*var addresses = [];
     var add = null;
     for (var k in interfaces) {
         for (var k2 in interfaces[k]) {
@@ -16,7 +16,9 @@ function getIP() {
         }
     }
     console.log(add);
-    return add;
+    return add;*/
+    console.log("Local IP:" + require('my-local-ip')())
+    return require('my-local-ip')();
 }
 
 module.exports = getIP;
