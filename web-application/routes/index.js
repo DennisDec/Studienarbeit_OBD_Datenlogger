@@ -84,6 +84,7 @@ router.get('/getGPS/:token', authenticationMiddleware(), function(req, res) {
     });
   }
 });
+
 router.get('/getAllGPS', authenticationMiddleware(), function(req, res) {
   var db = require('../db.js');
   db.query('SELECT filename FROM data', function(err, results, fields) {
@@ -100,6 +101,32 @@ router.get('/getAllGPS', authenticationMiddleware(), function(req, res) {
       delete data[i]['COMMANDED_EQUIV_RATIO'];
       delete data[i]['SPEED'];
       delete data[i]['ENGINE_LOAD'];
+    }
+    res.send(data);
+  });
+});
+
+router.get('/getWaitingTime', authenticationMiddleware(), function(req, res) {
+  var db = require('../db.js');
+  db.query('SELECT date, starttime, endtime, endLat, endLong, endDate FROM data', function(err, results, fields) {
+    if(err) throw err;
+    var data = [];
+    for(var i = 0; i < (results.length - 1); i++) {
+      var tmp1 = (results[i].endtime).split(":");
+      var date1 = (results[i].endDate).split("-");
+      var tmp2 = (results[i+1].starttime).split(":");
+      var date2 = (results[i+1].date).split("-");
+      time1 = new Date(date1[2], date1[0], date1[1], tmp1[0], tmp1[1], tmp1[2]);
+      time2 = new Date(date2[2], date2[0], date2[1], tmp2[0], tmp2[1], tmp2[2]);
+      console.log(results[i].endtime)
+      console.log(results[i+1].starttime)
+      dateGesamt = time2 - time1;
+      console.log((dateGesamt))
+      data.push({
+        waitingTime: dateGesamt, 
+        gpsLat: results[i].endLat,
+        gpsLong: results[i].endLong
+      });
     }
     res.send(data);
   });

@@ -1,8 +1,19 @@
+//All Markers map
 var printAllMarkers = async function() {
     var map0 = L.map( 'map0', {
         center: [20.0, 5.0],
         minZoom: 2,
         zoom: 2
+    });
+
+    var customIcon = L.icon({
+        iconUrl: '../img/dot.png',
+
+        iconSize:     [4, 4], // size of the icon
+        shadowSize:   [0, 0], // size of the shadow
+        iconAnchor:   [2, 2], // point of the icon which will correspond to marker's location
+        shadowAnchor: [4, 62],  // the same for the shadow
+        popupAnchor:  [2, 2] // point from which the popup should open relative to the iconAnchor
     });
 
     var allMarkers = [];
@@ -28,7 +39,7 @@ var printAllMarkers = async function() {
                     "lat": markers[i].GPS_Lat[g],
                     "lng": markers[i].GPS_Long[g]
                 });
-                L.marker( [markers[i].GPS_Lat[g], markers[i].GPS_Long[g]], {icon: customIcon} ,{opacity : 1} )
+                L.marker( [markers[i].GPS_Lat[g], markers[i].GPS_Long[g]], {icon: customIcon})
                     .addTo( map0 );
             }
         }
@@ -40,20 +51,99 @@ var printAllMarkers = async function() {
 }
 printAllMarkers();
 
+
+//Waiting time map
+
+function parseTime(milliseconds){
+    //Get hours from milliseconds
+    var hours = milliseconds / (3600000);
+    var absoluteHours = Math.floor(hours);
+    var h = absoluteHours > 9 ? absoluteHours : '0' + absoluteHours;
+
+    //Get remainder from hours and convert to minutes
+    var minutes = (hours - absoluteHours) * 60;
+    var absoluteMinutes = Math.floor(minutes);
+    var m = absoluteMinutes > 9 ? absoluteMinutes : '0' +  absoluteMinutes;
+
+    //Get remainder from minutes and convert to seconds
+    var seconds = (minutes - absoluteMinutes) * 60;
+    var absoluteSeconds = Math.floor(seconds);
+    var s = absoluteSeconds > 9 ? absoluteSeconds : '0' + absoluteSeconds;
+
+
+    return h + 'h' + m;
+}
+
+
+var LeafIcon = L.Icon.extend({
+    options: {
+        shadowUrl: 'leaf-shadow.png',
+        iconSize:     [182/5, 219/5],
+        shadowSize:   [0, 0],
+        iconAnchor:   [182/10, 219/5],
+        shadowAnchor: [0, 0],
+        popupAnchor:  [0, -219/10]
+    }
+});
+
+var redIcon = new LeafIcon({iconUrl: '../img/red.png'}),
+    orangeIcon = new LeafIcon({iconUrl: '../img/orange.png'}),
+    yellowIcon = new LeafIcon({iconUrl: '../img/yellow.png'});
+    greenIcon = new LeafIcon({iconUrl: '../img/green.png'});
+
+var printWaitingTime = async function() {
+    var map2 = L.map( 'map2', {
+        center: [20.0, 5.0],
+        minZoom: 2,
+        zoom: 2
+    });
+
+    var allMarkers = [];
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map2);
+
+    let response = await fetch("/getWaitingTime", {
+        credentials: 'same-origin'
+    });
+    let markers = await response.json();
+
+    var allMarkers = []
+
+    console.log(markers)
+    console.log(markers[0].gpsLong)
+    for(var i = 0; i < markers.length; i++) {
+        console.log(markers[i].gpsLong)
+        console.log(parseTime(markers[i].waitingTime))
+        if(markers[i].waitingTime < 1800000) {
+            customIcon = redIcon;
+        } else if (markers[i].waitingTime < 2 * 1800000 && markers[i].waitingTime > 1800000) {
+            customIcon = orangeIcon;
+        } else if (markers[i].waitingTime < 8 * 1800000 && markers[i].waitingTime > 2 * 1800000) {
+            customIcon = yellowIcon;
+        } else {
+            customIcon = greenIcon;
+        }
+        allMarkers.push({ 
+            "lat": markers[i].gpsLat,
+            "lng": markers[i].gpsLong
+        });
+        L.marker( [markers[i].gpsLat, markers[i].gpsLong], {icon: customIcon})
+            .bindPopup( '<p>Waiting-Time: ' + parseTime(markers[i].waitingTime) + '</p>' )
+            .addTo( map2 );
+
+    }
+    
+    var bounds = L.latLngBounds(allMarkers);
+    map2.fitBounds(bounds);
+}
+printWaitingTime();
+
+// Trip information map
 var map = L.map( 'map1', {
     center: [20.0, 5.0],
     minZoom: 2,
     zoom: 2
-});
-
-var customIcon = L.icon({
-    iconUrl: '../img/dot.png',
-
-    iconSize:     [4, 4], // size of the icon
-    shadowSize:   [0, 0], // size of the shadow
-    iconAnchor:   [2, 2], // point of the icon which will correspond to marker's location
-    shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [2, 2] // point from which the popup should open relative to the iconAnchor
 });
 
 var printMarkers = async function(filename, nof) {
