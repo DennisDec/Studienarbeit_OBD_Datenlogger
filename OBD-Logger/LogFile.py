@@ -1,5 +1,9 @@
 # pylint: disable=no-member
 
+"""
+This class is controlling the datalogging
+
+"""
 import csv
 import os
 import datetime    
@@ -9,6 +13,10 @@ import os
 import subprocess
 import socket
 import json
+
+from datetime import datetime, timedelta
+
+from Util import Util
 
 from statistics import mean
 
@@ -78,6 +86,17 @@ class LogFile:
     #         return filename.split(".csv")[0] + ".json"
 
     def transferToJson(self):
+        """ You have to call loadFromFile first"""
+
+        #TODO: Make several calculations before transfer to json
+        #TODO: get real Start Time through GPS time
+
+        # start = self.getStartTime() #Use this Time for the new filename
+        # fuelCons = self.getFuelConsumption()
+        # energyCons = self.getEnergyCons()
+
+
+
         jsonPath = path + "JSON/"
         filename = self._filename
         with open( jsonPath + filename.split(".csv")[0] + ".json", 'w') as fp:
@@ -193,8 +212,8 @@ class LogFile:
         timebuffer = self.getTime()
 
         for i in timebuffer:
-            tList.append(round((datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") -
-                                datetime.datetime.strptime(self._data[signals.TIME.name][0], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
+            tList.append(round((datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") -
+                                datetime.strptime(self._data[signals.TIME.name][0], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
         return tList
 
     def getfilename(self):
@@ -229,11 +248,32 @@ class LogFile:
             # Fill Dictionary with Signals from Class Signals
             self._data[s.name] = []
 
+    
     def loadFromFile(self, filename):
         """load data from csv file"""
         
         try:
-            with open(path+filename, 'r') as csvfile:
+            columns = []
+            with open(env.PATH + filename, 'r') as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    if columns:
+                        for i, value in enumerate(row):
+                            if(value == ""):
+                                columns[i].append(None)
+                            else:
+                                if(Util.isfloat(value)):
+                                    columns[i].append(float(value))
+                                else:
+                                    columns[i].append(value)
+                    else:
+                        # first row
+                        columns = [[value] for value in row]
+            # you now have a column-major 2D array of your file.
+            as_dict = {c[0]: c[1:] for c in columns}
+
+            self._data = as_dict
+            """ with open(path+filename, 'r') as csvfile:
                 next(csvfile)  # ignore header (first row)
                 fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
                 for row in fileReader:
@@ -247,7 +287,7 @@ class LogFile:
                                 self._data[s.name].append(row[i])
                             else:
                                 self._data[s.name].append(round(float(row[i]),s.roundDigit))
-            self._filename = filename
+            self._filename = filename """
 
         except:
             raise FileNotFoundError("Error: Loading File failed!")
@@ -298,26 +338,112 @@ class LogFile:
         L = [x for x in L if x is not None]
         return mean(L)
 
-    # def getFuelConsumption(self):
-    #     #Not working yet
-    #     if (not self._status == LogStatus.LOG_FILE_LOADED):
-    #         raise ValueError("Not allowed! You have to loadFromFile first")
-    #     if not (signals.containsSignalByString("MAF")
-    #             and signals.containsSignalByString("COMMANDED_EQUIV_RATIO")
-    #             and signals.containsSignalByString("SPEED")):
-    #         raise ValueError(
-    #             "There are signals missing to calculate FuelConsumption")
-    #     if not len(self._data[signals.MAF.name]) == len(self._data[signals.COMMANDED_EQUIV_RATIO.name]):
-    #         raise ValueError("MAF list and AFR list don't have same shapes")
-    #     FuelDensity = 0.775
-    #     fuelcons = []
-    #     maf = self._data[signals.MAF.name]
-    #     afr = self._data[signals.COMMANDED_EQUIV_RATIO.name]
-    #     speed = self._data[signals.SPEED.name]
-    #     for i, v in enumerate(speed):
-    #         if(afr[i] != 0 and v != 0): 
-    #             fuelcons.append((maf[i]*3600)/(1000* 14.5*afr[i]* FuelDensity)* 100/(v))
-    #         else:
-    #             fuelcons.append(0)
-    #      return fuelcons
+    def getFuelConsumption(self):
+        speed = self._data["SPEED"]
+        maf = self._data["MAF"]
+        cer = self._data["COMMANDED_EQUIV_RATIO"]
+
+        fuelCon_normal = []
+        for i in range(len(speed)):
+            if((cer[i]) == 0):
+                pass
+            else:
+                fuelCon_normal.append(((maf[i]* 3600)/(748*14.7*cer[i])))
+
+        avfuelCon = Util.mean(fuelCon_normal)
+        avSpeed = Util.mean(speed)
+
+        avfuelCon = 100*(avfuelCon/avSpeed)
+
+        print("Normal: " + str(avfuelCon))
+
+        return avfuelCon
+
+    def getEnergyCons(self):
+        """ Time has to be relative Signal! """
+        #time = self._data[signals.TIME.name]
+        time = self.getRelTime()
+        diff = []
+        maf = self._data[signals.MAF.name] #Mass Air Flow
+        cer = self._data[signals.COMMANDED_EQUIV_RATIO.name] 
+
+        eff = 0.495 #efficiency engine
+        cal = 0.01135  #calorific value gasoline
+        airFuel = 14.7 #Air Fuel ratio  
+
+        for i in range(1, len(time)):
+            diff.append(time[i]- time[i-1])
+        dT = Util.mean(diff)
+        
+        energy = []
+        for i in range(len(maf)):
+            if(cer[i] == 0):
+                pass
+            else:
+                energy.append(eff *cal *dT * maf[i] / (airFuel * cer[i]))
+        
+        return sum(energy)
+
+    def getStartTime(self):
+
+        """ returns a datetime of the real start of datalogging """
+        str = [x for x in self._data["GPS_Time"] if x is not None][0]
+        #2019-02-23T10:58:31.000Z417.75
+
+        dateArray  = str.split("T")[0].split("-")
+        year = dateArray[0]
+        month = dateArray[1]
+        day = dateArray[2]
+
+        time = str.split("T")[1].split("Z")[0].split(":")
+
+        hours = time[0]
+        min = time[1]
+        sec = time[2]
+
+        ind = self._data["GPS_Time"].index(str)
+        timeInd = self._data["TIME"][ind]
+        d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hours), minute=int(min), second=int(float(sec))) - timedelta(seconds=int(float(timeInd)))
+        
+        return d
+
+
+    def getEndTime(self):
+
+        str = [x for x in self._data["GPS_Time"] if x is not None][0]
+        #2019-02-23T10:58:31.000Z417.75
+
+        dateArray  = str.split("T")[0].split("-")
+        print(dateArray)
+        year = dateArray[0]
+        month = dateArray[1]
+        day = dateArray[2]
+
+        time = str.split("T")[1].split("Z")[0].split(":")
+
+        hours = time[0]
+        min = time[1]
+        sec = time[2]
+
+        ind = self._data["GPS_Time"].index(str)
+        timeInd = self._data["TIME"][ind]
+        timeend = self._data["TIME"][-1]
+
+        timedel = timeend - timeInd
+
+
+        d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hours), minute=int(min), second=int(float(sec))) - timedelta(seconds=int(float(timedel)))
+        return d
+
+    def getDistance(self):
+        #time = self._data[signals.TIME.name][-1]
+        time = self.getRelTime()
+        avSpeed = Util.mean(self._data[signals.SPEED.name])
+        km = avSpeed*(time[-1]/3600)
+        return km
+
+
+
+
+                
 
