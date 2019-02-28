@@ -12,7 +12,9 @@ from Signals import signals
 import pygame
 from uptime import uptime
 
-
+#Moduls for DS18B20 temperature sensor
+import glob
+import RPi.GPIO as GPIO
 
 
 def main():
@@ -20,12 +22,28 @@ def main():
     pygame.mixer.init()
     pygame.mixer.music.load("/home/pi/Musik/success_sound") #Load Success Sound
     
-    
-    #Run GPS Deamon
+    ### Run GPS Deamon                              ###
     os.system("sudo gpsd /dev/serial0 -F /var/run/gpsd.sock")
 
     session = gps.gps("localhost", "2947")
     session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
+
+    ### Initialisation of DS18B20 temperature sensor ###
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # Wait for initialisation of DS18B20 temperature sensor
+    base_dir = '/sys/bus/w1/devices/'
+    while True:
+        try:
+            device_folder = glob.glob(base_dir + '28*')[0]
+            break
+        except IndexError:
+            time.sleep(0.5)
+            continue
+    device_file = device_folder + '/w1_slave'
+
+    TemperaturMessung(device_file)
+    ###
 
     i = 1                                   #This line counter for output file is needed to manage different sample rates
     connection = None           
@@ -87,7 +105,7 @@ def main():
     
     while(OnlyGPSMode == 2):
         i = i+1
-        GPS_Only(session, log, i, start)
+        GPS_Only(session, log, i, start, device_file)
  
     while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
         
@@ -112,6 +130,7 @@ def main():
         lon = None
         lat = None
         gpsTime = None
+        internalTemp = None
 
         #Get GPS Information if possible
         if(i % 4 == 0):
@@ -123,6 +142,9 @@ def main():
                     gpsTime = report.time
                     print("Laengengrad:  ", lon)
                     print("Breitengrad: ", lat)
+        
+        #Get internal tempterature information
+        internalTemp = TemperaturAuswertung(device_file)
 
         for signal in signals.getOBDSignalList():
 
@@ -139,6 +161,8 @@ def main():
         result.append(lon)
         result.append(lat)
         result.append(gpsTime)
+        #Append Temperature-Data
+        result.append(internalTemp)
         #Append GPS Data first (if available) 
         log.addData(result)
 
@@ -154,8 +178,7 @@ def main():
     time.sleep(4)
 
 
-
-def GPS_Only(session, log, count, start):
+def GPS_Only(session, log, count, start, device_file):
 
     #timestr = str(datetime.datetime.now())
     timestr = uptime()
@@ -165,9 +188,11 @@ def GPS_Only(session, log, count, start):
     lon = None
     lat = None
     gpsTime = None
+    internalTemp = None
         
     report = session.next()
     
+    #Get GPS-Data
     if report['class'] == 'TPV':
         if hasattr(report, 'lon') and hasattr(report, 'lat'):
             lon = report.lon
@@ -175,6 +200,10 @@ def GPS_Only(session, log, count, start):
             gpsTime = report.time
             OBDError = 0 
 
+    #Get internal Temperature-Data
+    internalTemp = TemperaturAuswertung(device_file)
+
+    #Append None for OBD signals
     for signal in signals.getOBDSignalList():
         result.append(None)
     
@@ -182,6 +211,8 @@ def GPS_Only(session, log, count, start):
     result.append(lon)
     result.append(lat)
     result.append(gpsTime)
+    #Append internal temperature
+    result.append(internalTemp)
     #Appending all other OBD Siganls
     log.addData(result)
 
@@ -192,6 +223,24 @@ def GPS_Only(session, log, count, start):
         print("Appending File ...")
 
 
+def TemperaturMessung(device_file):
+    f = open(device_file, 'r')
+    lines = f.readlines()
+    f.close()
+    return lines
+
+def TemperaturAuswertung(device_file):
+    lines = TemperaturMessung(device_file)
+    while lines[0].strip()[-3:] != 'YES':
+        time.sleep(0.1)
+        lines = TemperaturMessung(device_file)
+    equals_pos = lines[1].find('t=')
+    if equals_pos != -1:
+        temp_string = lines[1][equals_pos+2:]
+        temp_c = float(temp_string) / 1000.0
+        return temp_c
+    else:
+        return None
 
 if __name__ == "__main__":
     main()
