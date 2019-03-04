@@ -33,19 +33,21 @@ def main():
     GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     # Wait for initialisation of DS18B20 temperature sensor
     base_dir = '/sys/bus/w1/devices/'
-    while True:
+    tempError = 0
+    while (tempError < 10):                 #TO DO: test tempError threshold
         try:
             device_folder = glob.glob(base_dir + '28*')[0]
             break
         except IndexError:
             time.sleep(0.5)
+            tempError += 1
             continue
     device_file = device_folder + '/w1_slave'
 
     TemperaturMessung(device_file)
     ###
 
-    i = 1                                   #This line counter for output file is needed to manage different sample rates
+    i = 0                                   #This line counter for output file is needed to manage different sample rates
     connection = None           
     NotConnected = True
     errorcnt = 0                            #Error count to detect the moment if ignition is off at the end of a Driving Cycle
@@ -55,6 +57,7 @@ def main():
     filename = datetime.datetime.now().strftime("%y_%m_%d_%H:%M:%S_") + "test.csv"
     start = uptime()
 
+    #Try to establish a connection with the OBD dongle
     while NotConnected:
         try:
                            
@@ -73,14 +76,12 @@ def main():
             print("Error Connecting to OBD-Adapter (" + str(OBDError) + ")")
             
             time.sleep(2)
-            OBDError +=1
+            OBDError += 1
         
         if(OBDError == 4):
                 NotConnected = False
                 OnlyGPSMode = 1
              
-
-    
     pygame.mixer.music.load("/home/pi/Musik/success_1")
     
     log = LogFile()
@@ -89,6 +90,7 @@ def main():
     temp = True
     stri = ""
     
+    #Handle only GPS Mode: check if GPS data is available 
     while(temp and OnlyGPSMode == 1):
         report = session.next()
         if report['class'] == 'TPV':
@@ -103,10 +105,12 @@ def main():
       
     log.createLogfile(stri + filename)
     
+    #Only GPS Mode
     while(OnlyGPSMode == 2):
         i = i+1
         GPS_Only(session, log, i, start, device_file)
  
+    #Normal Mode: OBD-, GPS-, Temperature-Data
     while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
         
         #Error handling to detect IGNITION OFF Signal
@@ -122,18 +126,22 @@ def main():
             HasConnection = False
 
         i = i+1
+
+        #Get actual time data
         #timestr = str(datetime.datetime.now())
         timestr = uptime()
         timestr = timestr - start
         result = []
         result.append(timestr)
+
+        #Set the GPS and Temperature variables to initial value
         lon = None
         lat = None
         gpsTime = None
         internalTemp = None
 
-        #Get GPS Information if possible
-        if(i % 4 == 0):
+        #Get GPS data (if possible)
+        if(i % signals.getSignal("GPS_Long").sampleRate == 0):
             report = session.next()
             if report['class'] == 'TPV':
                 if hasattr(report, 'lon') and hasattr(report, 'lat'):
@@ -143,9 +151,11 @@ def main():
                     print("Laengengrad:  ", lon)
                     print("Breitengrad: ", lat)
         
-        #Get internal tempterature information
-        internalTemp = TemperaturAuswertung(device_file)
-
+        #Get internal tempterature data
+        if (i % signals.getSignal("INTERNAL_AIR_TEMP").sampleRate == 0):
+            internalTemp = TemperaturAuswertung(device_file)
+        
+        #Get OBD data
         for signal in signals.getOBDSignalList():
 
             if(i % signal.sampleRate == 0):  #Handle different Sample Rates
@@ -157,18 +167,18 @@ def main():
             else:
                 result.append(None)
         
-        #Appending GPS-Data
+        #Appending GPS-Data (if available)
         result.append(lon)
         result.append(lat)
         result.append(gpsTime)
-        #Append Temperature-Data
+        #Append Temperature-Data (if available)
         result.append(internalTemp)
-        #Append GPS Data first (if available) 
+        #Appending OBD data
         log.addData(result)
 
         time.sleep(0.5)                      #Sleep 500ms to get not that much ammount of data 
 
-        if(i % 20 == 0):                     #Appand file every 20 rows of measurement data
+        if(i % 20 == 0):                     #Appand file every 10 rows of measurement data
             log.appendFile()
             print("Appending File ...")
     log.appendFile()
@@ -178,47 +188,50 @@ def main():
     time.sleep(4)
 
 
-def GPS_Only(session, log, count, start, device_file):
-
+def GPS_Only(session, log, i, start, device_file):
+    #Get actual time data
     #timestr = str(datetime.datetime.now())
     timestr = uptime()
     timestr = timestr - start
     result = []
     result.append(timestr)
+    
+    #Set the GPS and Temperature variables to initial value
     lon = None
     lat = None
     gpsTime = None
     internalTemp = None
         
-    report = session.next()
-    
-    #Get GPS-Data
-    if report['class'] == 'TPV':
-        if hasattr(report, 'lon') and hasattr(report, 'lat'):
-            lon = report.lon
-            lat = report.lat
-            gpsTime = report.time
-            OBDError = 0 
+    #Get GPS data
+    if(i % signals.getSignal("GPS_Long").sampleRate == 0):
+        report = session.next()
+        
+        if report['class'] == 'TPV':
+            if hasattr(report, 'lon') and hasattr(report, 'lat'):
+                lon = report.lon
+                lat = report.lat
+                gpsTime = report.time
 
     #Get internal Temperature-Data
-    internalTemp = TemperaturAuswertung(device_file)
+    if(i % signals.getSignal("INTERNAL_AIR_TEMP").sampleRate == 0):
+        internalTemp = TemperaturAuswertung(device_file)
 
     #Append None for OBD signals
     for signal in signals.getOBDSignalList():
         result.append(None)
     
-    #Appending GPS-Data
+    #Appending GPS data
     result.append(lon)
     result.append(lat)
     result.append(gpsTime)
-    #Append internal temperature
+    #Append internal temperature data
     result.append(internalTemp)
     #Appending all other OBD Siganls
     log.addData(result)
 
-    time.sleep(1.0)                      #Sleep 500ms to get not that much ammount of data 
+    time.sleep(0.5)                      #Sleep 500ms to get not that much ammount of data 
 
-    if(count % 10 == 0):                     #Appand file every 20 rows of measurement data
+    if(i % 10 == 0):                     #Append file every 10 rows of measurement data
         log.appendFile()
         print("Appending File ...")
 
@@ -244,4 +257,3 @@ def TemperaturAuswertung(device_file):
 
 if __name__ == "__main__":
     main()
-  

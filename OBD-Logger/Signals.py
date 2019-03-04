@@ -16,9 +16,9 @@ __signals__ = [
     OBDSignal("FUEL_LEVEL"              , "fuel_level"                     ,True       , 2         , 2),
 
     #Other SIGNALS:
-    OBDSignal("GPS_Long"                , "Longitude"                      ,False      , 2         , 9),
-    OBDSignal("GPS_Lat"                 , "Latitude"                       ,False      , 2         , 9),
-    OBDSignal("GPS_Time"                , "time"                           ,False      , 2         , 0),
+    OBDSignal("GPS_Long"                , "Longitude"                      ,False      , 4         , 9),
+    OBDSignal("GPS_Lat"                 , "Latitude"                       ,False      , 4         , 9),
+    OBDSignal("GPS_Time"                , "time"                           ,False      , 4         , 0),
     OBDSignal("INTERNAL_AIR_TEMP"       , "internal_temperature"           ,False      , 1         , 2),
 ]
 
@@ -45,9 +45,11 @@ class Signals:
     def getTimeSignal(self):
         return [x for x in self.signals if x.name == "TIME"][0]
 
+    def getSignal(self, name):
+        return [x for x in self.signals if x.name == name][0]
+
     def getOBDSignalList(self):
         return [x for x in self.signals if x.isOBDSignal == True]
-
 
     def getSignalList(self):
         return self.signals
