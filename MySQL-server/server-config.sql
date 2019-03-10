@@ -21,31 +21,24 @@ CREATE SCHEMA IF NOT EXISTS `obd/gps-datenlogger`;
 USE `obd/gps-datenlogger` ;
 
 -- -----------------------------------------------------
--- Table `obd/gps-datenlogger`.`gpsdata`
+-- Table `obd/gps-datenlogger`.`data`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`gpsdata` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `route_name` VARCHAR(50) NULL DEFAULT NULL,
-  `lat` FLOAT NULL DEFAULT NULL,
-  `lng` FLOAT NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-);
 
--- -----------------------------------------------------
--- Table `obd/gps-datenlogger`.`importobd`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`importobd` (
+CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`data` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `time` VARCHAR(45) NULL DEFAULT NULL,
-  `speed` INT(11) NULL DEFAULT NULL,
-  `rpm` DOUBLE NULL DEFAULT NULL,
-  `engine_load` DOUBLE NULL DEFAULT NULL,
-  `maf` DOUBLE NULL DEFAULT NULL,
-  `temperature` INT(11) NULL DEFAULT NULL,
-  `pedal` DOUBLE NULL DEFAULT NULL,
-  `afr` DOUBLE NULL DEFAULT NULL,
-  `fuel_level` DOUBLE NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `filename` VARCHAR(180) NULL DEFAULT NULL,
+  `date` VARCHAR(45) NULL DEFAULT NULL,
+  `starttime` VARCHAR(45) NULL DEFAULT NULL,
+  `totalKM` FLOAT NULL DEFAULT NULL,
+  `endtime` VARCHAR(45) NULL DEFAULT NULL,
+  `VIN` VARCHAR(20) NULL DEFAULT NULL,
+  `fuelConsumption` FLOAT NULL DEFAULT NULL,
+  `energyConsumption` FLOAT NULL DEFAULT NULL,
+  `endLat` FLOAT NULL DEFAULT NULL,
+  `endLong` FLOAT NULL DEFAULT NULL,
+  `endDate` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `filename_UNIQUE` (`filename` ASC)
 );
 
 -- -----------------------------------------------------
@@ -66,5 +59,7 @@ CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`users` (
   `username` VARCHAR(20) NULL DEFAULT NULL,
   `email` VARCHAR(100) NULL DEFAULT NULL,
   `password` BINARY(60) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  UNIQUE INDEX `username_UNIQUE` (`username` ASC)
 );
