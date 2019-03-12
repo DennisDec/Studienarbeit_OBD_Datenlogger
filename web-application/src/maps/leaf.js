@@ -1,6 +1,14 @@
 //All Markers map
+var map0 = L.map( 'map0', {
+    center: [20.0, 5.0],
+    minZoom: 2,
+    zoom: 2
+});
+
 var printAllMarkers = async function() {
-    var map0 = L.map( 'map0', {
+    map0.remove()
+
+    map0 = L.map( 'map0', {
         center: [20.0, 5.0],
         minZoom: 2,
         zoom: 2
@@ -21,7 +29,11 @@ var printAllMarkers = async function() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map0);
 
-    let response = await fetch("/getAllGPS", {
+    var vin = document.getElementById('VIN').value;
+    vin = (vin === "") ? "none" : vin; 
+    console.log(vin)
+
+    let response = await fetch("/getAllGPS/" + vin, {
         credentials: 'same-origin'
     });
     let markers = await response.json();
@@ -29,7 +41,7 @@ var printAllMarkers = async function() {
     var allMarkers = []
 
     console.log(markers)
-    console.log(markers[0].GPS_Long[0])
+    //console.log(markers[0].GPS_Long[0])
     for(var i = 0; i < markers.length; i++) {
         console.log(markers[i].GPS_Long.length)
         for (let g = 0; g < markers[i].GPS_Long.length; g++) {
@@ -74,36 +86,48 @@ function parseTime(milliseconds){
     return h + 'h' + m;
 }
 
-
-var LeafIcon = L.Icon.extend({
-    options: {
-        shadowUrl: 'leaf-shadow.png',
-        iconSize:     [182/5, 219/5],
-        shadowSize:   [0, 0],
-        iconAnchor:   [182/10, 219/5],
-        shadowAnchor: [0, 0],
-        popupAnchor:  [0, -219/10]
-    }
+var map2 = L.map( 'map2', {
+    center: [20.0, 5.0],
+    minZoom: 2,
+    zoom: 2
 });
 
-var redIcon = new LeafIcon({iconUrl: '../img/red.png'}),
-    orangeIcon = new LeafIcon({iconUrl: '../img/orange.png'}),
-    yellowIcon = new LeafIcon({iconUrl: '../img/yellow.png'});
-    greenIcon = new LeafIcon({iconUrl: '../img/green.png'});
-
 var printWaitingTime = async function() {
-    var map2 = L.map( 'map2', {
+    map2.remove()
+    
+    map2 = L.map( 'map2', {
         center: [20.0, 5.0],
         minZoom: 2,
         zoom: 2
     });
+    
+    var LeafIcon = L.Icon.extend({
+        options: {
+            shadowUrl: 'leaf-shadow.png',
+            iconSize:     [182/5, 219/5],
+            shadowSize:   [0, 0],
+            iconAnchor:   [182/10, 219/5],
+            shadowAnchor: [0, 0],
+            popupAnchor:  [0, -219/10]
+        }
+    });
+
+    var redIcon = new LeafIcon({iconUrl: '../img/red.png'}),
+        orangeIcon = new LeafIcon({iconUrl: '../img/orange.png'}),
+        yellowIcon = new LeafIcon({iconUrl: '../img/yellow.png'});
+        greenIcon = new LeafIcon({iconUrl: '../img/green.png'});
 
     var allMarkers = [];
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map2);
 
-    let response = await fetch("/getWaitingTime", {
+    
+    var vin = document.getElementById('VIN').value;
+    vin = (vin === "") ? "none" : vin; 
+    console.log(vin)
+
+    let response = await fetch("/getWaitingTime/" + vin, {
         credentials: 'same-origin'
     });
     let markers = await response.json();
@@ -111,7 +135,7 @@ var printWaitingTime = async function() {
     var allMarkers = []
 
     console.log(markers)
-    console.log(markers[0].gpsLong)
+    //console.log(markers[0].gpsLong)
     for(var i = 0; i < markers.length; i++) {
         console.log(markers[i].gpsLong)
         console.log(parseTime(markers[i].waitingTime))

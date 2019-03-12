@@ -85,9 +85,10 @@ router.get('/getGPS/:token', authenticationMiddleware(), function(req, res) {
   }
 });
 
-router.get('/getAllGPS', authenticationMiddleware(), function(req, res) {
+router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
+  var vin = req.params.vin;
   var db = require('../db.js');
-  db.query('SELECT filename FROM data', function(err, results, fields) {
+  db.query('SELECT filename FROM data WHERE vin = ?', [vin], function(err, results, fields) {
     if(err) throw err;
     var data = [];
     for(var i = 0; i < results.length; i++) {
@@ -106,9 +107,10 @@ router.get('/getAllGPS', authenticationMiddleware(), function(req, res) {
   });
 });
 
-router.get('/getWaitingTime', authenticationMiddleware(), function(req, res) {
+router.get('/getWaitingTime/:vin', authenticationMiddleware(), function(req, res) {
+  var vin = req.params.vin;
   var db = require('../db.js');
-  db.query('SELECT date, starttime, endtime, endLat, endLong, endDate FROM data', function(err, results, fields) {
+  db.query('SELECT date, starttime, endtime, endLat, endLong, endDate FROM data WHERE vin = ?', [vin], function(err, results, fields) {
     if(err) throw err;
     var data = [];
     for(var i = 0; i < (results.length - 1); i++) {
@@ -168,9 +170,10 @@ router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
   res.render('dashboard', { title: 'Dashboard', dashboard: true});
 });
 
-router.get('/getTrips/:token', authenticationMiddleware(), function(req, res) {
-  var date = req.params.token;
-  if(req.params.token === "undefined") {
+router.get('/getTrips/:date/:vin', authenticationMiddleware(), function(req, res) {
+  var date = req.params.date;
+  var vin = req.params.vin;
+  if(req.params.date === "undefined") {
     var today = new Date();
     var dd = today.getDate();
     var mm = today.getMonth()+1; //January is 0!
@@ -185,7 +188,7 @@ router.get('/getTrips/:token', authenticationMiddleware(), function(req, res) {
   } 
   console.log(date)
   var db = require('../db.js');
-  db.query('SELECT filename, starttime, totalKM FROM data WHERE date=?', [date], function(err, results, fields) {
+  db.query('SELECT filename, starttime, totalKM FROM data WHERE date=? AND VIN=?', [date, vin], function(err, results, fields) {
     if(err) throw err;
     var data = [];
     for(var i = 0; i < results.length; i++) {

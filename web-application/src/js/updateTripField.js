@@ -1,4 +1,7 @@
 var update = async function() {
+    var vin = document.getElementById('VIN').value;
+    vin = (vin === "") ? "none" : vin; 
+    console.log(vin)
     var dateArray = (document.getElementById('datepicker').value).split(".")
     var date = (dateArray[1] + '-' + dateArray[0]+ '-' + dateArray[2])
     //var date = (document.getElementById('datepicker').value).replace(/\//g,  '-')
@@ -16,7 +19,7 @@ var update = async function() {
         date = mm + '-' + dd + '-' + yyyy;
     }
     console.log(date);
-    let response = await fetch("/getTrips/" + date, {
+    let response = await fetch("/getTrips/" + date + "/" + vin, {
         credentials: 'same-origin'
     });
     let filenames = await response.json();

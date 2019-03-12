@@ -81,6 +81,17 @@ body {
     padding-bottom: .75rem;
     font-size: 1rem;
   } */
+
+  .btn-outline-success {
+    color: #fff;
+    border-color: #93ebfb;
+  }
+
+  .btn-outline-success:hover {
+    color: #fff;
+    border-color: #fff;
+    background-color: #93ebfb;
+  }
   
   .navbar .form-control {
     padding: .75rem 1rem;
