@@ -255,7 +255,8 @@ class LogFile:
         try:
             columns = []
             with open(env.PATH + filename, 'r') as f:
-                reader = csv.reader(f)
+                reader = csv.reader( (line.replace('\0','') for line in f) )
+                #reader = csv.reader(f)
                 for row in reader:
                     if columns:
                         for i, value in enumerate(row):
