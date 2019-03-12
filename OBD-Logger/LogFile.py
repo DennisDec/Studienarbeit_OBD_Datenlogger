@@ -125,7 +125,7 @@ class LogFile:
 
             for i, line in enumerate(output):
                 if(line.find("open") != -1 and output[i-3].split(' ')[-1] != own_ip):
-                    ip.append(output[i-3].split(' ')[-1])
+                    ip.append(output[i-3].split(' ')[-1].replace("(", "").replace(")",""))
                     print(ip)
 
 
