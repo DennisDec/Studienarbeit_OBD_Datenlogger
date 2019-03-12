@@ -34,6 +34,8 @@ def main():
     # Wait for initialisation of DS18B20 temperature sensor
     base_dir = '/sys/bus/w1/devices/'
     tempError = 0
+    device_folder = None
+    
     while (tempError < 10):                 #TO DO: test tempError threshold
         try:
             device_folder = glob.glob(base_dir + '28*')[0]
@@ -42,9 +44,15 @@ def main():
             time.sleep(0.5)
             tempError += 1
             continue
-    device_file = device_folder + '/w1_slave'
+    
+    if (device_folder != None):
+        device_file = device_folder + '/w1_slave'
+        TemperaturMessung(device_file)
+    else:
+        device_file = None
 
-    TemperaturMessung(device_file)
+
+    
     ###
 
     i = 0                                   #This line counter for output file is needed to manage different sample rates
@@ -243,15 +251,18 @@ def TemperaturMessung(device_file):
     return lines
 
 def TemperaturAuswertung(device_file):
-    lines = TemperaturMessung(device_file)
-    while lines[0].strip()[-3:] != 'YES':
-        time.sleep(0.1)
+    if (device_file != None):
         lines = TemperaturMessung(device_file)
-    equals_pos = lines[1].find('t=')
-    if equals_pos != -1:
-        temp_string = lines[1][equals_pos+2:]
-        temp_c = float(temp_string) / 1000.0
-        return temp_c
+        while lines[0].strip()[-3:] != 'YES':
+            time.sleep(0.1)
+            lines = TemperaturMessung(device_file)
+        equals_pos = lines[1].find('t=')
+        if equals_pos != -1:
+            temp_string = lines[1][equals_pos+2:]
+            temp_c = float(temp_string) / 1000.0
+            return temp_c
+        else:
+            return None
     else:
         return None
 
