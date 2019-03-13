@@ -44,7 +44,7 @@
       // Hide the datepicker automatically when picked
       autoHide: false,
       // Pick the initial date automatically when initialized
-      autoPick: false,
+      autoPick: true,
       // Enable inline mode
       inline: false,
       // A element (or selector) for putting the datepicker
@@ -67,7 +67,7 @@
       // The start day of the week
       // 0 for Sunday, 1 for Monday, 2 for Tuesday, 3 for Wednesday,
       // 4 for Thursday, 5 for Friday, 6 for Saturday
-      weekStart: 0,
+      weekStart: 1,
       // Show year before month on the datepicker header
       yearFirst: false,
       // A string suffix to the year number.

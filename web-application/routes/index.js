@@ -84,6 +84,21 @@ router.get('/getGPS/:token', authenticationMiddleware(), function(req, res) {
     });
   }
 });
+/*
+router.get('/getDatesOfTrips/:vin', authenticationMiddleware(), function(req, res) {
+  var vin = req.params.vin;
+  var db = require('../db.js');
+  db.query('SELECT date FROM data WHERE vin = ?', [vin], function(err, results, fields) {
+    if(err) throw err;
+    var data = [];
+    for(var i = 0; i < results.length; i++) {
+      data.push({
+        date: results[i].date
+      })
+    }
+    res.send(data);
+  });
+});*/
 
 router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
   var vin = req.params.vin;
