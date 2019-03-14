@@ -229,7 +229,7 @@ class LogFile:
 
         tList = []
         timebuffer = self.getTime()
-
+        
         for i in timebuffer:
             tList.append(round((datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") -
                                 datetime.strptime(self._data[signals.TIME.name][0], "%Y-%m-%d %H:%M:%S.%f")).total_seconds(), 2))
@@ -380,7 +380,7 @@ class LogFile:
     def getEnergyCons(self):
         """ Time has to be relative Signal! """
         #time = self._data[signals.TIME.name]
-        time = self.getRelTime()
+        time = self.getTime()
         diff = []
         maf = self._data[signals.MAF.name] #Mass Air Flow
         cer = self._data[signals.COMMANDED_EQUIV_RATIO.name] 
@@ -455,7 +455,7 @@ class LogFile:
 
     def getDistance(self):
         #time = self._data[signals.TIME.name][-1]
-        time = self.getRelTime()
+        time = self.getTime()
         avSpeed = Util.mean(self._data[signals.SPEED.name])
         km = avSpeed*(time[-1]/3600)
         return km
