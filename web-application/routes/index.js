@@ -103,11 +103,21 @@ router.get('/getDatesOfTrips/:vin', authenticationMiddleware(), function(req, re
 router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
   var vin = req.params.vin;
   var db = require('../db.js');
-  db.query('SELECT filename FROM data WHERE vin = ?', [vin], function(err, results, fields) {
+  db.query('SELECT filename, vin FROM data', function(err, results, fields) {
     if(err) throw err;
-    var data = [];
+    var tmp = [];
     for(var i = 0; i < results.length; i++) {
-      var address = '../../datafiles/' + results[i].filename;
+      if(bcrypt.compareSync(vin, results[i].vin)) {
+        console.log(bcrypt.compareSync(vin, results[i].vin))
+        tmp.push({
+          filename: results[i].filename
+        })
+      }
+    }
+    var data = [];
+    for(var i = 0; i < tmp.length; i++) {
+      console.log("File: " + tmp[i].filename)
+      var address = '../../datafiles/' + tmp[i].filename;
       data[i] = JSON.parse(fs.readFileSync(address));
       delete data[i]['AMBIANT_AIR_TEMP'];
       delete data[i]['RPM'];
@@ -125,24 +135,38 @@ router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
 router.get('/getWaitingTime/:vin', authenticationMiddleware(), function(req, res) {
   var vin = req.params.vin;
   var db = require('../db.js');
-  db.query('SELECT date, starttime, endtime, endLat, endLong, endDate FROM data WHERE vin = ?', [vin], function(err, results, fields) {
+  db.query('SELECT date, starttime, endtime, endLat, endLong, endDate, vin FROM data', function(err, results, fields) {
     if(err) throw err;
+    var tmp = [];
+    for(var i = 0; i < results.length; i++) {
+      if(bcrypt.compareSync(vin, results[i].vin)) {
+        console.log(bcrypt.compareSync(vin, results[i].vin))
+        tmp.push({
+          date: results[i].date,
+          starttime: results[i].starttime,
+          endtime: results[i].endtime,
+          endLat: results[i].endLat,
+          endLong: results[i].endLong,
+          endDate: results[i].endDate
+        })
+      }
+    }
     var data = [];
-    for(var i = 0; i < (results.length - 1); i++) {
-      var tmp1 = (results[i].endtime).split(":");
-      var date1 = (results[i].endDate).split("-");
-      var tmp2 = (results[i+1].starttime).split(":");
-      var date2 = (results[i+1].date).split("-");
+    for(var i = 0; i < (tmp.length - 1); i++) {
+      var tmp1 = (tmp[i].endtime).split(":");
+      var date1 = (tmp[i].endDate).split("-");
+      var tmp2 = (tmp[i+1].starttime).split(":");
+      var date2 = (tmp[i+1].date).split("-");
       time1 = new Date(date1[2], date1[0], date1[1], tmp1[0], tmp1[1], tmp1[2]);
       time2 = new Date(date2[2], date2[0], date2[1], tmp2[0], tmp2[1], tmp2[2]);
-      console.log(results[i].endtime)
-      console.log(results[i+1].starttime)
+      console.log(tmp[i].endtime)
+      console.log(tmp[i+1].starttime)
       dateGesamt = time2 - time1;
       console.log((dateGesamt))
       data.push({
         waitingTime: dateGesamt, 
-        gpsLat: results[i].endLat,
-        gpsLong: results[i].endLong
+        gpsLat: tmp[i].endLat,
+        gpsLong: tmp[i].endLong
       });
     }
     res.send(data);
@@ -203,14 +227,25 @@ router.get('/getTrips/:date/:vin', authenticationMiddleware(), function(req, res
   } 
   console.log(date)
   var db = require('../db.js');
-  db.query('SELECT filename, starttime, totalKM FROM data WHERE date=? AND VIN=?', [date, vin], function(err, results, fields) {
+  db.query('SELECT filename, starttime, totalKM, vin FROM data WHERE date=?', [date], function(err, results, fields) {
     if(err) throw err;
-    var data = [];
+    var tmp = [];
     for(var i = 0; i < results.length; i++) {
+      if(bcrypt.compareSync(vin, results[i].vin)) {
+        console.log(bcrypt.compareSync(vin, results[i].vin))
+        tmp.push({
+          filename: results[i].filename,
+          starttime: results[i].starttime,
+          totalKM: results[i].totalKM
+        })
+      }
+    }
+    var data = [];
+    for(var i = 0; i < tmp.length; i++) {
       data.push({
-        filename: results[i].filename, 
-        starttime: results[i].starttime,
-        totalKM: results[i].totalKM
+        filename: tmp[i].filename, 
+        starttime: tmp[i].starttime,
+        totalKM: tmp[i].totalKM
       });
     }
     res.send(data);
@@ -246,6 +281,9 @@ router.post('/dashboard', authenticationMiddleware(), function(req, res, next) {
 
 // GET login page
 router.get('/login', function(req, res, next) {
+  if(req.isAuthenticated()) {
+    res.redirect('/dashboard')
+  }
   res.render('login', { title: 'Login', login: true });
 });
 // handle POST of login page; use passport to authenticate the user
@@ -384,6 +422,9 @@ router.get('/logout', function(req, res, next) {
 
 // GET register page
 router.get('/register', function(req, res, next) {
+  if(req.isAuthenticated()) {
+    res.redirect('/dashboard')
+  }
   res.render('register', { title: 'Registration', register: true });
 });
 
