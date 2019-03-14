@@ -1,6 +1,9 @@
 # pylint: disable=no-member
 
 import obd
+from obd import OBDCommand, Unit
+from obd.protocols import ECU
+from obd.decoders import raw_string
 import time
 import csv
 import datetime
@@ -117,7 +120,7 @@ def main():
     while(OnlyGPSMode == 2):
         i = i+1
         GPS_Only(session, log, i, start, device_file)
- 
+
     #Normal Mode: OBD-, GPS-, Temperature-Data
     while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
         
@@ -147,7 +150,16 @@ def main():
         lat = None
         gpsTime = None
         internalTemp = None
+        vin = None
+        vinNotRead = True
 
+        if(vinNotRead):
+            c = OBDCommand("VIN", "Get Vehicle Identification Number",  b"0902", 20, raw_string, ECU.ENGINE, False)
+            response = connection.query(c, force=True)
+            vin = LogFile.parseVIN(response.value)
+            vinNotRead = False
+
+        
         #Get GPS data (if possible)
         if(i % signals.getSignal("GPS_Long").sampleRate == 0):
             report = session.next()
@@ -181,6 +193,7 @@ def main():
         result.append(gpsTime)
         #Append Temperature-Data (if available)
         result.append(internalTemp)
+        result.append(vin)
         #Appending OBD data
         log.addData(result)
 
@@ -209,6 +222,7 @@ def GPS_Only(session, log, i, start, device_file):
     lat = None
     gpsTime = None
     internalTemp = None
+    vin = None
         
     #Get GPS data
     if(i % signals.getSignal("GPS_Long").sampleRate == 0):
@@ -234,6 +248,7 @@ def GPS_Only(session, log, i, start, device_file):
     result.append(gpsTime)
     #Append internal temperature data
     result.append(internalTemp)
+    result.append(vin)
     #Appending all other OBD Siganls
     log.addData(result)
 
