@@ -57,9 +57,10 @@ var printAllMarkers = async function() {
         }
 
     }
-    
-    var bounds = L.latLngBounds(allMarkers);
-    map0.fitBounds(bounds);
+    if(allMarkers.length != 0) {
+        var bounds = L.latLngBounds(allMarkers);
+        map0.fitBounds(bounds);
+    }
 }
 printAllMarkers();
 
@@ -157,9 +158,10 @@ var printWaitingTime = async function() {
             .addTo( map2 );
 
     }
-    
-    var bounds = L.latLngBounds(allMarkers);
-    map2.fitBounds(bounds);
+    if(allMarkers.length != 0) {
+        var bounds = L.latLngBounds(allMarkers);
+        map2.fitBounds(bounds);
+    }
 }
 printWaitingTime();
 

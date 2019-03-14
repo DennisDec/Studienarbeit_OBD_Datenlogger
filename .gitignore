@@ -8,6 +8,7 @@ OBD-Logger/Test.py
 
 # web-application
 node_modules
+package-lock.json
 # Debug log from npm
 npm-debug.log
 # Local env file with credentials
