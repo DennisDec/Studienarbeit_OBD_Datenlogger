@@ -9,7 +9,7 @@
     "bcrypt": "^3.0.2",
     "body-parser": "~1.15.2",
     "cookie-parser": "~1.4.3",
-    "debug": "~2.2.0",
+    "debug": ">=2.6.9",
     "express": "~4.14.0",
     "express-mysql-session": "^2.0.1",
     "express-session": "^1.15.6",
