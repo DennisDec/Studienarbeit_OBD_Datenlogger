@@ -13,6 +13,7 @@ import os
 import subprocess
 import socket
 import json
+import bcrypt
 
 from datetime import datetime, timedelta
 
@@ -26,6 +27,7 @@ from Signals import signals
 # "/Files/" #"\\OBD-Logger\\Files\\"
 path = env.PATH #"\\OBD-Logger\\Files\\" # 
 #path = "/home/pi/Studienarbeit_OBD_Datenlogger/OBD-Logger/Files/"
+
 
 class LogStatus:
     """ Values for the Log status flags """
@@ -74,6 +76,20 @@ class LogFile:
         """returns a List of filenames which are located in path """
         return [f for f in os.listdir(path) if f.endswith('.csv')]
 
+
+    @staticmethod
+    def parseVIN(res):
+        """parse VIN from OBD response to VIN string"""
+        str1 = res.split('\n')
+        VIN = ""
+        str10 = str1[0].split("490201")[-1]
+        VIN = VIN + str(str10)
+        VIN = VIN + str(str1[1][5:]) + str(str1[2][5:])
+        VIN = bytes.fromhex(VIN).decode("utf-8")
+        return VIN
+
+
+
     # @staticmethod
     # def transferToJson(filename):
     #     jsonPath = path + "JSON/"
@@ -87,27 +103,21 @@ class LogFile:
 
     def transferToJson(self):
         """ You have to call loadFromFile first"""
-
-        #TODO: Make several calculations before transfer to json
-        #TODO: get real Start Time through GPS time
-
-        # start = self.getStartTime() #Use this Time for the new filename
-        # fuelCons = self.getFuelConsumption()
-        # energyCons = self.getEnergyCons()
-
-
+        data = self._data   #get dictionary
+        if("VIN" in data):
+            data.pop("VIN")     #remove VIN from data
 
         jsonPath = path + "JSON/"
         filename = self._filename
         with open( jsonPath + filename.split(".csv")[0] + ".json", 'w') as fp:
-            json.dump(self._data, fp)
+            json.dump(data, fp)
         return filename.split(".csv")[0] + ".json"    
 
     @staticmethod
     def copyFileToServer(filename):
         errcnt = 0
         ip = []
-        f = open("ipAddress.ip", "r")
+        f = open(env.PATH_REPO + "ipAddress.ip", "r")
         ipAddress = f.read()
         if(not ipAddress == ""):
             stri = str(subprocess.check_output(('nmap -p22 ' + str(ipAddress)), shell=True))
@@ -134,7 +144,7 @@ class LogFile:
             try:
                 subprocess.check_output(("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/"), shell=True)
                 LogFile.transmitToSQL(filename, str(ip[i]))
-                f = open("ipAddress.ip", "w")
+                f = open(env.PATH_REPO + "ipAddress.ip", "w")
                 f.write(str(ip[i]))
 
 
@@ -359,6 +369,15 @@ class LogFile:
         print("Normal: " + str(avfuelCon))
 
         return avfuelCon
+
+    def getHashedVIN(self):
+        """encryption of the vehicle identification number to store it in db on server"""
+        vin = [x for x in self._data["VIN"] if x is not None][0]
+        hashed = bcrypt.hashpw(vin.encode(), bcrypt.gensalt(10))
+        return hashed
+
+
+
 
     def getEnergyCons(self):
         """ Time has to be relative Signal! """
