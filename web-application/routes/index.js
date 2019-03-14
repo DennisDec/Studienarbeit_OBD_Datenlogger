@@ -142,7 +142,12 @@ router.get('/getWaitingTime/:vin', authenticationMiddleware(), function(req, res
       if(bcrypt.compareSync(vin, results[i].vin)) {
         console.log(bcrypt.compareSync(vin, results[i].vin))
         tmp.push({
-          filename: results[i].filename
+          date: results[i].date,
+          starttime: results[i].starttime,
+          endtime: results[i].endtime,
+          endLat: results[i].endLat,
+          endLong: results[i].endLong,
+          endDate: results[i].endDate
         })
       }
     }
@@ -229,7 +234,9 @@ router.get('/getTrips/:date/:vin', authenticationMiddleware(), function(req, res
       if(bcrypt.compareSync(vin, results[i].vin)) {
         console.log(bcrypt.compareSync(vin, results[i].vin))
         tmp.push({
-          filename: results[i].filename
+          filename: results[i].filename,
+          starttime: results[i].starttime,
+          totalKM: results[i].totalKM,
         })
       }
     }
