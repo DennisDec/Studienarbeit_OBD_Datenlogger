@@ -59,12 +59,21 @@ class Stringbuilder:
         return sql
 
     @staticmethod
-    def SqlAddEntry(filename):
+    def SqlAddEntry(filename, date, starttime, totalKM, endtime, VIN, fuelConsumption, energyConsumption, endLat, endLong, endDate):
         """
         Create query string to load new file to db
+        SqlAddEntry(filename, date, starttime, totalKM, endtime, VIN, fuelConsumption, energyConsumption, endLat, endLong, endDate)
+        date: MM-DD-YYYY
+        time: HH:MM:SS
         """
-        sql = "INSERT INTO  data ( filename ) VALUES ('" + str(filename) + "\')"
         
+        sql = "INSERT INTO  data ( filename, date, starttime, totalKM, endtime," \
+            + " VIN, fuelConsumption, energyConsumption, endLat, endLong, endDate ) VALUES ('" + str(filename) \
+            + "', '" + str(date) + "', '" + str(starttime) + "', '" + str(totalKM) + "', '" + str(endtime) \
+            +"', '" + str(VIN) + "', '" + str(fuelConsumption) +"', '" + str(energyConsumption) + "', '" + str(endLat) \
+            +"', '" + str(endLong) + "', '" + str(endDate) +  "')"
+
+
         return sql
 
 
@@ -113,8 +122,8 @@ class LogFile:
             json.dump(data, fp)
         return filename.split(".csv")[0] + ".json"    
 
-    @staticmethod
-    def copyFileToServer(filename):
+    
+    def copyFileToServer(self, filename):
         errcnt = 0
         ip = []
         f = open(env.PATH_REPO + "ipAddress.ip", "r")
@@ -143,7 +152,7 @@ class LogFile:
             #os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
             try:
                 subprocess.check_output(("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/"), shell=True)
-                LogFile.transmitToSQL(filename, str(ip[i]))
+                self.transmitToSQL(filename, str(ip[i]))
                 f = open(env.PATH_REPO + "ipAddress.ip", "w")
                 f.write(str(ip[i]))
 
@@ -284,29 +293,14 @@ class LogFile:
             as_dict = {c[0]: c[1:] for c in columns}
 
             self._data = as_dict
-            """ with open(path+filename, 'r') as csvfile:
-                next(csvfile)  # ignore header (first row)
-                fileReader = csv.reader(csvfile, delimiter=',', quotechar='"')
-                for row in fileReader:
-
-                    for i, s in enumerate(signals.getSignalList()):
-                        
-                        if(row[i] == ""):
-                            self._data[s.name].append(None)
-                        else:
-                            if(s.name == "GPS_Time"):
-                                self._data[s.name].append(row[i])
-                            else:
-                                self._data[s.name].append(round(float(row[i]),s.roundDigit))
-            self._filename = filename """
-
-        except:
-            raise FileNotFoundError("Error: Loading File failed!")
+            
+        except Exception as e:
+            raise FileNotFoundError("Error: Loading File failed!" + e.message)
         self._filename = filename
         self._status = LogStatus.LOG_FILE_LOADED
 
-    @staticmethod
-    def transmitToSQL(filename, ip):                      #Connecting to SQL Server
+    
+    def transmitToSQL(self, filename, ip):                      #Connecting to SQL Server
         """
             Connecting to SQL server and transmit all data stored in this Class
             
@@ -317,21 +311,25 @@ class LogFile:
             host=ip,
             database=env.DB_NAME
         )
+        #calculate the data
 
+        dateTimeStart = self.getStartTime().split(";")
+        dateTimeEnd = self.getEndTime().split(";")
+
+        date = dateTimeStart[0]
+        starttime = dateTimeStart[1]
+
+        endDate = dateTimeEnd[0]
+        endtime = dateTimeEnd[1]
+        totalKM = self.getDistance()
+        VIN = self.getHashedVIN()
+        fuelConsumption = self.getFuelConsumption()
+        energyConsumption = self.getEnergyCons()
+
+        
         cursor = db.cursor()                   
-        cursor.execute(Stringbuilder.SqlAddEntry(filename))
-        # for i in range(len(self._data["TIME"])):
-        #     row = []
-        #     for s in signals.getSignalList():
-        #         row.append(self._data[s.name][i])                
-        #     cursor.execute(Stringbuilder.SqlBuidler("importobd"), row)
-                    
-        ##            row1 =[]
-        ##            row1.append("test")
-        ##            row1.append(self._data["GPS_Long"][i])
-        ##            row1.append(self._data["GPS_Lat"][i])
-        ##            cursor.execute(Stringbuilder.SqlBuidler("gpsdata"), row1)
-
+        cursor.execute(Stringbuilder.SqlAddEntry(filename, date, starttime, totalKM, endtime, VIN, fuelConsumption, energyConsumption, endLat, endLong, endDate))
+        
         db.commit()
         db.close()
 
@@ -372,11 +370,11 @@ class LogFile:
 
     def getHashedVIN(self):
         """encryption of the vehicle identification number to store it in db on server"""
-        vin = [x for x in self._data["VIN"] if x is not None][0]
-        hashed = bcrypt.hashpw(vin.encode(), bcrypt.gensalt(10))
+        hashed = ""
+        if("VIN" in self._data):
+            vin = [x for x in self._data["VIN"] if x is not None][0]
+            hashed = bcrypt.hashpw(vin.encode(), bcrypt.gensalt(10))
         return hashed
-
-
 
 
     def getEnergyCons(self):
@@ -425,7 +423,7 @@ class LogFile:
         timeInd = self._data["TIME"][ind]
         d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hours), minute=int(min), second=int(float(sec))) - timedelta(seconds=int(float(timeInd)))
         
-        return d
+        return d.strftime("%m-%d-%Y;%H:%M:%S")
 
 
     def getEndTime(self):
@@ -453,7 +451,7 @@ class LogFile:
 
 
         d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hours), minute=int(min), second=int(float(sec))) - timedelta(seconds=int(float(timedel)))
-        return d
+        return d.strftime("%m-%d-%Y;%H:%M:%S")
 
     def getDistance(self):
         #time = self._data[signals.TIME.name][-1]

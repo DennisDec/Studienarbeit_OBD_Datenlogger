@@ -31,11 +31,11 @@ try:
     #TODO: Add for - Loop here
     log = LogFile()
     files = LogFile.getFilenames()
-    print(files[2])
-    log.loadFromFile(files[2])
+    print(files[0])
+    log.loadFromFile(files[0])
     filename = log.transferToJson()
     print(filename)
-    if(LogFile.copyFileToServer(filename)):
+    if(log.copyFileToServer(filename)):
         print("Success!!")
     #TODO: Delete file after successful transmission
 except Exception as ex:
