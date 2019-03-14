@@ -236,7 +236,7 @@ router.get('/getTrips/:date/:vin', authenticationMiddleware(), function(req, res
         tmp.push({
           filename: results[i].filename,
           starttime: results[i].starttime,
-          totalKM: results[i].totalKM,
+          totalKM: results[i].totalKM
         })
       }
     }
@@ -281,6 +281,9 @@ router.post('/dashboard', authenticationMiddleware(), function(req, res, next) {
 
 // GET login page
 router.get('/login', function(req, res, next) {
+  if(req.isAuthenticated()) {
+    res.redirect('/dashboard')
+  }
   res.render('login', { title: 'Login', login: true });
 });
 // handle POST of login page; use passport to authenticate the user
@@ -419,6 +422,9 @@ router.get('/logout', function(req, res, next) {
 
 // GET register page
 router.get('/register', function(req, res, next) {
+  if(req.isAuthenticated()) {
+    res.redirect('/dashboard')
+  }
   res.render('register', { title: 'Registration', register: true });
 });
 

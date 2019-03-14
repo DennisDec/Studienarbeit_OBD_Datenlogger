@@ -34,8 +34,8 @@ function mailer(id, email, mode) {
             var mailOptions = {
                 from: process.env.MAIL_NAME,
                 to: email,
-                subject: 'Confirm your email!',
-                html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`
+                subject: 'Reset your password!',
+                html: `Please click this link to reset your password: <a href="${url}">${url}</a>`
             };
         } else if (mode === "getIP") {
             const url = `http://${add}:3000`;
@@ -50,8 +50,8 @@ function mailer(id, email, mode) {
             var mailOptions = {
                 from: process.env.MAIL_NAME,
                 to: mail,
-                subject: 'Confirm your email!',
-                html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`
+                subject: 'Your Server-Homepage!',
+                html: `Please click this link to connect to the Server-Homepage: <a href="${url}">${url}</a>`
             };
         }
         transporter.sendMail(mailOptions, async (error, info) => {
