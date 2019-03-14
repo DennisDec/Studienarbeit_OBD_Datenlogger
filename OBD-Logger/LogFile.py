@@ -325,6 +325,8 @@ class LogFile:
         VIN = self.getHashedVIN()
         fuelConsumption = self.getFuelConsumption()
         energyConsumption = self.getEnergyCons()
+        endLat = [x for x in self._data["GPS_Lat"] if x is not None][-1]
+        endLong = [x for x in self._data["GPS_Long"] if x is not None][-1]
 
         
         cursor = db.cursor()                   
