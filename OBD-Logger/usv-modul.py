@@ -6,6 +6,7 @@ import time
 import os
 import socket
 import env
+import shutil
 
 def timeout_handler(num, stack):
     print("Received SIGALRM")
@@ -32,14 +33,20 @@ try:
     #TODO: Add for - Loop here
     log = LogFile()
     files = LogFile.getFilenames()
-    print(files[0])
-    log.loadFromFile(files[0])
+    print(files)
+    file = files[0]
+    log.loadFromFile(file)
     filename = log.transferToJson()
     print(filename)
     if(log.copyFileToServer(filename)):
         print("Success!!")
-        if os.path.exists(filename):    #TODO: Delete json and csv file and add logfile here
-            os.remove(env.PATH + filename)
+        if os.path.exists(env.PATH + file):
+            shutil.copy2(env.PATH + file, env.PATH + "OLD/")
+            print("copy file to old folder")
+            os.remove(env.PATH  + file)
+            print("[DELETE] " + str(file))
+        if os.path.exists(env.PATH + "JSON/" +  filename):
+            os.remove(env.PATH  + "JSON/" + filename)
             print("[DELETE] " + str(filename))
 
     #TODO: Delete file after successful transmission
