@@ -1,5 +1,5 @@
 # pylint: disable=no-member
-from subprocess import call
+
 import obd
 from obd import OBDCommand, Unit
 from obd.protocols import ECU
@@ -55,6 +55,8 @@ def main():
     NotConnected = True
     errorcnt = 0                            #Error count to detect the moment if ignition is off at the end of a Driving Cycle
     HasConnection = True
+    
+    vinNotRead = True
     OnlyGPSMode = 0
     OBDError = 0
     filename = datetime.datetime.now().strftime("%y_%m_%d_%H:%M:%S_") + "test.csv"
@@ -85,7 +87,6 @@ def main():
                 NotConnected = False
                 OnlyGPSMode = 1
              
-    
     
     log = LogFile()
     
@@ -144,7 +145,6 @@ def main():
             gpsTime = None
             internalTemp = None
             vin = None
-            vinNotRead = True
             alt = None
 
             if(vinNotRead):

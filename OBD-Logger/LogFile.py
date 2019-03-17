@@ -170,6 +170,7 @@ class LogFile:
         self._data = {
 
         }
+        self._VIN = ""
 
         for s in signals.getSignalList():    #Get OBD Signals
             # Fill Dictionary with Signals from Class Signals
@@ -201,7 +202,7 @@ class LogFile:
         """add data to buffer"""
         if(len(signals.getSignalList()) == len(signalList)):
             for i, s in enumerate(signals.getSignalList()):
-                if(s.name == "GPS_Time" or signalList[i] == None):
+                if(s.name == "GPS_Time" or s.name == "VIN" or signalList[i] == None):
                     self._data[s.name].append(signalList[i])
                 else:
                     self._data[s.name].append(round(float(signalList[i]),s.roundDigit))
@@ -239,7 +240,6 @@ class LogFile:
         """
             returns the current fileName
         """
-
         return self._filename
 
     def appendFile(self):
@@ -291,11 +291,13 @@ class LogFile:
                         columns = [[value] for value in row]
             # you now have a column-major 2D array of your file.
             as_dict = {c[0]: c[1:] for c in columns}
+            if("VIN" in self._data):
+                self._VIN = [x for x in as_dict["VIN"] if x is not None][0]
 
             self._data = as_dict
             
         except Exception as e:
-            raise FileNotFoundError("Error: Loading File failed!" + e.message)
+            raise FileNotFoundError("Error: Loading File failed!" + str(e))
         self._filename = filename
         self._status = LogStatus.LOG_FILE_LOADED
 
@@ -373,15 +375,13 @@ class LogFile:
     def getHashedVIN(self):
         """encryption of the vehicle identification number to store it in db on server"""
         hashed = ""
-        if("VIN" in self._data):
-            vin = [x for x in self._data["VIN"] if x is not None][0]
-            hashed = bcrypt.hashpw(vin.encode(), bcrypt.gensalt(10))
+        if(not self._VIN == ""):
+            hashed = bcrypt.hashpw(self._VIN.encode(), bcrypt.gensalt(10))
         return hashed
 
 
     def getEnergyCons(self):
         """ Time has to be relative Signal! """
-        #time = self._data[signals.TIME.name]
         time = self.getTime()
         diff = []
         maf = self._data[signals.MAF.name] #Mass Air Flow
