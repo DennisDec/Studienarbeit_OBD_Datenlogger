@@ -16,9 +16,10 @@ __signals__ = [
     OBDSignal("FUEL_LEVEL"              , "fuel_level"                     ,True       , 2         , 2),
 
     #Other SIGNALS:
-    OBDSignal("GPS_Long"                , "Longitude"                      ,False      , 4         , 9),
-    OBDSignal("GPS_Lat"                 , "Latitude"                       ,False      , 4         , 9),
-    OBDSignal("GPS_Time"                , "time"                           ,False      , 4         , 0),
+    OBDSignal("GPS_Long"                , "Longitude"                      ,False      , 2         , 9),
+    OBDSignal("GPS_Lat"                 , "Latitude"                       ,False      , 2         , 9),
+    OBDSignal("GPS_Alt"                 , "Altitude"                       ,False      , 2         , 9),
+    OBDSignal("GPS_Time"                , "time"                           ,False      , 2         , 0),
     OBDSignal("INTERNAL_AIR_TEMP"       , "internal_temperature"           ,False      , 1         , 2),
     OBDSignal("VIN"                     , "Vehicle Identification Number"  ,False      , 0         , 0), #VIN is not an OBD Signal because its only necessary to read once
     

@@ -1,5 +1,6 @@
 import os 
 from gps import *
+import gps
 from time import *
 import time 
 import threading 
@@ -8,7 +9,10 @@ class GpsPoller(threading.Thread):
     
     def __init__(self):
         threading.Thread.__init__(self)
-        self.session = gps(mode=WATCH_ENABLE)
+        os.system("sudo gpsd /dev/serial0 -F /var/run/gpsd.sock")
+
+        self.session = gps.gps("localhost", "2947")
+        self.session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
         self.current_value = None 
         self.running = True 
         
