@@ -93,6 +93,7 @@ def main():
     OBDError = 0
     temp = True
     stri = ""
+    stri_end = ""
     
     #Handle only GPS Mode: check if GPS data is available 
     while(temp and OnlyGPSMode == 1):
@@ -101,13 +102,14 @@ def main():
             if hasattr(report, 'lon') and hasattr(report, 'lat'):
                 print("GPS found-> Only GPS Mode")
                 stri = "GPS_"
+                stri_end = "x"
                 
                 OnlyGPSMode = 2
                 temp = False
         else:
             time.sleep(1)
       
-    log.createLogfile(stri + filename)
+    log.createLogfile(stri + filename + stri_end)
     
     try:
         #Only GPS Mode
