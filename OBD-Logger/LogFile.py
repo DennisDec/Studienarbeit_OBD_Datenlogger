@@ -377,7 +377,7 @@ class LogFile:
         hashed = ""
         if(not self._VIN == ""):
             hashed = bcrypt.hashpw(self._VIN.encode(), bcrypt.gensalt(10))
-        return hashed
+        return hashed.decode("utf-8")
 
 
     def getEnergyCons(self):
