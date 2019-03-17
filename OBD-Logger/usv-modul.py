@@ -5,6 +5,7 @@ import signal
 import time
 import os
 import socket
+import env
 
 def timeout_handler(num, stack):
     print("Received SIGALRM")
@@ -37,6 +38,10 @@ try:
     print(filename)
     if(log.copyFileToServer(filename)):
         print("Success!!")
+        if os.path.exists(filename):    #TODO: Delete json and csv file and add logfile here
+            os.remove(env.PATH + filename)
+            print("[DELETE] " + str(filename))
+
     #TODO: Delete file after successful transmission
 except Exception as ex:
     print(ex)
