@@ -83,7 +83,7 @@ class LogFile:
     @staticmethod
     def getFilenames():
         """returns a List of filenames which are located in path """
-        return [f for f in os.listdir(path) if f.endswith('.csv')]
+        return sorted([f for f in os.listdir(path) if f.endswith('.csv')])
 
 
     @staticmethod
