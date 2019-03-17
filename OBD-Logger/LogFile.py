@@ -291,7 +291,7 @@ class LogFile:
                         columns = [[value] for value in row]
             # you now have a column-major 2D array of your file.
             as_dict = {c[0]: c[1:] for c in columns}
-            if("VIN" in self._data):
+            if("VIN" in as_dict):
                 self._VIN = [x for x in as_dict["VIN"] if x is not None][0]
 
             self._data = as_dict
@@ -452,7 +452,7 @@ class LogFile:
         timedel = timeend - timeInd
 
 
-        d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hours), minute=int(min), second=int(float(sec))) - timedelta(seconds=int(float(timedel)))
+        d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hours), minute=int(min), second=int(float(sec))) + timedelta(seconds=int(float(timedel)))
         return d.strftime("%m-%d-%Y;%H:%M:%S")
 
     def getDistance(self):
@@ -460,7 +460,7 @@ class LogFile:
         time = self.getTime()
         avSpeed = Util.mean(self._data[signals.SPEED.name])
         km = avSpeed*(time[-1]/3600)
-        return km
+        return round(km,2)
 
 
 
