@@ -38,27 +38,6 @@ class LogStatus:
 class Stringbuilder:
 
     @staticmethod
-    def SqlBuidler(tableName):
-        """ 
-        Creates a string with SQL INSTERT command to load all measurements to a sql table 
-
-        """
-
-        #TODO: Call different getSignalList()-method, depending on tableName!
-        sql = "INSERT INTO " + str(tableName) + "("
-        s = []
-        for signal in signals.getSignalList():
-            s.append(signal.db_name)
-        sql += ", ".join(s)
-        sql += ") VALUES ("
-        tmp = []
-        for i in range(len(s)):
-            tmp.append("%s")
-        sql += ", ".join(tmp)
-        sql += ")" 
-        return sql
-
-    @staticmethod
     def SqlAddEntry(filename, date, starttime, totalKM, endtime, VIN, fuelConsumption, energyConsumption, endLat, endLong, endDate):
         """
         Create query string to load new file to db
@@ -73,7 +52,6 @@ class Stringbuilder:
             +"', '" + str(VIN) + "', '" + str(fuelConsumption) +"', '" + str(energyConsumption) + "', '" + str(endLat) \
             +"', '" + str(endLong) + "', '" + str(endDate) +  "')"
 
-
         return sql
 
 
@@ -82,9 +60,8 @@ class LogFile:
 
     @staticmethod
     def getFilenames():
-        """returns a List of filenames which are located in path """
+        """returns a sorted List of filenames which are located in path"""
         return sorted([f for f in os.listdir(path) if f.endswith('.csv')])
-
 
     @staticmethod
     def parseVIN(res):
@@ -97,18 +74,24 @@ class LogFile:
         VIN = bytes.fromhex(VIN).decode("utf-8")
         return VIN
 
+    def __init__(self):
+        self._filename = ""
+        self._data = {
 
+        }
+        self._VIN = ""
 
-    # @staticmethod
-    # def transferToJson(filename):
-    #     jsonPath = path + "JSON/"
-    #     with open(path +filename, 'r') as csvfile:
-    #         next(csvfile)
-    #         fileReader = csv.DictReader(csvfile, fieldnames=("TIME", "SPEED", "RPM", "ENGINE_LOAD", "MAF" ,"AMBIANT_AIR_TEMP", "RELATIVE_ACCEL_POS", "COMMANDED_EQUIV_RATIO","FUEL_LEVEL" ,"GPS_Long", "GPS_Lat"))
-    #         out = json.dumps( [ row for row in fileReader ] ) 
-    #         f = open( jsonPath + filename.split(".csv")[0] + ".json", 'w')  
-    #         f.write(out)
-    #         return filename.split(".csv")[0] + ".json"
+        for s in signals.getSignalList():    #Get OBD Signals
+            # Fill Dictionary with Signals from Class Signals
+            self._data[s.name] = []
+
+        self._status = LogStatus.NO_LOGFILE
+
+    def status(self):
+        return self._status
+
+    def getDataDict(self):
+        return self._data
 
     def transferToJson(self):
         """ You have to call loadFromFile first"""
@@ -122,7 +105,6 @@ class LogFile:
             json.dump(data, fp)
         return filename.split(".csv")[0] + ".json"    
 
-    
     def copyFileToServer(self, filename):
         errcnt = 0
         ip = []
@@ -163,26 +145,6 @@ class LogFile:
                 if(len(ip)-1  == i):
                     return False
                 pass
-
-
-    def __init__(self):
-        self._filename = ""
-        self._data = {
-
-        }
-        self._VIN = ""
-
-        for s in signals.getSignalList():    #Get OBD Signals
-            # Fill Dictionary with Signals from Class Signals
-            self._data[s.name] = []
-
-        self._status = LogStatus.NO_LOGFILE
-
-    def status(self):
-        return self._status
-
-    def getDataDict(self):
-        return self._data
 
     def createLogfile(self, filename):
         """Create logfile to track OBDII data"""
@@ -267,7 +229,6 @@ class LogFile:
             # Fill Dictionary with Signals from Class Signals
             self._data[s.name] = []
 
-    
     def loadFromFile(self, filename):
         """load data from csv file"""
         
@@ -301,7 +262,6 @@ class LogFile:
         self._filename = filename
         self._status = LogStatus.LOG_FILE_LOADED
 
-    
     def transmitToSQL(self, filename, ip):                      #Connecting to SQL Server
         """
             Connecting to SQL server and transmit all data stored in this Class
@@ -379,7 +339,6 @@ class LogFile:
             hashed = bcrypt.hashpw(self._VIN.encode(), bcrypt.gensalt(10))
         return hashed.decode("utf-8")
 
-
     def getEnergyCons(self):
         """ Time has to be relative Signal! """
         time = self.getTime()
@@ -426,7 +385,6 @@ class LogFile:
         d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hours), minute=int(min), second=int(float(sec))) - timedelta(seconds=int(float(timeInd)))
         
         return d.strftime("%m-%d-%Y;%H:%M:%S")
-
 
     def getEndTime(self):
 
