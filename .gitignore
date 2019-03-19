@@ -1,8 +1,5 @@
 #OBD-logging
-OBD-Logger/__pycache__/LogFile.cpython-35.pyc
 .vscode
-OBD-Logger/__pycache__/LogFile_test.cpython-35.pyc
-OBD-Logger/Files/TestFile.csv
 .vscode/launch.json
 OBD-Logger/Test.py
 
@@ -13,15 +10,13 @@ package-lock.json
 npm-debug.log
 # Local env file with credentials
 .env
+__pycache__
 markers.json
 data.json
 OBD-Logger/Files/Unittest.csv
 OBD-Logger/Files/TestFile.csv
-OBD-Logger/__pycache__/Signals.cpython-35.pyc
-OBD-Logger/__pycache__/OBDSignal.cpython-35.pyc
 OBD-Logger/Test.py
 OBD-Logger/Files/TestFile.csv
 OBD-Logger/env.py
-OBD-Logger/__pycache__/
 *test.json
 *.csv
