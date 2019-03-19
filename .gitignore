@@ -22,13 +22,6 @@ OBD-Logger/__pycache__/OBDSignal.cpython-35.pyc
 OBD-Logger/Test.py
 OBD-Logger/Files/TestFile.csv
 OBD-Logger/env.py
-OBD-Logger/__pycache__/env.cpython-37.pyc
-OBD-Logger/__pycache__/env.cpython-35.pyc
-OBD-Logger/__pycache__/Util.cpython-35.pyc
-OBD-Logger/__pycache__/Signals.cpython-37.pyc
-OBD-Logger/__pycache__/OBDSignal.cpython-37.pyc
-OBD-Logger/__pycache__/LogFile_test.cpython-37.pyc
-OBD-Logger/__pycache__/LogFile.cpython-37.pyc
-OBD-Logger/__pycache__/env.cpython-35.pyc
-OBD-Logger/__pycache__/env.cpython-35.pyc
-OBD-Logger/__pycache__/env.cpython-35.pyc
+OBD-Logger/__pycache__/
+*test.json
+*.csv
