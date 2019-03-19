@@ -1,5 +1,5 @@
 from OBDSignal import OBDSignal
-import numpy as np
+
 
 __signals__ = [
     #         SignalName                  db-name                       isOBDSignal  sampleRate     round
