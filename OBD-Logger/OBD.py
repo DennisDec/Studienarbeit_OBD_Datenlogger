@@ -99,7 +99,7 @@ def main():
     while(temp and OnlyGPSMode == 1):
         report = gpsp.get_current_value()
         if report['class'] == 'TPV':
-            if hasattr(report, 'lon') and hasattr(report, 'lat'):
+            if hasattr(report, 'lon') and hasattr(report, 'lat') and hasattr(report, 'alt'):
                 print("GPS found-> Only GPS Mode")
                 stri = "GPS_"
                 stri_end = "x"
@@ -160,7 +160,7 @@ def main():
             if(i % signals.getSignal("GPS_Long").sampleRate == 0):
                 report = gpsp.get_current_value()
                 if report['class'] == 'TPV':
-                    if hasattr(report, 'lon') and hasattr(report, 'lat'):
+                    if hasattr(report, 'lon') and hasattr(report, 'lat') and hasattr(report, 'alt') and hasattr(report, 'time'):
                         lon = report.lon
                         lat = report.lat
                         alt = report.alt                    
