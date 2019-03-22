@@ -1,0 +1,12 @@
+[Unit]
+Description=Start_OBD_Logging
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/Studienarbeit_OBD_Datenlogger/OBD-Logger/OBD.py
+
+
+[Install]
+WantedBy=multi-user.target
+
