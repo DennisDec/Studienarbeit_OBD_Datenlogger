@@ -1,48 +1,59 @@
 {{> header}}
 
 <div class="container-fluid">
-      <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-          <div class="sidebar-sticky">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link" id="scroll" href="#generalData">
-                  <span data-feather="home"></span>
-                  General Data <span class="sr-only">(current)</span>
-                </a>
-              </li>
-              <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                <span>Trip Information</span>
-              </h6>
-              <li class="nav-item">
-                <a class="nav-link" id="scroll" href="#tripMap">
-                  <span data-feather="map"></span>
-                  Map
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" id="scroll" href="#tripData">
-                  <span data-feather="bar-chart-2"></span>
-                   Data
-                </a>
-              </li>
-            </ul>
-          </div>
-        </nav>
+  <div class="row">
+    <div id="sidebar">
+      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" id="scroll" href="#generalData">
+                <span data-feather="home"></span>
+                General Data <span class="sr-only">(current)</span>
+              </a>
+            </li>
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>Trip Information</span>
+            </h6>
+            <li class="nav-item">
+              <a class="nav-link" id="scroll" href="#tripMap">
+                <span data-feather="map"></span>
+                Map
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="scroll" href="#tripData">
+                <span data-feather="bar-chart-2"></span>
+                  Data
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
 
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-          <div style="height: 600px;">
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <div id="VinEingabe" class="container jumbotron login">
+        <h1>VIN</h1>
+          <div class="form-group">
+              <input type="text" id="firstVin" name="vin" class="form-control" placeholder="Your VIN">
+          </div>
+          <button onclick="displayData()" class="btn btn-primary">Submit</button>
+      </div>
+      <div id="firstPart" style="display: none">
+        <div style="height: 600px;">
           <section id="generalData">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
               <h1 class="h2">General Data</h1>
             </div>
             <h2>Map</h2>
             <div style="float:left; width: 50%;">
-            <div class="table-responsive">
-              <div id="map0" style="height: 440px; border: 1px solid #AAA;"></div>
-              <h2>Waiting Time</h2>
-              <div id="map2" style="margin-top: 10px; height: 440px; border: 1px solid #AAA;"></div>
-            </div></div>
+              <div class="table-responsive">
+                <div id="map0" style="height: 440px; border: 1px solid #AAA;"></div>
+                <h2>Waiting Time</h2>
+                <div id="map2" style="margin-top: 10px; height: 440px; border: 1px solid #AAA;"></div>
+              </div>
+            </div>
             <div style="margin-left: 3%; float: right; width: 47%;">
               <p>Test</p>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
@@ -90,85 +101,89 @@
                   </div>
                 </div>
               </div>
-            </div>
-            </div>
-          </section>
-          <div style="margin-top: 500px;" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Trip Information</h1>
-          </div>
-          
-            <!--<div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
-              </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                {{#each filenames}}
-                  <a class="dropdown-item" onclick="getData('{{this}}'); printMarkers('{{this}}')">{{this}}</a>
-                {{/each}}
-              </div>
-            </div>-->
-          <p></p>
-          <div class="col-md-6 mb-4 tripButtons">
-            <div class="card example-1 scrollbar-ripe-malinka">
-              <div class="card-body">
-                <input data-toggle="datepicker" id="datepicker">
-                <button type="button" class="btn btn-primary showButton" onclick="update()">Show</button>
-                <div class="btn-group-toggle" id="allTrips" data-toggle="buttons">
-                  <!--{{#each data}}
-                    <label class="btn btn-secondary active">
-                      {{#this}}
-                          <input type="checkbox" class="filename" filename={{filenames}} checked autocomplete="off">Fahrt {{count}}
-                      {{/this}}
-                    </label>
-                  {{/each}}-->
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mapAndChart">
-            <section id="tripMap">
-              <div class="mapHeading"><h2>Map</h2></div>
-              <div style="margin-top: 7px; float: right;" class="btn-toolbar mb-2 mb-md-0">
-                <div class="btn-group mr-2">
-                  <button class="btn btn-sm btn-outline-secondary">Share</button>
-                  <button class="btn btn-sm btn-outline-secondary">Export</button>
-                </div>
-              </div>
-              <div class="table-responsive">
-                <div id="map1" style="height: 440px; border: 1px solid #AAA;"></div>
-              </div>
             </section>
           </div>
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom" style="width: inherit;">
+        </div>
+        <div id="secondPart" style="display: none">
+        <div style="margin-top: 500px;" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">Trip Information</h1>
+        </div>
+        
+          <!--<div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Dropdown button
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {{#each filenames}}
+                <a class="dropdown-item" onclick="getData('{{this}}'); printMarkers('{{this}}')">{{this}}</a>
+              {{/each}}
+            </div>
+          </div>-->
+        <p></p>
+        <div class="col-md-6 mb-4 tripButtons">
+          <div class="card example-1 scrollbar-ripe-malinka">
+            <div class="card-body">
+              <input data-toggle="datepicker" id="datepicker">
+              <button type="button" class="btn btn-primary showButton" onclick="update()">Show</button>
+              <div class="btn-group-toggle" id="allTrips" data-toggle="buttons">
+                <!--{{#each data}}
+                  <label class="btn btn-secondary active">
+                    {{#this}}
+                        <input type="checkbox" class="filename" filename={{filenames}} checked autocomplete="off">Fahrt {{count}}
+                    {{/this}}
+                  </label>
+                {{/each}}-->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mapAndChart">
+          <section id="tripMap">
+            <div class="mapHeading"><h2>Map</h2></div>
+            <div style="margin-top: 7px; float: right;" class="btn-toolbar mb-2 mb-md-0">
+              <div class="btn-group mr-2">
+                <button class="btn btn-sm btn-outline-secondary">Share</button>
+                <button class="btn btn-sm btn-outline-secondary">Export</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <div id="map1" style="height: 440px; border: 1px solid #AAA;"></div>
+            </div>
+          </section>
+        </div></div>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom" style="width: inherit;">    
+          <div id="dataPart" style="display: none">
             <section id="tripData">
               <h2>Data</h2>
             </section>
           </div>
-        </main>
+        </div>
       </div>
-    </div>
-    <div style="margin-left: 100px;" id="charts"></div>
-    <!--<script type='text/javascript'>
-      var getFilenames = function() {
-        var fn = []
-        {{#each filenames}}
-        fn.push("{{this}}");
-        {{/each}}
-        return fn;
-      }
-    </script>-->
-    <script type='text/javascript' src='obd/chart.js'></script>
-    <script type='text/javascript' src='maps/leaf.js'></script>
-    <script type='text/javascript' src='js/scroll.js'></script>
-    <!--<script type='text/javascript' src='js/checkbox.js'></script>-->
-    <script type='text/javascript' src='js/datepicker.js'></script>
-    <script type='text/javascript' src='js/jquery_datepicker.js'></script>
-    <script type='text/javascript' src='js/updateTripField.js'></script>
-    <!-- Icons -->
-    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
-    <script>
-      feather.replace()
-    </script>
+    </main>
+  </div>
+</div>
+<div style="margin-left: 100px;" id="charts"></div>
+<!--<script type='text/javascript'>
+  var getFilenames = function() {
+    var fn = []
+    {{#each filenames}}
+    fn.push("{{this}}");
+    {{/each}}
+    return fn;
+  }
+</script>-->
+<script type='text/javascript' src='js/updateTripField.js'></script>
+<script type='text/javascript' src='obd/chart.js'></script>
+<script type='text/javascript' src='maps/leaf.js'></script>
+<script type='text/javascript' src='js/scroll.js'></script>
+<!--<script type='text/javascript' src='js/checkbox.js'></script>-->
+<script type='text/javascript' src='js/datepicker.js'></script>
+<script type='text/javascript' src='js/jquery_datepicker.js'></script>
+<!-- Icons -->
+<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+<script>
+  feather.replace()
+</script>
 
 
 {{> footer-end }}

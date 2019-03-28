@@ -85,7 +85,7 @@
             </div>
             {{#if isAuthenticated}}
             {{#if dashboard}}
-            <div class="form-inline mt-2 mt-md-0">
+            <div id="headerVinEingabe" style="display: none" class="form-inline mt-2 mt-md-0">
                 <input id="VIN" class="form-control mr-sm-2" type="text" placeholder="Your VIN" aria-label="Search" onkeydown = "if (event.keyCode == 13) {document.getElementById('VINButton').click()}">
                 <button id="VINButton" type="button" class="btn btn-outline-success my-2 my-sm-0" onclick="update(); printAllMarkers(); printWaitingTime()">Update</button>
             </div>

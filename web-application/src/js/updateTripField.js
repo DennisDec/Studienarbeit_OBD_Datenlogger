@@ -1,7 +1,19 @@
+var displayData = function() {
+    
+    $("#headerVinEingabe").css("display", "")
+    $("#sidebar").css("display", "")
+    $("#firstPart").css("display", "")
+    $("#secondPart").css("display", "")
+    $("#dataPart").css("display", "")
+    $("#VinEingabe").css("display", "none")
+    var vin = document.getElementById('firstVin').value;  
+    $("#VIN").val(vin);
+    document.getElementById('VINButton').click()
+}
 var update = async function() {
     var vin = document.getElementById('VIN').value;
-    vin = (vin === "") ? "none" : vin; 
     console.log(vin)
+    vin = (vin === "") ? "none" : vin; 
     var dateArray = (document.getElementById('datepicker').value).split(".")
     var date = (dateArray[1] + '-' + dateArray[0]+ '-' + dateArray[2])
     //var date = (document.getElementById('datepicker').value).replace(/\//g,  '-')
@@ -43,6 +55,11 @@ var update = async function() {
     });
     printMarkers(fn, nof);
     $("#charts").empty()
+    if(nof === 0) {
+        $("#dataPart").css("display", "none")
+    } else {
+        $("#dataPart").css("display", "")
+    }
     for(var h = 1; h <= nof; h++) {
         console.log("Filename: " + fn[h-1])
         $("#charts").append("<div id='Fahrt " + h + "'></div>")
