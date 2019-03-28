@@ -153,7 +153,7 @@ var printWaitingTime = async function() {
             "lat": markers[i].gpsLat,
             "lng": markers[i].gpsLong
         });
-        L.marker( [markers[i].gpsLat, markers[i].gpsLong], {icon: customIcon})
+        L.marker( [markers[i].gpsLat, markers[i].gpsLong], {icon: customIcon, opacity: 0.7})
             .bindPopup( '<p>Waiting-Time: ' + parseTime(markers[i].waitingTime) + '</p>' )
             .addTo( map2 );
 
