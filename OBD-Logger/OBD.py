@@ -224,7 +224,7 @@ def getGpsData(report):
             gpsTime = report.time
             print("Lon:  ", lon)
             print("Lat: ", lat)
-            return (lon, lat, alt, gpsTime)
+    return (lon, lat, alt, gpsTime)
 
 def GPS_Only(log, i, start, temperature, gpsp):
     """ This method is not logging OBD-data """
