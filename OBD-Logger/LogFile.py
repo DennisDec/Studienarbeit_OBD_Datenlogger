@@ -14,6 +14,7 @@ import subprocess
 import socket
 import json
 import bcrypt
+from subprocess import Popen, PIPE
 
 from datetime import datetime, timedelta
 
@@ -131,20 +132,21 @@ class LogFile:
 
 
         for i, tmp in enumerate(ip):
-            #os.system("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/")
-            try:
-                subprocess.check_output(("sshpass -p '" + str(env.DB_PASSWORD) + "' scp " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) + ":datafiles/"), shell=True)
+            cmd = "sshpass -p '" + str(env.DB_PASSWORD) + "' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/home/pi/known_host -r " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) +":datafiles/"
+            print(cmd)
+            proc =  Popen([cmd], stdin=PIPE, stdout=PIPE,  stderr=PIPE, shell=True)    #print(stdout)
+            stdout, stderr = proc.communicate()
+            print(stderr)
+            
+            if stderr == b'' or stderr.endswith(b'to the list of known hosts.\r\n'):
                 self.transmitToSQL(filename, str(ip[i]))
                 f = open(env.PATH_REPO + "ipAddress.ip", "w")
                 f.write(str(ip[i]))
-
-
                 return True
-            except subprocess.CalledProcessError:
-                errcnt = errcnt + 1
+            else:
                 if(len(ip)-1  == i):
                     return False
-                pass
+                
 
     def createLogfile(self, filename):
         """Create logfile to track OBDII data"""
