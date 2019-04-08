@@ -13,17 +13,12 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema obd/gps-datenlogger
 -- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema obd/gps-datenlogger
--- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `obd/gps-datenlogger`;
 USE `obd/gps-datenlogger` ;
 
 -- -----------------------------------------------------
 -- Table `obd/gps-datenlogger`.`data`
 -- -----------------------------------------------------
-
 CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`data` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `filename` VARCHAR(180) NULL DEFAULT NULL,
@@ -62,4 +57,19 @@ CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`users` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC)
+);
+
+-- -----------------------------------------------------
+-- Table `obd/gps-datenlogger`.`cars`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `obd/gps-datenlogger`.`cars` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `type` VARCHAR(20) NULL DEFAULT NULL,
+  `consumption` FLOAT NULL DEFAULT NULL,
+  `capacity` FLOAT NULL DEFAULT NULL,
+  `power` FLOAT NULL DEFAULT NULL,
+  `name` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC)
 );

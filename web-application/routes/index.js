@@ -27,6 +27,26 @@ router.get('/confirmation/:token', function(req, res) {
   res.redirect('/login');
 });
 
+router.get('/getCars/:token', authenticationMiddleware(), function(req, res) {
+  var db = require('../db.js');
+  console.log("Cartype: " + req.params.token)
+  db.query('SELECT consumption, capacity, power, name FROM cars WHERE type=?', [req.params.token], function(err, results, fields) {
+    if(err) throw err;
+    var data = [];
+    console.log(results.length)
+    for(var i = 0; i < results.length; i++) {
+      console.log(results[i].consumption)
+      data.push({
+        consumption: results[i].consumption,
+        capacity: results[i].capacity,
+        power: results[i].power,
+        name: results[i].name
+      })
+    }
+    res.send(data);
+  });
+});
+
 router.get('/getOBD/:token', authenticationMiddleware(), function(req, res) {
   if(req.params.token != "undefined") {
     var address = '../../datafiles/' + req.params.token;

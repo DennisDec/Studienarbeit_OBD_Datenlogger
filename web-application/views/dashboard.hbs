@@ -55,7 +55,9 @@
               </div>
             </div>
             <div style="margin-left: 3%; float: right; width: 47%;">
-              <p>Test</p>
+              <div id="car">
+                <p>Test</p>
+              </div>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                 Welches E-Auto passt zu mir?
               </button>
@@ -81,7 +83,8 @@
                             <option value="1">Kleinstwagen (z.B. Smart)</option>
                             <option value="2" selected>Kleinwagen (z.B. VW Golf)</option>
                             <option value="3">Mittelklassewagen (z.B. BMW 5er)</option>
-                            <option value="4">Oberklasse inkl. SUV (z.B. Mercedes S-Klasse)</option>
+                            <option value="4">Van oder Kastenwagen (z.B. VW T6)</option>
+                            <option value="5">Oberklasse inkl. SUV (z.B. Mercedes S-Klasse)</option>
                           </select>
                         </div>
                         <label for="input02" class="col-form-label">Fahrstil</label>
@@ -97,7 +100,7 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="calculateBattery()">Mein E-Auto</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="calculateCar()">Mein E-Auto</button>
                   </div>
                 </div>
               </div>
@@ -173,6 +176,7 @@
   }
 </script>-->
 <script type='text/javascript' src='js/updateTripField.js'></script>
+<script type='text/javascript' src='js/calcCar.js'></script>
 <script type='text/javascript' src='obd/chart.js'></script>
 <script type='text/javascript' src='maps/leaf.js'></script>
 <script type='text/javascript' src='js/scroll.js'></script>
