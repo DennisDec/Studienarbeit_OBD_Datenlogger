@@ -1,0 +1,10 @@
+[Unit]
+Description=RFCOMM service
+After=bluetooth.service
+Requires=bluetooth.service
+
+[Service]
+ExecStart=/usr/bin/rfcomm bind hci0 83:38:13:04:05:B0
+
+[Install]
+WantedBy=multi-user.target
