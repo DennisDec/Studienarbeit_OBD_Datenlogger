@@ -123,18 +123,20 @@ router.get('/getDatesOfTrips/:vin', authenticationMiddleware(), function(req, re
 router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
   var vin = req.params.vin;
   var db = require('../db.js');
-  db.query('SELECT filename, vin FROM data', function(err, results, fields) {
+  db.query('SELECT filename, vin, totalKM FROM data', function(err, results, fields) {
     if(err) throw err;
     var tmp = [];
     for(var i = 0; i < results.length; i++) {
       if(bcrypt.compareSync(vin, results[i].vin)) {
         console.log(bcrypt.compareSync(vin, results[i].vin))
         tmp.push({
-          filename: results[i].filename
+          filename: results[i].filename,
+          totalKM: results[i].totalKM
         })
       }
     }
     var data = [];
+    var averageTripLength = 0;
     for(var i = 0; i < tmp.length; i++) {
       console.log("File: " + tmp[i].filename)
       var address = '../../datafiles/' + tmp[i].filename;
@@ -147,7 +149,13 @@ router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
       delete data[i]['COMMANDED_EQUIV_RATIO'];
       delete data[i]['SPEED'];
       delete data[i]['ENGINE_LOAD'];
+      console.log("tmp[i].totalKM: " + tmp[i].totalKM)
+      averageTripLength += tmp[i].totalKM * (1/tmp.length);
     }
+    console.log("averageTripLength: " + averageTripLength)
+    data.push({
+      averageTripLength: averageTripLength
+    })
     res.send(data);
   });
 });

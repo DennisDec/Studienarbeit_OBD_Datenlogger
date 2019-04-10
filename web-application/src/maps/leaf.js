@@ -41,21 +41,31 @@ var printAllMarkers = async function() {
     var allMarkers = []
 
     console.log(markers)
-    //console.log(markers[0].GPS_Long[0])
-    for(var i = 0; i < markers.length; i++) {
-        console.log(markers[i].GPS_Long.length)
+
+    //averageLength needed for calCar.js
+    averageTripLength = markers[markers.length-1].averageTripLength;
+    numberOfTrips = 0;
+    for(var i = 0; i < (markers.length-1); i++) {
+        //console.log(markers[i].GPS_Long.length)
         for (let g = 0; g < markers[i].GPS_Long.length; g++) {
             if(!(markers[i].GPS_Long[g] === null || markers[i].GPS_Lat[g] === null)) {
-                console.log("test")
+                //console.log("test")
                 allMarkers.push({ 
                     "lat": markers[i].GPS_Lat[g],
                     "lng": markers[i].GPS_Long[g]
                 });
                 L.marker( [markers[i].GPS_Lat[g], markers[i].GPS_Long[g]], {icon: customIcon})
                     .addTo( map0 );
+                /*
+                if(g != 0) {
+                    var deltaLat = Math.pow(markers[i].GPS_Lat[g] - markers[i].GPS_Lat[g-1], 2);
+                    var deltaLong = Math.pow(markers[i].GPS_Long[g] - markers[i].GPS_Long[g-1], 2);
+                    averageLengthTrip += Math.sqrt(deltaLat + deltaLong)
+                    //console.log("averageLengthTrip: " + averageLengthTrip)
+                }*/
             }
         }
-
+        numberOfTrips++;
     }
     if(allMarkers.length != 0) {
         var bounds = L.latLngBounds(allMarkers);
@@ -135,7 +145,7 @@ var printWaitingTime = async function() {
 
     var allMarkers = []
 
-    console.log(markers)
+    //console.log(markers)
     //console.log(markers[0].gpsLong)
     for(var i = 0; i < markers.length; i++) {
         console.log(markers[i].gpsLong)
