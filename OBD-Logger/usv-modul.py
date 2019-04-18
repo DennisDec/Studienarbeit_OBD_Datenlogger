@@ -34,22 +34,25 @@ try:
     log = LogFile()
     files = LogFile.getFilenames()
     print(files)
-    file = files[0]
-    log.loadFromFile(file)
-    filename = log.transferToJson()
-    print(filename)
-    if(log.copyFileToServer(filename)):
-        print("Success!!")
-        if os.path.exists(env.PATH + file):
-            shutil.copy2(env.PATH + file, env.PATH + "OLD/")
-            print("copy file to old folder")
-            os.remove(env.PATH  + file)
-            print("[DELETE] " + str(file))
-        if os.path.exists(env.PATH + "JSON/" +  filename):
-            os.remove(env.PATH  + "JSON/" + filename)
-            print("[DELETE] " + str(filename))
+    for file in files:
+        log.loadFromFile(file)
+        filename = log.transferToJson()
+        print(filename)
+        if(log.copyFileToServer(filename)):
+            print("Success!!")
+            with open( env.PATH + "LOG.log", "a") as f:
+                f.write("Success: " + str(file) "(" + str(filename) ") has been copied to Server")
+            if os.path.exists(env.PATH + file):
+                shutil.copy2(env.PATH + file, env.PATH + "OLD/")
+                print("copy file to old folder")
+                os.remove(env.PATH  + file)
+                print("[DELETE] " + str(file))
+            if os.path.exists(env.PATH + "JSON/" +  filename):
+                os.remove(env.PATH  + "JSON/" + filename)
+                print("[DELETE] " + str(filename))
+        with open( env.PATH + "LOG.log", "a") as f:
+            f.write("Error: " + str(file) "(" + str(filename) ") could not be copied to Server")
 
-    #TODO: Delete file after successful transmission
 except Exception as ex:
     print(ex)
 finally:
