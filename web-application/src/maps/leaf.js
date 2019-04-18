@@ -44,6 +44,8 @@ var printAllMarkers = async function() {
 
     //averageLength needed for calCar.js
     averageTripLength = markers[markers.length-1].averageTripLength;
+    longestTrip = markers[markers.length-1].longestTrip;
+    vConsumption = markers[markers.length-1].vConsumption;
     numberOfTrips = 0;
     for(var i = 0; i < (markers.length-1); i++) {
         //console.log(markers[i].GPS_Long.length)
