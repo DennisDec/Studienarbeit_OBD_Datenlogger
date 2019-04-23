@@ -55,9 +55,38 @@
               </div>
             </div>
             <div style="margin-left: 3%; float: right; width: 47%;">
-              <div id="car">
-                <p>Test</p>
-              </div>
+              <table id="table" style="display: none" class="table">
+                <tbody>
+                  <tr>
+                    <td>Passendes E-Auto:</td>
+                    <td id="car"></td>
+                  </tr>
+                  <tr>
+                    <td>Reichweite:</td>
+                    <td id="range"></td>
+                  </tr>
+                  <tr>
+                    <td>Energieverbrauch dieses E-Autos:</td>
+                    <td id="eConsumption"></td>
+                  </tr>
+                  <tr>
+                    <td>Durchschnittliche Routenlänge:</td>
+                    <td id="averageTripLength"></td>
+                  </tr>
+                  <tr>
+                    <td>Längste Route:</td>
+                    <td id="longestTrip"></td>
+                  </tr>
+                  <tr>
+                    <td>Ladestopps für die längste Route:</td>
+                    <td id="chargeStops"></td>
+                  </tr>
+                  <tr>
+                    <td>Energieverbrauch Verbrenner auf E-Auto umgerechnet:</td>
+                    <td id="vConsumption"></td>
+                  </tr>
+                </tbody>
+              </table>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                 Welches E-Auto passt zu mir?
               </button>

@@ -1,5 +1,8 @@
 var averageTripLength = 0;
 var numberOfTrips = 0;
+var longestTrip = 0;
+var vConsumption = 0;
+
 var calculateCar = async function(){
     var type;
     var energyConsumptionFactor;
@@ -54,7 +57,29 @@ var calculateCar = async function(){
         }
         console.log("Range: " + range[i])
     }
-
-    var innerHTML = `<p>${cars[bestCar].name}</p>`
+    //falls kein Fahrzeug passt, muss das beste gewählt werden
+    $("#car").empty()
+    $("#range").empty()
+    $("#averageTripLength").empty()
+    $("#longestTrip").empty()
+    $("#chargeStops").empty()
+    $("#table").css("display", "")
+    var innerHTML = `${cars[bestCar].name}`
     $("#car").append(innerHTML)
+    innerHTML = `${Math.round(range[bestCar])}km`
+    $("#range").append(innerHTML)
+    innerHTML = `${cars[bestCar].consumption}kWh/100km`
+    $("#eConsumption").append(innerHTML)
+    innerHTML = `${Math.round(averageTripLength)}km`
+    $("#averageTripLength").append(innerHTML)
+    innerHTML = `${Math.round(longestTrip)}km`
+    $("#longestTrip").append(innerHTML)
+    innerHTML = `${Math.ceil(longestTrip / range[bestCar])}`
+    $("#chargeStops").append(innerHTML)
+    innerHTML = `${vConsumption.toFixed(2)}kWh/100km`
+    $("#vConsumption").append(innerHTML)
+    
+    $(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    })
 }

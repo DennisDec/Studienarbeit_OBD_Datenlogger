@@ -123,7 +123,7 @@ router.get('/getDatesOfTrips/:vin', authenticationMiddleware(), function(req, re
 router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
   var vin = req.params.vin;
   var db = require('../db.js');
-  db.query('SELECT filename, vin, totalKM FROM data', function(err, results, fields) {
+  db.query('SELECT filename, vin, totalKM, energyConsumption FROM data', function(err, results, fields) {
     if(err) throw err;
     var tmp = [];
     for(var i = 0; i < results.length; i++) {
@@ -131,12 +131,15 @@ router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
         console.log(bcrypt.compareSync(vin, results[i].vin))
         tmp.push({
           filename: results[i].filename,
-          totalKM: results[i].totalKM
+          totalKM: results[i].totalKM,
+          energyConsumption: results[i].energyConsumption / 100 * results[i].totalKM
         })
       }
     }
     var data = [];
     var averageTripLength = 0;
+    var longestTrip = 0;
+    var averageConsumption = 0;
     for(var i = 0; i < tmp.length; i++) {
       console.log("File: " + tmp[i].filename)
       var address = '../../datafiles/' + tmp[i].filename;
@@ -150,11 +153,17 @@ router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
       delete data[i]['SPEED'];
       delete data[i]['ENGINE_LOAD'];
       console.log("tmp[i].totalKM: " + tmp[i].totalKM)
-      averageTripLength += tmp[i].totalKM * (1/tmp.length);
+      averageTripLength += tmp[i].totalKM / tmp.length;
+      if(longestTrip <= tmp[i].totalKM) {
+        longestTrip = tmp[i].totalKM;
+      }
+      averageConsumption += tmp[i].energyConsumption;
     }
     console.log("averageTripLength: " + averageTripLength)
     data.push({
-      averageTripLength: averageTripLength
+      averageTripLength: averageTripLength,
+      longestTrip: longestTrip,
+      vConsumption: averageConsumption / tmp.length
     })
     res.send(data);
   });
