@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sudo python3 /home/pi/Studienarbeit_OBD_Datenlogger/OBD-Logger/usv-modul.py

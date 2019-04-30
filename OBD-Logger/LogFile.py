@@ -129,24 +129,29 @@ class LogFile:
                 if(line.find("open") != -1 and output[i-3].split(' ')[-1] != own_ip):
                     ip.append(output[i-3].split(' ')[-1].replace("(", "").replace(")",""))
                     print(ip)
-
-
-        for i, tmp in enumerate(ip):
-            cmd = "sshpass -p '" + str(env.DB_PASSWORD) + "' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/home/pi/known_host -r " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) +":datafiles/"
-            print(cmd)
-            proc =  Popen([cmd], stdin=PIPE, stdout=PIPE,  stderr=PIPE, shell=True)    #print(stdout)
-            stdout, stderr = proc.communicate()
-            print(stderr)
-            
-            if stderr == b'' or stderr.endswith(b'to the list of known hosts.\r\n'):
-                self.transmitToSQL(filename, str(ip[i]))
-                f = open(env.PATH_REPO + "ipAddress.ip", "w")
-                f.write(str(ip[i]))
-                return True
-            else:
-                if(len(ip)-1  == i):
-                    return False
+        
+        if(len(ip) >= 1):              
+            for i, tmp in enumerate(ip):
+                cmd = "sshpass -p '" + str(env.DB_PASSWORD) + "' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/home/pi/known_host -r " + str(path) + "JSON/" + str(filename) + " pi@" + str(ip[i]) +":datafiles/"
                 
+                proc =  Popen([cmd], stdin=PIPE, stdout=PIPE,  stderr=PIPE, shell=True)
+                stdout, stderr = proc.communicate()
+                print(stderr)
+                
+                if stderr == b'' or stderr.endswith(b'to the list of known hosts.\r\n'):
+                    try:
+                        self.transmitToSQL(filename, str(ip[i]))
+                        f = open(env.PATH_REPO + "ipAddress.ip", "w")
+                        f.write(str(ip[i]))
+                    except mysql.connector.errors.IntegrityError as err:
+                        return False, err
+                    return True, ""
+                else:
+                    if(len(ip)-1  == i):
+                        return False, ""
+        else:
+            return False, "No Server connection found!"
+                    
 
     def createLogfile(self, filename):
         """Create logfile to track OBDII data"""
