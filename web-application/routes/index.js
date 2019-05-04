@@ -132,14 +132,14 @@ router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
         tmp.push({
           filename: results[i].filename,
           totalKM: results[i].totalKM,
-          energyConsumption: results[i].energyConsumption / 100 * results[i].totalKM
+          energyConsumption: results[i].energyConsumption
         })
       }
     }
     var data = [];
     var averageTripLength = 0;
     var longestTrip = 0;
-    var averageConsumption = 0;
+    var vConsumption = 0;
     for(var i = 0; i < tmp.length; i++) {
       console.log("File: " + tmp[i].filename)
       var address = '../../datafiles/' + tmp[i].filename;
@@ -157,13 +157,13 @@ router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
       if(longestTrip <= tmp[i].totalKM) {
         longestTrip = tmp[i].totalKM;
       }
-      averageConsumption += tmp[i].energyConsumption;
+      vConsumption += tmp[i].energyConsumption;
     }
     console.log("averageTripLength: " + averageTripLength)
     data.push({
       averageTripLength: averageTripLength,
       longestTrip: longestTrip,
-      vConsumption: averageConsumption / tmp.length
+      vConsumption: vConsumption / (tmp.length * averageTripLength) * 100
     })
     res.send(data);
   });
