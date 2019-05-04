@@ -46,23 +46,37 @@ var calculateCar = async function(){
     let response = await fetch("/getCars/" + type, {
         credentials: 'same-origin'
     });
+
     let cars = await response.json();
     var range = [];
+    var count = 0;
     var deltaToAverage = averageTripLength;
     for(let i = 0; i < cars.length; i++) {
         range[i] = (cars[i].capacity / (cars[i].consumption * energyConsumptionFactor)) * 100;
         if(((range[i] - averageTripLength) < deltaToAverage) && (range[i] > averageTripLength)) {
             deltaToAverage = range[i] - averageTripLength;
             bestCar = i;
+        } else {
+            count++;
         }
         console.log("Range: " + range[i])
     }
     //falls kein Fahrzeug passt, muss das beste gewählt werden
+    if(count == cars.length) {
+        bestCar = 0;
+        for(let i = 0; i < cars.length; i++) {
+            if(range[i] > range[bestCar]) {
+                bestCar = i;
+            }
+        }
+    }
     $("#car").empty()
     $("#range").empty()
+    $("#eConsumption").empty()
     $("#averageTripLength").empty()
     $("#longestTrip").empty()
     $("#chargeStops").empty()
+    $("#vConsumption").empty()
     $("#table").css("display", "")
     var innerHTML = `${cars[bestCar].name}`
     $("#car").append(innerHTML)
