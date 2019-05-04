@@ -29,16 +29,16 @@ try:
     log = LogFile()
     files = LogFile.getFilenames()
     print(files)
-    for file in files:
-        num_lines = sum(1 for line in open(env.PATH + file))
-        #Filter Files without content
-        if(num_lines < 5):
+    for file in files:        
+        log.loadFromFile(file)
+        #Delete Files without content
+        if(log.isBrokenFile()):
             if os.path.exists(env.PATH + file):
                 os.remove(env.PATH  + file)
                 print("[DELETE] broken file: " + str(file))
+                with open( env.PATH + "LOG.log", "a") as f:
+                    f.write("[DELETE]: " + str(file) +  " - File was broken (No GPS or RPM signals) "+ "\n")
             continue
-        print(num_lines)
-        log.loadFromFile(file)
         filename = log.transferToJson()
         print(filename)
         success, err = log.copyFileToServer(filename)

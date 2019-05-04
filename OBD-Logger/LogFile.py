@@ -156,7 +156,6 @@ class LogFile:
         else:
             return False, "No Server connection found!"
                     
-
     def createLogfile(self, filename):
         """Create logfile to track OBDII data"""
         try:
@@ -260,13 +259,21 @@ class LogFile:
                     else:
                         # first row
                         columns = [[value] for value in row]
-            # you now have a column-major 2D array of your file.
             as_dict = {c[0]: c[1:] for c in columns}
             if("VIN" in as_dict):
                 #TODO:
                 vinList = [x for x in as_dict["VIN"] if x is not None]
                 if(len(vinList) > 0):
                     self._VIN = vinList[0]
+            if("GPS_Long" in as_dict):
+                gpsL = [x for x in as_dict["GPS_Long"] if x is not None]
+                if(len(gpsL) < 1):
+                    self._isBrokenFile = True
+            
+            if("RPM" in as_dict):
+                rpm = [x for x in as_dict["RPM"] if int(x) is not 0]
+                if(len(rpm) < 1):
+                    self._isBrokenFile = True
 
             self._data = as_dict
             
@@ -379,8 +386,11 @@ class LogFile:
     def getStartTime(self):
 
         """ returns a datetime of the real start of datalogging """
-        str = [x for x in self._data["GPS_Time"] if x is not None][0]
-        #2019-02-23T10:58:31.000Z417.75
+        str = "2000-01-01T00:00:00.000Z000.00" #default Time
+        strlist = [x for x in self._data["GPS_Time"] if x is not None]
+        if(len(strlist) >= 1):
+            str = strlist[0]
+        #2000-01-01T00:00:00.000Z000.00
 
         dateArray  = str.split("T")[0].split("-")
         year = dateArray[0]
@@ -392,17 +402,22 @@ class LogFile:
         hours = time[0]
         min = time[1]
         sec = time[2]
-
-        ind = self._data["GPS_Time"].index(str)
-        timeInd = self._data["TIME"][ind]
+        if(str in self._data["GPS_Time"]):
+            ind = self._data["GPS_Time"].index(str)
+            timeInd = self._data["TIME"][ind]
+        else:#deault Time
+            ind = 0
+            timeInd = 0
         d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hours), minute=int(min), second=int(float(sec))) - timedelta(seconds=int(float(timeInd)))
         
         return d.strftime("%m-%d-%Y;%H:%M:%S")
 
     def getEndTime(self):
-
-        str = [x for x in self._data["GPS_Time"] if x is not None][0]
         #2019-02-23T10:58:31.000Z417.75
+        str = "2000-01-01T00:00:00.000Z000.00" #default Time
+        strlist = [x for x in self._data["GPS_Time"] if x is not None]
+        if(len(strlist) >= 1):
+            str = strlist[0]
 
         dateArray  = str.split("T")[0].split("-")
         print(dateArray)
@@ -416,10 +431,13 @@ class LogFile:
         min = time[1]
         sec = time[2]
 
-        ind = self._data["GPS_Time"].index(str)
-        timeInd = self._data["TIME"][ind]
-        timeend = self._data["TIME"][-1]
-
+        if(str in self._data["GPS_Time"]):
+            ind = self._data["GPS_Time"].index(str)
+            timeInd = self._data["TIME"][ind]
+            timeend = self._data["TIME"][-1]
+        else:
+            timeInd = 0
+            timeend = 0
         timedel = timeend - timeInd
 
 
