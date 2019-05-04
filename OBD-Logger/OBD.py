@@ -13,16 +13,33 @@ import os
 from LogFile import LogFile, LogStatus         
 from Signals import signals
 from uptime import uptime
+from subprocess import call
 #Moduls for DS18B20 temperature sensor
 import glob
 from TempPoller import TempPoller
-
 #Moduls for GPS sensor
 from GpsPoller import GpsPoller
+import RPi.GPIO as GPIO
+
 
 
 def main():
-        
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(17,GPIO.OUT)
+    GPIO.setup(27,GPIO.OUT)
+    GPIO.setup(22,GPIO.OUT)
+    GPIO.setwarnings(False)
+
+    RGBblue =  17
+    RGBred = 27
+    RGBgreen = 22
+    GPIO.output(RGBblue, GPIO.LOW)
+    GPIO.output(RGBred,GPIO.LOW)
+    GPIO.output(RGBgreen,GPIO.LOW)
+    GPIO.output(RGBblue,GPIO.HIGH)
+    GPIO.output(RGBred,GPIO.HIGH)
+    GPIO.output(RGBgreen,GPIO.HIGH)
+    
     gpsp = GpsPoller()                      #Start GPS thread
     gpsp.start()
     temperature = TempPoller()              #Start temperature thread
@@ -60,7 +77,7 @@ def main():
             time.sleep(1)
             OBDError += 1
         
-        if(OBDError == 4):
+        if(OBDError == 10):
                 NotConnected = False
                 OnlyGPSMode = 1
              
@@ -78,6 +95,11 @@ def main():
         if report['class'] == 'TPV':
             if hasattr(report, 'lon') and hasattr(report, 'lat') and hasattr(report, 'alt'):
                 print("GPS found-> Only GPS Mode")
+                #Set Colour to Cyan
+                GPIO.output(RGBblue, GPIO.LOW)
+                GPIO.output(RGBred,GPIO.LOW)
+                GPIO.output(RGBgreen,GPIO.LOW)
+                GPIO.output(RGBblue, GPIO.HIGH)
                 stri = "GPS_"
                 stri_end = "x"
                 
@@ -113,6 +135,12 @@ def main():
                 connection.watch(obd.commands[signal.name]) # keep track of the RPM
             connection.start()
             time.sleep(0.5)
+            #Set Colour to pink
+            GPIO.output(RGBblue, GPIO.LOW)
+            GPIO.output(RGBred,GPIO.LOW)
+            GPIO.output(RGBgreen,GPIO.LOW)
+            GPIO.output(RGBblue, GPIO.HIGH)
+            GPIO.output(RGBred, GPIO.HIGH)
                 
         #Normal Mode: OBD-, GPS-, Temperature-Data
         while (connection.status() == obd.utils.OBDStatus.CAR_CONNECTED and HasConnection):
@@ -128,6 +156,9 @@ def main():
             if(errorcnt >= 5):
                 print("End: Too many Errors - Ignition seems to be off")
                 HasConnection = False
+                GPIO.output(RGBblue, GPIO.LOW)
+                GPIO.output(RGBred,GPIO.LOW)
+                GPIO.output(RGBgreen,GPIO.LOW)
 
             i = i+1
             if(i == 2048): 
@@ -184,7 +215,7 @@ def main():
                 vin = None
 
             time.sleep(0.5)                      #Sleep 500ms to get not that much ammount of data 
-
+            
             if(i % 20 == 0):                     #Appand file every 20 rows of measurement data
                 log.appendFile()
                 print("Appending File ...")
@@ -198,9 +229,17 @@ def main():
         temperature.running = False
         temperature.join()
         connection.stop()
-        time.sleep(4)
+        GPIO.output(RGBblue, GPIO.LOW)
+        GPIO.output(RGBred,GPIO.LOW)
+        GPIO.output(RGBgreen,GPIO.LOW)
+        GPIO.cleanup()
+
     
     except(KeyboardInterrupt, SystemExit):
+        GPIO.output(RGBblue, GPIO.LOW)
+        GPIO.output(RGBred,GPIO.LOW)
+        GPIO.output(RGBgreen,GPIO.LOW)
+        GPIO.cleanup()
         print("Excpetion:")
         print("\nKilling Threads..")
         log.appendFile()
@@ -209,7 +248,7 @@ def main():
         temperature.running = False
         temperature.join()
         connection.stop()
-        
+           
 def getGpsData(report):
     """ return gps data from report """
     lon = None
@@ -217,6 +256,8 @@ def getGpsData(report):
     alt = None
     gpsTime = None
     if report['class'] == 'TPV':
+        if(hasattr(report, 'time')):                    
+            gpsTime = report.time
         if hasattr(report, 'lon') and hasattr(report, 'lat') and hasattr(report, 'alt') and hasattr(report, 'time'):
             lon = report.lon
             lat = report.lat

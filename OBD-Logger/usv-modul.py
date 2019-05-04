@@ -7,48 +7,46 @@ import os
 import socket
 import env
 import shutil
-
-
+import RPi.GPIO as GPIO
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(19,GPIO.OUT)
+GPIO.setup(23,GPIO.OUT)
+GPIO.setup(21,GPIO.OUT)
+GPIO.output(21, GPIO.HIGH)
 
 def timeout_handler(num, stack):
     print("Received SIGALRM")
     raise Exception("No wireless networks connected")
 
-
-def connectToWIFI():
-    tmp = True
-    while tmp == True:
-        try:
-            output = subprocess.check_output(('ping -q -c 1 -W 1 8.8.8.8'), shell=True)
-            print(output)
-            tmp = False
-        except subprocess.CalledProcessError:
-            print("No wireless networks connected")
-
-with open( env.PATH + "LALA.log", "a") as f:
-    f.write("ltest123\n")
 signal.signal(signal.SIGALRM, timeout_handler)
 signal.alarm(20)
 
 
 
 try:
-    #connectToWIFI()
-    #TODO: Add for - Loop here
     print(env.PATH)
     log = LogFile()
     files = LogFile.getFilenames()
     print(files)
     for file in files:
+        num_lines = sum(1 for line in open(env.PATH + file))
+        #Filter Files without content
+        if(num_lines < 5):
+            if os.path.exists(env.PATH + file):
+                os.remove(env.PATH  + file)
+                print("[DELETE] broken file: " + str(file))
+            continue
+        print(num_lines)
         log.loadFromFile(file)
         filename = log.transferToJson()
         print(filename)
-        
         success, err = log.copyFileToServer(filename)
         print(success)
         print(err)
         if(success):
             print("Success!!")
+            GPIO.output(19, GPIO.HIGH)
             with open( env.PATH + "LOG.log", "a") as f:
                 f.write("Success: " + str(file) + "(" + str(filename) + ") has been copied to Server\n")
             if os.path.exists(env.PATH + file):
@@ -59,11 +57,25 @@ try:
             if os.path.exists(env.PATH + "JSON/" +  filename):
                 os.remove(env.PATH  + "JSON/" + filename)
                 print("[DELETE] " + str(filename))
+            
         else:
+            GPIO.output(23, GPIO.HIGH)
             with open( env.PATH + "LOG.log", "a") as f:
                 f.write("Error: " + str(file) + "(" + str(filename) + ") could not be copied to Server: "+ str(err) + "\n")
-
+                
 except Exception as ex:
     print(ex)
+    for i in range(3):
+        GPIO.output(23, GPIO.HIGH)
+        time.sleep(0.1)
+        GPIO.output(23, GPIO.LOW)
+        time.sleep(0.1)
 finally:
+    time.sleep(1)
+    GPIO.output(23, GPIO.LOW)
+    GPIO.output(19, GPIO.LOW)
+    GPIO.output(21, GPIO.LOW)
     signal.alarm(0)
+    
+
+

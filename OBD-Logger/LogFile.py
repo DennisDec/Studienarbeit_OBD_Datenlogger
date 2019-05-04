@@ -87,9 +87,13 @@ class LogFile:
             self._data[s.name] = []
 
         self._status = LogStatus.NO_LOGFILE
+        self._isBrokenFile = False
 
     def status(self):
         return self._status
+
+    def isBrokenFile(self):
+        return self._isBrokenFile
 
     def getDataDict(self):
         return self._data
@@ -243,7 +247,6 @@ class LogFile:
             columns = []
             with open(env.PATH + filename, 'r') as f:
                 reader = csv.reader( (line.replace('\0','') for line in f) )
-                #reader = csv.reader(f)
                 for row in reader:
                     if columns:
                         for i, value in enumerate(row):
@@ -260,7 +263,10 @@ class LogFile:
             # you now have a column-major 2D array of your file.
             as_dict = {c[0]: c[1:] for c in columns}
             if("VIN" in as_dict):
-                self._VIN = [x for x in as_dict["VIN"] if x is not None][0]
+                #TODO:
+                vinList = [x for x in as_dict["VIN"] if x is not None]
+                if(len(vinList) > 0):
+                    self._VIN = vinList[0]
 
             self._data = as_dict
             
