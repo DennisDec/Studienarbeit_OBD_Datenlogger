@@ -17,7 +17,3 @@ class Util:
         """ calculate mean value of an array"""
         return (sum(value) / float(len(value)))
 
-    @staticmethod
-    def test(value):
-       str = "123.432"
-       int(float(str))
