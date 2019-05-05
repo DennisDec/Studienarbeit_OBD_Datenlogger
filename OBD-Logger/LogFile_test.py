@@ -71,7 +71,7 @@ class TestLogFile(unittest.TestCase):
 
     def test_StatusLogCreated(self):
         log = LogFile()
-        log.createLogfile("testFile.csv")
+        log.createLogfile("testFile.test")
         self.assertEqual(log.status(), LogStatus.LOG_CREATED)
 
     def test_StatusLogFileLoaded(self):
@@ -85,10 +85,10 @@ class TestLogFile(unittest.TestCase):
     
     def test_loadEmptyFile(self):
         log = LogFile()
-        log.createLogfile("empty.csv")
+        log.createLogfile("empty.test")
 
         log2 = LogFile()
-        log2.loadFromFile("empty.csv")
+        log2.loadFromFile("empty.test")
         self.assertTrue(log2.isBrokenFile())
 
     def test_without_GPSFile(self):
@@ -104,7 +104,7 @@ class TestLogFile(unittest.TestCase):
 
     def test_createRandomDataFileNoGPS(self):
         log = LogFile()
-        log.createLogfile("Random_NoGPS.csv")
+        log.createLogfile("Random_NoGPS.test")
         time = range(100)
         speed = np.random.randint(100, size=100).tolist()
         rpm = np.random.randint(5000, size=100).tolist()
@@ -161,7 +161,7 @@ class TestLogFile(unittest.TestCase):
 
     def test_createRandomDataFile(self):
         log = LogFile()
-        log.createLogfile("Random.csv")
+        log.createLogfile("Random.test")
         time = range(100)
         speed = np.random.randint(100, size=100).tolist()
         rpm = np.random.randint(5000, size=100).tolist()
@@ -217,7 +217,7 @@ class TestLogFile(unittest.TestCase):
 
     def test_createZerosDataFile(self):
         log = LogFile()
-        log.createLogfile("Zeros.csv")
+        log.createLogfile("Zeros.test")
         time = range(100)
         speed = [0]*100
         rpm = [0]*100
@@ -274,38 +274,38 @@ class TestLogFile(unittest.TestCase):
     
     def test_isBrokenFile_NoRPM(self):
         log = LogFile()
-        log.loadFromFile("Zeros.csv")
+        log.loadFromFile("Zeros.test")
         broken = log.isBrokenFile()
         self.assertTrue(broken)
 
     def test_isBrokenFile_OK(self):
         log = LogFile()
-        log.loadFromFile("Random.csv")
+        log.loadFromFile("Random.test")
         broken = log.isBrokenFile()
         self.assertFalse(broken)
         
 
     def test_isBrokenFile_NoGPS(self):
         log = LogFile()
-        log.loadFromFile("Random_NoGPS.csv")
+        log.loadFromFile("Random_NoGPS.test")
         broken = log.isBrokenFile()
         self.assertTrue(broken)
 
     def test_getDistance(self):
         log = LogFile()
-        log.loadFromFile("Random.csv")
+        log.loadFromFile("Random.test")
 
         self.assertTrue(log.getDistance() is not None)
     
     def test_getHashedVin(self):
         log = LogFile()
-        log.loadFromFile("Random.csv")
+        log.loadFromFile("Random.test")
 
         self.assertTrue(log.getHashedVIN is not None)
 
     def test_getEnergyCons(self):
         log = LogFile()
-        log.loadFromFile("Random.csv")
+        log.loadFromFile("Random.test")
 
         self.assertTrue(log.getEnergyCons is not None)
 
