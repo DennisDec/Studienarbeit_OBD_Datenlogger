@@ -82,13 +82,13 @@ var calculateCar = async function(){
     $("#car").append(innerHTML)
     innerHTML = `${Math.round(range[bestCar])}km`
     $("#range").append(innerHTML)
-    innerHTML = `${cars[bestCar].consumption}kWh/100km`
+    innerHTML = `${cars[bestCar].consumption.toFixed(2)}kWh/100km`
     $("#eConsumption").append(innerHTML)
     innerHTML = `${Math.round(averageTripLength)}km`
     $("#averageTripLength").append(innerHTML)
     innerHTML = `${Math.round(longestTrip)}km`
     $("#longestTrip").append(innerHTML)
-    innerHTML = `${Math.ceil(longestTrip / range[bestCar])}`
+    innerHTML = `${Math.floor(longestTrip / range[bestCar])}`
     $("#chargeStops").append(innerHTML)
     innerHTML = `${vConsumption.toFixed(2)}kWh/100km`
     $("#vConsumption").append(innerHTML)

@@ -1,13 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var expressValidator = require('express-validator');
 var passport = require('passport');
 const bcrypt = require('bcrypt');
-var nodemailer = require('nodemailer');
 var fs = require('fs');
+var jwt = require('jsonwebtoken');
 
 var mailer = require('../mailer.js');
-var jwt = require('jsonwebtoken');
 
 const saltRounds = 10;
 
@@ -16,10 +14,10 @@ router.get('/', function(req, res) {
   res.render('home', { title: 'Home', home: true });
 });
 
+// Route to confirm the email
 router.get('/confirmation/:token', function(req, res) {
-  console.log(req.params.token);
   var id = jwt.verify(req.params.token, process.env.MAIL_SECRET);
-  console.log(id);
+  console.log("User to be confirmed: " + id);
   var db = require('../db.js');
   db.query('UPDATE users SET confirmed = 1 WHERE id = ?', [id.user], function(err, results, fields) {
     if(err) throw err;
@@ -27,15 +25,14 @@ router.get('/confirmation/:token', function(req, res) {
   res.redirect('/login');
 });
 
+// GET information about the cars of the given car type
 router.get('/getCars/:token', authenticationMiddleware(), function(req, res) {
   var db = require('../db.js');
-  console.log("Cartype: " + req.params.token)
+  console.log("Car type: " + req.params.token)
   db.query('SELECT consumption, capacity, power, name FROM cars WHERE type=?', [req.params.token], function(err, results, fields) {
     if(err) throw err;
     var data = [];
-    console.log(results.length)
     for(var i = 0; i < results.length; i++) {
-      console.log(results[i].consumption)
       data.push({
         consumption: results[i].consumption,
         capacity: results[i].capacity,
@@ -47,79 +44,32 @@ router.get('/getCars/:token', authenticationMiddleware(), function(req, res) {
   });
 });
 
+// GET the obd data of the given filename
 router.get('/getOBD/:token', authenticationMiddleware(), function(req, res) {
-  if(req.params.token != "undefined") {
-    var address = '../../datafiles/' + req.params.token;
-    var data = JSON.parse(fs.readFileSync(address, 'utf8'));
-    res.send(data);
-  } else {
-    var db = require('../db.js');
-    //TODO: Where id = 1 macht keinen sinn, hier entscheiden welche fahrt dargestellt werden soll!!!!
-    db.query('SELECT filename FROM data', function(err, results, fields) {
-      if(err) throw err;
-      console.log(results[0].filename)
-      var address = '../../datafiles/' + results[0].filename;
-      var data = JSON.parse(fs.readFileSync(address, 'utf8'));
-      //console.log(data);
-      res.send(data);
-      /*fs.readFile(address, JSON.stringify(results), function (err) {
-        if (err) throw err;
-        console.log('All data saved');
-        res.send(JSON.stringify(results))
-      });*/
-    });
-  }
+  var address = '../../datafiles/' + req.params.token;
+  var data = JSON.parse(fs.readFileSync(address, 'utf8'));
+  delete data['GPS_Long'];
+  delete data['GPS_Lat'];
+  delete data['GPS_Alt'];
+  res.send(data);
 });
 
+// GET the gps data of the given filename
 router.get('/getGPS/:token', authenticationMiddleware(), function(req, res) {
-  if(req.params.token != "undefined") {
-    var address = '../../datafiles/' + req.params.token;
-    var data = JSON.parse(fs.readFileSync(address, 'utf8'));
-    delete data['AMBIANT_AIR_TEMP'];
-    delete data['RPM'];
-    delete data['RELATIVE_ACCEL_POS'];
-    delete data['FUEL_LEVEL'];
-    delete data['MAF'];
-    delete data['COMMANDED_EQUIV_RATIO'];
-    delete data['SPEED'];
-    delete data['ENGINE_LOAD'];
-    res.send(data);
-  } else {
-    //TODO: dieser Teil wird nie benutzt
-    var db = require('../db.js');
-    //TODO: Where id = 1 macht keinen sinn, hier entscheiden welche fahrt dargestellt werden soll!!!!
-    db.query('SELECT filename FROM data', function(err, results, fields) {
-      if(err) throw err;
-      var address = '../../datafiles/' + results[0].filename;
-      var data = JSON.parse(fs.readFileSync(address));
-      delete data['AMBIANT_AIR_TEMP'];
-      delete data['RPM'];
-      delete data['RELATIVE_ACCEL_POS'];
-      delete data['FUEL_LEVEL'];
-      delete data['MAF'];
-      delete data['COMMANDED_EQUIV_RATIO'];
-      delete data['SPEED'];
-      delete data['ENGINE_LOAD'];
-      res.send(data);
-    });
-  }
+  var address = '../../datafiles/' + req.params.token;
+  var data = JSON.parse(fs.readFileSync(address, 'utf8'));
+  delete data['AMBIANT_AIR_TEMP'];
+  delete data['RPM'];
+  delete data['RELATIVE_ACCEL_POS'];
+  delete data['FUEL_LEVEL'];
+  delete data['MAF'];
+  delete data['COMMANDED_EQUIV_RATIO'];
+  delete data['SPEED'];
+  delete data['ENGINE_LOAD'];
+  res.send(data);
 });
-/*
-router.get('/getDatesOfTrips/:vin', authenticationMiddleware(), function(req, res) {
-  var vin = req.params.vin;
-  var db = require('../db.js');
-  db.query('SELECT date FROM data WHERE vin = ?', [vin], function(err, results, fields) {
-    if(err) throw err;
-    var data = [];
-    for(var i = 0; i < results.length; i++) {
-      data.push({
-        date: results[i].date
-      })
-    }
-    res.send(data);
-  });
-});*/
 
+// GET the gps data of the given vin
 router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
   var vin = req.params.vin;
   var db = require('../db.js');
@@ -127,19 +77,19 @@ router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
     if(err) throw err;
     var tmp = [];
     for(var i = 0; i < results.length; i++) {
+      // the vin is saved as a hash in the database, so it has to be compared with bcrypt
       if(bcrypt.compareSync(vin, results[i].vin)) {
-        console.log(bcrypt.compareSync(vin, results[i].vin))
         tmp.push({
           filename: results[i].filename,
           totalKM: results[i].totalKM,
-          energyConsumption: results[i].energyConsumption / 100 * results[i].totalKM
+          energyConsumption: results[i].energyConsumption
         })
       }
     }
     var data = [];
     var averageTripLength = 0;
     var longestTrip = 0;
-    var averageConsumption = 0;
+    var vConsumption = 0;
     for(var i = 0; i < tmp.length; i++) {
       console.log("File: " + tmp[i].filename)
       var address = '../../datafiles/' + tmp[i].filename;
@@ -152,23 +102,25 @@ router.get('/getAllGPS/:vin', authenticationMiddleware(), function(req, res) {
       delete data[i]['COMMANDED_EQUIV_RATIO'];
       delete data[i]['SPEED'];
       delete data[i]['ENGINE_LOAD'];
-      console.log("tmp[i].totalKM: " + tmp[i].totalKM)
+      // Calculate the average trip length and the total energy consumption
       averageTripLength += tmp[i].totalKM / tmp.length;
       if(longestTrip <= tmp[i].totalKM) {
         longestTrip = tmp[i].totalKM;
       }
-      averageConsumption += tmp[i].energyConsumption;
+      vConsumption += tmp[i].energyConsumption;
     }
     console.log("averageTripLength: " + averageTripLength)
+    // Add general information to the end of the data object 
     data.push({
       averageTripLength: averageTripLength,
       longestTrip: longestTrip,
-      vConsumption: averageConsumption / tmp.length
+      vConsumption: vConsumption / (tmp.length * averageTripLength) * 100
     })
     res.send(data);
   });
 });
 
+// GET the waiting points for the given vin
 router.get('/getWaitingTime/:vin', authenticationMiddleware(), function(req, res) {
   var vin = req.params.vin;
   var db = require('../db.js');
@@ -177,7 +129,6 @@ router.get('/getWaitingTime/:vin', authenticationMiddleware(), function(req, res
     var tmp = [];
     for(var i = 0; i < results.length; i++) {
       if(bcrypt.compareSync(vin, results[i].vin)) {
-        console.log(bcrypt.compareSync(vin, results[i].vin))
         tmp.push({
           date: results[i].date,
           starttime: results[i].starttime,
@@ -189,6 +140,7 @@ router.get('/getWaitingTime/:vin', authenticationMiddleware(), function(req, res
       }
     }
     var data = [];
+    // Calculate the waiting time by creating the dates with end and starttime and subtract them 
     for(var i = 0; i < (tmp.length - 1); i++) {
       var tmp1 = (tmp[i].endtime).split(":");
       var date1 = (tmp[i].endDate).split("-");
@@ -196,12 +148,10 @@ router.get('/getWaitingTime/:vin', authenticationMiddleware(), function(req, res
       var date2 = (tmp[i+1].date).split("-");
       time1 = new Date(date1[2], date1[0], date1[1], tmp1[0], tmp1[1], tmp1[2]);
       time2 = new Date(date2[2], date2[0], date2[1], tmp2[0], tmp2[1], tmp2[2]);
-      console.log(tmp[i].endtime)
-      console.log(tmp[i+1].starttime)
-      dateGesamt = time2 - time1;
-      console.log((dateGesamt))
+      // Subtraction of two dates delivers the difference in seconds
+      dateTotal = time2 - time1;
       data.push({
-        waitingTime: dateGesamt, 
+        waitingTime: dateTotal, 
         gpsLat: tmp[i].endLat,
         gpsLong: tmp[i].endLong
       });
@@ -212,109 +162,42 @@ router.get('/getWaitingTime/:vin', authenticationMiddleware(), function(req, res
 
 // GET dashboard page; only accessable for authenticated users
 router.get('/dashboard', authenticationMiddleware(), function(req, res, next) {
-  // get GPS-data from the MySQL-server and save it into a json-file 
-  /*var db = require('../db.js');
-  db.query('SELECT * FROM gpsdata', function(err, results, fields) {
-    if(err) throw err;
-    fs.writeFile('src/maps/markers.json', JSON.stringify(results), function (err) {
-      if (err) throw err;
-      console.log('GPS-data saved');
-    });
-  });
-  db.query('SELECT * FROM importobd', function(err, results, fields) {
-    if(err) throw err;
-    fs.writeFile('src/obd/data.json', JSON.stringify(results), function (err) {
-      if (err) throw err;
-      console.log('OBD-data saved');
-    });
-  });*//*
-  var db = require('../db.js');
-  db.query('SELECT filename FROM data', function(err, results, fields) {
-    if(err) throw err;
-    filenames = [];
-    data = [];
-    console.log(results[0].filename)
-    for(var i = 0; i < results.length; i++) {
-      //filenames[i] = results[i].filename;
-      data.push({
-        filenames: results[i].filename,
-        count: (i + 1)
-      })
-    }
-    res.render('dashboard', { title: 'Dashboard', dashboard: true,  data: data});
-  });*/
   res.render('dashboard', { title: 'Dashboard', dashboard: true});
 });
 
+// GET all trips of the given vin and date
 router.get('/getTrips/:date/:vin', authenticationMiddleware(), function(req, res) {
   var date = req.params.date;
   var vin = req.params.vin;
   if(req.params.date === "undefined") {
     var today = new Date();
     var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
+    var mm = today.getMonth() + 1; // January is 0!
     var yyyy = today.getFullYear();
-    if(dd<10) {
-        dd = '0'+dd
+    if(dd < 10) {
+        dd = '0'+ dd
     }
-    if(mm<10) {
-        mm = '0'+mm
+    if(mm < 10) {
+        mm = '0'+ mm
     }
     date = mm + '-' + dd + '-' + yyyy;
   } 
-  console.log(date)
   var db = require('../db.js');
   db.query('SELECT filename, starttime, totalKM, vin FROM data WHERE date=?', [date], function(err, results, fields) {
     if(err) throw err;
-    var tmp = [];
+    var data = [];
     for(var i = 0; i < results.length; i++) {
       if(bcrypt.compareSync(vin, results[i].vin)) {
-        console.log(bcrypt.compareSync(vin, results[i].vin))
-        tmp.push({
+        data.push({
           filename: results[i].filename,
           starttime: results[i].starttime,
           totalKM: results[i].totalKM
         })
       }
     }
-    var data = [];
-    for(var i = 0; i < tmp.length; i++) {
-      data.push({
-        filename: tmp[i].filename, 
-        starttime: tmp[i].starttime,
-        totalKM: tmp[i].totalKM
-      });
-    }
     res.send(data);
   });
 });
-
-/*router.get('/dashboard:token', authenticationMiddleware(), function(req, res, next) {
-  console.log("Date: " + req.params.token)
-  var db = require('../db.js');
-  db.query('SELECT filename FROM data WHERE date=?', [req.params.token], function(err, results, fields) {
-    if(err) throw err;
-    filenames = [];
-    for(var i = 0; i < results.length; i++) {
-      filenames[i] = results[i].filename;
-      console.log(filenames[i])
-    }
-    res.render('dashboard', { title: 'Dashboard', dashboard: true,  filenames: filenames});
-  });
-})
-router.post('/dashboard', authenticationMiddleware(), function(req, res, next) {
-  console.log("Date: " + req.body.date)
-  var db = require('../db.js');
-  db.query('SELECT filename FROM data WHERE date=?', [req.body.date], function(err, results, fields) {
-    if(err) throw err;
-    filenames = [];
-    for(var i = 0; i < results.length; i++) {
-      filenames[i] = results[i].filename;
-      console.log(filenames[i])
-    }
-    res.render('dashboard', { title: 'Dashboard', dashboard: true,  data: [{filenames: filenames}]});
-  });
-});*/
 
 // GET login page
 router.get('/login', function(req, res, next) {
@@ -323,15 +206,15 @@ router.get('/login', function(req, res, next) {
   }
   res.render('login', { title: 'Login', login: true });
 });
-// handle POST of login page; use passport to authenticate the user
-/*router.post('/login', passport.authenticate('local', {
-  successRedirect: '/dashboard',
-  failureRedirect: '/loginFail'
-}));*/
+
+// Handle POST of login page
+// Use passport.authenticate with custom callbacks to authenticate the user
+// See the official passport documentation: http://www.passportjs.org/docs/authenticate/ 
 router.post('/login', function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
     if (err) { return next(err);}
     if (!user) { 
+      // See the possible messages in ../app.js
       console.log(info.message);
       req.data = info.message;
       req.id = info.user_id;
@@ -350,29 +233,20 @@ router.post('/login', function(req, res, next) {
   if (req.data === 'Confirm your email!') {
     mailer(req.id, req.email, "confirmation");
   }
-  console.log(`errors: ${JSON.stringify(error)}`);
+  console.log(`Login errors: ${JSON.stringify(error)}`);
   res.render('login', { 
     title: 'Login failed',
     errors: error,
     login: true
   });
 });
-// after unsuccessful login head to route /loginFail and show error message
-/*router.get('/loginFail', function(req, res, next) {
-  var error = [{
-    msg: 'Incorrect username or password.'
-  }]
-  console.log(`errors: ${JSON.stringify(error)}`);
-  res.render('login', { 
-    title: 'Login failed',
-    errors: error,
-    login: true
-  });
-});*/
+
+// GET page to request a password reset
 router.get('/resetpw', function(req, res, next) {
   res.render('resetpw', { title: 'Reset your password' });
 });
 
+// Handle POST of reset password request page
 router.post('/resetpw', function(req, res, next) {
   var db = require('../db.js');
   db.query('SELECT id, email FROM users WHERE username = ?', [req.body.username], function(error, results, fields) {    // use ? so that you can't hack the server with unwanted inputs
@@ -402,6 +276,7 @@ router.post('/resetpw', function(req, res, next) {
   });
 });
 
+// GET page to reset the password
 router.get('/resetpw:token', function(req, res, next) {
   res.render('resetpw_confirmed', { 
     title: 'Reset your password',
@@ -409,6 +284,7 @@ router.get('/resetpw:token', function(req, res, next) {
   });
 });
 
+// Handle POST of reset password page
 router.post('/resetpw_confirmed:token', function(req, res, next) {
   req.checkBody('password', 'Password must be between 8-100 characters long.').len(8, 100);
   req.checkBody("password", "Password must include one lowercase character, one uppercase character, a number, and a special character.").matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.* )(?=.*[^a-zA-Z0-9]).{8,}$/, "i");
@@ -434,7 +310,6 @@ router.post('/resetpw_confirmed:token', function(req, res, next) {
     bcrypt.hash(password, saltRounds, function(err, hash) {
       db.query('UPDATE users SET confirmed = 1, password = ? WHERE id = ?', [hash, id.user], function(error, results, fields) {    // use ? so that you can't hack the server with unwanted inputs
         if(error) {
-
           console.log(`errors: ${JSON.stringify(error)}`);
           res.render(`resetpw${req.params.token}`, { 
             title: 'Resetting failed',
