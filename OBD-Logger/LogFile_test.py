@@ -12,7 +12,6 @@ import numpy as np
 
 from Signals import signals
 
-filename = 'Unittest.csv'
 
 class TestLogFile(unittest.TestCase):
 
@@ -74,10 +73,6 @@ class TestLogFile(unittest.TestCase):
         log.createLogfile("testFile.test")
         self.assertEqual(log.status(), LogStatus.LOG_CREATED)
 
-    def test_StatusLogFileLoaded(self):
-        log = LogFile()
-        log.loadFromFile(filename)
-        self.assertEqual(log.status(), LogStatus.LOG_FILE_LOADED)
 
     def test_getFilenames(self):
         LogFile.getFilenames()
@@ -284,6 +279,10 @@ class TestLogFile(unittest.TestCase):
         broken = log.isBrokenFile()
         self.assertFalse(broken)
         
+    def test_StatusLogFileLoaded(self):
+        log = LogFile()
+        log.loadFromFile("Random.test")
+        self.assertEqual(log.status(), LogStatus.LOG_FILE_LOADED)
 
     def test_isBrokenFile_NoGPS(self):
         log = LogFile()
