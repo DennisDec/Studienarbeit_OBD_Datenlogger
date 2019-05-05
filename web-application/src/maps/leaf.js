@@ -40,13 +40,12 @@ var printAllMarkers = async function() {
 
     var allMarkers = []
 
-    console.log(markers)
-
     //averageLength needed for calCar.js
     averageTripLength = markers[markers.length-1].averageTripLength;
     longestTrip = markers[markers.length-1].longestTrip;
     vConsumption = markers[markers.length-1].vConsumption;
     numberOfTrips = 0;
+
     for(var i = 0; i < (markers.length-1); i++) {
         //console.log(markers[i].GPS_Long.length)
         for (let g = 0; g < markers[i].GPS_Long.length; g++) {
@@ -150,8 +149,8 @@ var printWaitingTime = async function() {
     //console.log(markers)
     //console.log(markers[0].gpsLong)
     for(var i = 0; i < markers.length; i++) {
-        console.log(markers[i].gpsLong)
-        console.log(parseTime(markers[i].waitingTime))
+        //console.log(markers[i].gpsLong)
+        //console.log(parseTime(markers[i].waitingTime))
         if(markers[i].waitingTime < 1800000) {
             customIcon = redIcon;
         } else if (markers[i].waitingTime < 2 * 1800000 && markers[i].waitingTime > 1800000) {
@@ -198,8 +197,6 @@ var printMarkers = async function(filename, nof) {
     }).addTo(map);
 
     if(nof === 0) {} else {
-        console.log(nof)
-
         var allMarkers = [];
         for(var g = 0; g < nof; g++) {
             /*let response = await fetch("maps/markers.json");

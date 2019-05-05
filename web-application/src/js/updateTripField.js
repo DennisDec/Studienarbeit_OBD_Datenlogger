@@ -1,5 +1,4 @@
 var displayData = function() {
-    
     $("#headerVinEingabe").css("display", "")
     $("#sidebar").css("display", "")
     $("#firstPart").css("display", "")
@@ -10,23 +9,23 @@ var displayData = function() {
     $("#VIN").val(vin);
     document.getElementById('VINButton').click()
 }
+
 var update = async function() {
     var vin = document.getElementById('VIN').value;
     console.log(vin)
     vin = (vin === "") ? "none" : vin; 
     var dateArray = (document.getElementById('datepicker').value).split(".")
     var date = (dateArray[1] + '-' + dateArray[0]+ '-' + dateArray[2])
-    //var date = (document.getElementById('datepicker').value).replace(/\//g,  '-')
     if(document.getElementById('datepicker').value === "") {
         var today = new Date();
         var dd = today.getDate();
-        var mm = today.getMonth()+1; //January is 0!
+        var mm = today.getMonth() + 1; //January is 0!
         var yyyy = today.getFullYear();
-        if(dd<10) {
-            dd = '0'+dd
+        if(dd < 10) {
+            dd = '0' + dd
         }
-        if(mm<10) {
-            mm = '0'+mm
+        if(mm < 10) {
+            mm = '0' + mm
         }
         date = mm + '-' + dd + '-' + yyyy;
     }
@@ -93,36 +92,3 @@ var update = async function() {
 }
 
 update()
-
-/*
-function post(path, params, method) {
-    method = method || "post";
- 
-    const form = document.createElement("form");
-    form.setAttribute("method", method);
-    form.setAttribute("action", path);
- 
- 
-    for (const key in params) {
-        if (params.hasOwnProperty(key)) {
-            const hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
- 
-            form.appendChild(hiddenField);
-        }
-    }
- 
-    document.body.appendChild(form);
-    form.submit();
-}*/
-/*let response = await fetch("/dashboard", {
-        method: "POST",
-        credentials: 'same-origin',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    });*/
-    //post("/dashboard", {"date": document.getElementById('datepicker').value})

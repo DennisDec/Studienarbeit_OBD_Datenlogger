@@ -1,13 +1,10 @@
 var getData = async function(filename, name) {
-    /*let response = await fetch("obd/data.json");
-    let allData = await response.json();*/
     // sends a request with credentials included
     let response = await fetch("/getOBD/" + filename, {
         credentials: 'same-origin'
     });
     let allData = await response.json();
-    //console.log(response)
-    //console.log("Test: " + allData.SPEED)
+
     var time = allData.TIME;
     var speed = allData.SPEED;
     var rpm = allData.RPM;/*
@@ -18,23 +15,9 @@ var getData = async function(filename, name) {
     var afr = [];
     var fuel_level = [];*/
     var data = [time, speed, rpm/*, engine_load, maf, temperature, pedal, afr, fuel_level*/];
-    /*var tmp = allData.TIME[0];
-    console.log(tmp)
-    var startTime = parseInt(tmp.slice(11, 13))*60*60+parseInt(tmp.slice(14, 16))*60+parseFloat(tmp.slice(17));
-    var index = 0;
-    for ( var i=0; i < allData.TIME.length; ++i ) 
-    {
-        tmp = allData.TIME[i];
-        //console.log(tmp)
-        var res = parseInt(tmp.slice(11, 13))*60*60+parseInt(tmp.slice(14, 16))*60+parseFloat(tmp.slice(17));
-        //data[0][i] = (Math.floor(res/3600)).toString()+":"+(Math.floor((res/60)%60)).toString()+":"+(Math.floor(res%60)).toString()+"."+((res%1).toString()).slice(2,5);
-        if(i > 0 && (res - startTime) < data[0][i-1]) {
-            index = i-1;
-            break;
-        }
-        data[0][i] = res - startTime;
-    }*/
 
+    // Sources: https://plot.ly/javascript/configuration-options
+    //          https://community.plot.ly/t/remove-options-from-the-hover-toolbar/130/11 
     var speedTrace = {
         type: "scatter",
         mode: "lines",
@@ -90,5 +73,3 @@ var getData = async function(filename, name) {
     }
     Plotly.newPlot(name, data, layout, config);
 }
-
-//getData("undefined");
