@@ -86,15 +86,7 @@ class TestLogFile(unittest.TestCase):
         log2.loadFromFile("empty.test")
         self.assertTrue(log2.isBrokenFile())
 
-    def test_without_GPSFile(self):
-        log = LogFile()
-        log.loadFromFile("Without_GPS_File.test")
-        time = log.getStartTime()
-        end = log.getEndTime()
-        fuel = log.getFuelConsumption()
-        self.assertTrue(fuel is not None)
-        self.assertEqual(time, "01-01-2000;00:00:00")
-        self.assertEqual(end, "01-01-2000;00:00:00")
+
         
 
     def test_createRandomDataFileNoGPS(self):
@@ -107,7 +99,7 @@ class TestLogFile(unittest.TestCase):
         maf = np.random.randint(100, size=100).tolist()
         temp = np.random.randint(30, size=100).tolist()
         pedal = np.random.randint(100, size=100).tolist()
-        afr = np.random.randint(1, size=100).tolist()
+        afr = [1]*100
         fuel_lvl = np.random.randint(100, size=100).tolist()
         gps_long = [None] * 100
         gps_lat = [None] * 100
@@ -153,6 +145,15 @@ class TestLogFile(unittest.TestCase):
         self.assertEqual(vin_csv, vin)
         self.assertEqual(log2._VIN, "MF0DXXGAKDJP09111")
 
+    def test_without_GPSFile(self):
+        log = LogFile()
+        log.loadFromFile("Random_NoGPS.test")
+        time = log.getStartTime()
+        end = log.getEndTime()
+        fuel = log.getFuelConsumption()
+        self.assertTrue(fuel is not None)
+        self.assertEqual(time, "01-01-2000;00:00:00")
+        self.assertEqual(end, "01-01-2000;00:00:00")
 
     def test_createRandomDataFile(self):
         log = LogFile()
