@@ -391,7 +391,7 @@ class LogFile:
         str = "2000-01-01T00:00:00.000Z000.00" #default Time
         strlist = [x for x in self._data["GPS_Time"] if x is not None]
         if(len(strlist) >= 1):
-            str = strlist[0]
+            str = strlist[-1]
         #2000-01-01T00:00:00.000Z000.00
 
         dateArray  = str.split("T")[0].split("-")
@@ -419,7 +419,7 @@ class LogFile:
         str = "2000-01-01T00:00:00.000Z000.00" #default Time
         strlist = [x for x in self._data["GPS_Time"] if x is not None]
         if(len(strlist) >= 1):
-            str = strlist[0]
+            str = strlist[-1]
 
         dateArray  = str.split("T")[0].split("-")
         print(dateArray)
