@@ -20,3 +20,8 @@ OBD-Logger/Files/TestFile.csv
 OBD-Logger/env.py
 *test.json
 *.csv
+OBD-Logger/Files/Random.test
+OBD-Logger/Files/Random_NoGPS.test
+OBD-Logger/Files/Zeros.test
+OBD-Logger/Files/empty.test
+OBD-Logger/Files/testFile.test

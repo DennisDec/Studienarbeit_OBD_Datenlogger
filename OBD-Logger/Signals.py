@@ -2,7 +2,7 @@ from OBDSignal import OBDSignal
 
 
 __signals__ = [
-    #         SignalName                  db-name                       isOBDSignal  sampleRate     round
+    #         SignalName                  description                     isOBDSignal  sampleRate     round
     OBDSignal("TIME"                    , "time"                           ,False      , 1         , 2),
 
     #OBD SIGNALS:

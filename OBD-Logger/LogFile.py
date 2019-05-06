@@ -336,6 +336,8 @@ class LogFile:
         maf = self._data["MAF"]
         cer = self._data["COMMANDED_EQUIV_RATIO"]
 
+        #density fuel : 748
+        #Air Fuel ratio : 14.7
         fuelCon_normal = []
         for i in range(len(speed)):
             if((cer[i]) == 0):
@@ -366,8 +368,8 @@ class LogFile:
         maf = self._data[signals.MAF.name] #Mass Air Flow
         cer = self._data[signals.COMMANDED_EQUIV_RATIO.name] 
 
-        eff = 0.495 #efficiency engine
-        cal = 0.01135  #calorific value gasoline
+        eff = 0.35 #efficiency engine
+        cal = 0.01125  #calorific value gasoline
         airFuel = 14.7 #Air Fuel ratio  
 
         for i in range(1, len(time)):
@@ -381,7 +383,7 @@ class LogFile:
             else:
                 energy.append(eff *cal *dT * maf[i] / (airFuel * cer[i]))
         
-        return sum(energy)
+        return (sum(energy)/0.85) #Division: efficiency of electric engine
 
     def getStartTime(self):
 
