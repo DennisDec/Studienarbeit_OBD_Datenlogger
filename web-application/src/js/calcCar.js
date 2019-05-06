@@ -78,21 +78,31 @@ var calculateCar = async function(){
     $("#chargeStops").empty()
     $("#vConsumption").empty()
     $("#table").css("display", "")
-    var innerHTML = `${cars[bestCar].name}`
-    $("#car").append(innerHTML)
-    innerHTML = `${Math.round(range[bestCar])}km`
-    $("#range").append(innerHTML)
-    innerHTML = `${cars[bestCar].consumption.toFixed(2)}kWh/100km`
-    $("#eConsumption").append(innerHTML)
-    innerHTML = `${Math.round(averageTripLength)}km`
-    $("#averageTripLength").append(innerHTML)
-    innerHTML = `${Math.round(longestTrip)}km`
-    $("#longestTrip").append(innerHTML)
-    innerHTML = `${Math.floor(longestTrip / range[bestCar])}`
-    $("#chargeStops").append(innerHTML)
-    innerHTML = `${vConsumption.toFixed(2)}kWh/100km`
-    $("#vConsumption").append(innerHTML)
-    
+    if(averageTripLength != 0) {
+        var innerHTML = `${cars[bestCar].name}`
+        $("#car").append(innerHTML)
+        innerHTML = `${Math.round(range[bestCar])}km`
+        $("#range").append(innerHTML)
+        innerHTML = `${cars[bestCar].consumption.toFixed(2)}kWh/100km`
+        $("#eConsumption").append(innerHTML)
+        innerHTML = `${Math.round(averageTripLength)}km`
+        $("#averageTripLength").append(innerHTML)
+        innerHTML = `${Math.round(longestTrip)}km`
+        $("#longestTrip").append(innerHTML)
+        innerHTML = `${Math.floor(longestTrip / range[bestCar])}`
+        $("#chargeStops").append(innerHTML)
+        innerHTML = `${vConsumption.toFixed(2)}kWh/100km`
+        $("#vConsumption").append(innerHTML)
+    } else {
+        var innerHTML = `noch keine Fahrt`
+        $("#car").append(innerHTML)
+        $("#range").append(innerHTML)
+        $("#eConsumption").append(innerHTML)
+        $("#averageTripLength").append(innerHTML)
+        $("#longestTrip").append(innerHTML)
+        $("#chargeStops").append(innerHTML)
+        $("#vConsumption").append(innerHTML)
+    }
     $(function(){
         $('[data-toggle="tooltip"]').tooltip();
     })
