@@ -1,0 +1,15 @@
+Ublox NEO-6M GPS-Modul
+
+Anleitung zum Auslesen der GPS Daten:
+https://learn.adafruit.com/adafruit-ultimate-gps-on-the-raspberry-pi/introduction
+
+Gekauft bei Amazon:
+https://www.amazon.de/GoolRC-Pr%C3%A4zision-Flugsteuerung-Acromodelle-Quadcopter/dp/B00XL9RE06/ref=sr_1_2?s=toys&ie=UTF8&qid=1540053452&sr=1-2&keywords=Ublox+NEO+6M
+
+
+Pinbelegung:
+GPS   Modul	  Raspberry Pi
+VCC	  3.3V    (Pin 1 oder 17)
+RX	  TXD0    (Pin 8)
+TX	  RXD0    (Pin 10)
+GND	  Ground  (Pin 6, 9 oder 14)
